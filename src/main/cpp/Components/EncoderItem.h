@@ -1,0 +1,39 @@
+/****************************** Header ******************************\
+Class Name: EncoderItem inherits InputComponent
+File Name:	EncoderItem.h
+Summary: Abstraction for the WPIlib Encoder that extends to include
+some helper and control methods.
+Project:     BroncBotzFRC2019
+Copyright (c) BroncBotz.
+All rights reserved.
+
+Author(s): Dylan Watson
+Email: dylan.watson@broncbotz.org
+\********************************************************************/
+
+#ifndef SRC_COMPONENTS_ENCODERITEM_H_
+#define SRC_COMPONENTS_ENCODERITEM_H_
+
+#include "Components/InputComponent.h"
+#include <string>
+#include "WPILib.h"
+
+namespace Components{
+class EncoderItem : public InputComponent{
+private:
+	int aChannel;
+	int bChannel;
+	bool reversed;
+	Encoder *encoder;
+
+public:
+	virtual double Get() override;
+	EncoderItem();
+	EncoderItem(string _name, int _aChannel, int _bChannel, bool _reversed);
+	virtual string GetName() override;
+	void Reset();
+	virtual ~EncoderItem();
+};
+}
+
+#endif /* SRC_COMPONENTS_ENCODERITEM_H_ */

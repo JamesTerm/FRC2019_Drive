@@ -1,0 +1,30 @@
+/****************************** Header ******************************\
+Class Name: -
+File Name: LoopChecks.h
+Summary: Utility file to check for loop security.
+Project: FRC2019CPP
+Copyright (c) BroncBotz.
+All rights reserved.
+
+Author(s): Ryan Cooper
+Email: cooper.ryan@centaurisoft.org
+\********************************************************************/
+
+#ifndef SRC_INCLUDE_LOOPCHECKS_H_
+#define SRC_INCLUDE_LOOPCHECKS_H_
+
+#include <WPILib.h>
+
+inline static bool _IsAutononomous()
+{
+	return DriverStation::GetInstance().IsAutonomous() && DriverStation::GetInstance().IsEnabled();
+}
+
+inline static bool _IsTeleoporated()
+{
+	return DriverStation::GetInstance().IsOperatorControl() && DriverStation::GetInstance().IsEnabled();
+}
+
+namespace Util{}
+
+#endif /* SRC_INCLUDE_LOOPCHECKS_H_ */
