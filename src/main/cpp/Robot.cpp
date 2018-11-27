@@ -16,7 +16,7 @@ Email: cooper.ryan@centaurisoft.org, dylan.watson@broncbotz.org
 #include <thread>
 #include <iostream>
 #include <string>
-
+//TODO: what are these .h files
 #include "Autonomi/Autons.h"
 #include "Config/ActiveCollection.h"
 #include "Config/Config.h"
@@ -53,8 +53,10 @@ public:
 	 * This runs right after Robot() when the code is started
 	 * Creates Config
 	 */
+	//TODO: What is override
 	void RobotInit() override
 	{
+		//TODO: where does activeCollection come from and what does it do same for config
 		activeCollection = new ActiveCollection();
 		Config *config = new Config(activeCollection); //!< Pointer to the configuration file of the robot
 		cout << "Program Version: " << VERSION << " Revision: " << REVISION << endl;
@@ -66,12 +68,15 @@ public:
 	 */
 	void Autonomous() override
 	{
+		//TODO: What does SmartDashboard::GetString do also why do you make it tell you what autoSelected is
 		string autoSelected = SmartDashboard::GetString("Auto Selector", drivestraight);
 		cout << autoSelected << endl;
 
 //		DRIVE STRAIGHT
+//TODO: Is all this for the autonomous if so is this whart we type into the little box on the drive station
 		if (autoSelected == drivestraight)
 		{
+			//TODO: What is this asterisk before driveStraight for
 			DriveStraight *driveStraight = new DriveStraight(activeCollection);
 			driveStraight->Start();
 		}
@@ -192,6 +197,7 @@ public:
     /**
     * Called when teleop starts
     **/
+   // TODO: What is InitializeDrive
 	void OperatorControl() override
 	{
 		cout << "OPERATOR REACHED" << endl;
