@@ -73,7 +73,7 @@ public:
 		cout << autoSelected << endl;
 
 //		DRIVE STRAIGHT
-//TODO: Is all this for the autonomous if so is this whart we type into the little box on the drive station
+//TODO: Is all this for the autonomous if so is this what we type into the little box on the drive station
 		if (autoSelected == drivestraight)
 		{
 			//TODO: What is this asterisk before driveStraight for
@@ -197,7 +197,7 @@ public:
     /**
     * Called when teleop starts
     **/
-   // TODO: What is InitializeDrive
+   // TODO: What is InitializeDrive()
 	void OperatorControl() override
 	{
 		cout << "OPERATOR REACHED" << endl;
