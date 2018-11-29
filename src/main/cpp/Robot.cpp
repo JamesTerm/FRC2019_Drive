@@ -11,6 +11,7 @@ Author(s): Ryan Cooper, Dylan Watson
 Email: cooper.ryan@centaurisoft.org, dylan.watson@broncbotz.org
 \********************************************************************/
 //TODO: what the h*ck is a #include mate
+//TODO: suck gabes butt
 #include <WPILib.h>
 #include <fstream>
 #include <thread>
