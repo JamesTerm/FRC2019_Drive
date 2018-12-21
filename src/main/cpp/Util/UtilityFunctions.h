@@ -7,7 +7,7 @@ Copyright (c) BroncBotz.
 All rights reserved.
 
 Author(s): Ryan Cooper, Dylann Ruiz
-Email: cooper.ryan@centaurisoft.org, ruizdylann@gmail.com
+Email: cooper.ryan@centaurisoftware.co, ruizdylann@gmail.com
 \********************************************************************/
 
 #ifndef SRC_UTIL_UTILITYFUNCTIONS_H_

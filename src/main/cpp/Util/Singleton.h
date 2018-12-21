@@ -8,7 +8,7 @@ Copyright (c) BroncBotz.
 All rights reserved.
 
 Author(s):	Ryan Cooper
-Email:	cooper.ryan@centaurisoft.org
+Email:	cooper.ryan@centaurisoftware.co
 \*********************************************************************/
 
 #ifndef INCLUDE_SINGLETON_H_

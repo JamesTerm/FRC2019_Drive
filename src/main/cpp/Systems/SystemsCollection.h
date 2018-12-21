@@ -9,7 +9,7 @@ Copyright (c) BroncBotz.
 All rights reserved.
 
 Author(s):	Ryan Cooper
-Email:	cooper.ryan@centaurisoft.org
+Email:	cooper.ryan@centaurisoftware.co
 \*********************************************************************/
 #ifndef SYSTEMS_SYSTEMSCOLLECTION_H_
 #define SYSTEMS_SYSTEMSCOLLECTION_H_

@@ -7,7 +7,7 @@ Copyright (c) BroncBotz.
 All rights reserved.
 
 Author(s): Ryan Cooper
-Email: cooper.ryan@centaurisoft.org
+Email: cooper.ryan@centaurisoftware.co
 \********************************************************************/
 
 #ifndef SRC_INCLUDE_LOOPCHECKS_H_

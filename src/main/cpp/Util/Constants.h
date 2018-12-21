@@ -7,7 +7,7 @@ Copyright (c) BroncBotz.
 All rights reserved.
 
 Author(s): Ryan Cooper, Dylan Watsonr
-Email: cooper.ryan@centaurisoft.org, dylan.watson@broncbotz.org
+Email: cooper.ryan@centaurisoftware.co, dylan.watson@broncbotz.org
 \********************************************************************/
 
 #ifndef SRC_UTIL_CONSTANTS_H_
@@ -18,6 +18,8 @@ Email: cooper.ryan@centaurisoft.org, dylan.watson@broncbotz.org
 
 using namespace std;
 
+//TODO: why is this a singleton??? Why did we do this...
+//Can probably make this a static class with static constants
 namespace Util{
 class Constants : public Singleton<Constants>{
 	friend class Singleton<Constants>;
