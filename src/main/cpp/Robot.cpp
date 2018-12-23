@@ -8,7 +8,7 @@ Copyright (c) BroncBotz.
 All rights reserved.
 
 Author(s): Ryan Cooper, Dylan Watson
-Email: cooper.ryan@centaurisoftware.co, dylan.watson@broncbotz.org
+Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 \********************************************************************/
 
 #include <WPILib.h>
@@ -71,122 +71,14 @@ public:
 		
 		string autoSelected = SmartDashboard::GetString("Auto Selector", drivestraight);
 		cout << autoSelected << endl;
-//		DRIVE STRAIGHT
 
-		if (autoSelected == drivestraight)
+		if (autoSelected == drivestraight) //!< Drive Straight Autonomous
 		{
 			DriveStraight *driveStraight = new DriveStraight(activeCollection);
 			driveStraight->Start();
 		}
 
-
-//		TIMERS
-		else if (autoSelected == tSwCenter)
-		{
-			TimerSwitchCenter *test = new TimerSwitchCenter(activeCollection);
-			test->Start();
-		}
-
-
-//		SWITCH
-		else if (autoSelected == swLeft)
-		{
-			SwitchLeft *switchLeft = new SwitchLeft(activeCollection);
-			switchLeft->Start();
-		}
-		else if (autoSelected == swRight)
-		{
-			SwitchRight *switchRight = new SwitchRight(activeCollection);
-			switchRight->Start();
-		}
-		/*else if (autoSelected == swCenter)
-		{
-			SwitchCenter* test = new SwitchCenter(activeCollection);
-			test->Start();
-		}*/
-
-
-//		SCALE
-		else if (autoSelected == scLeft)
-		{
-			ScaleLeft *test  = new ScaleLeft(activeCollection);
-			test->Start();
-		}
-		else if(autoSelected == scRight)
-		{
-			ScaleRight *test = new ScaleRight(activeCollection);
-			test->Start();
-		}
-
-
-//		NO CROSS
-/*		else if (autoSelected == swScNCLeft)
-		{
-			SwitchScaleNoCrossLeft *test = new SwitchScaleNoCrossLeft(activeCollection);
-			test->Start();
-		}
-		else if (autoSelected == swScNCRight)
-		{
-			SwitchScaleNoCrossRight* test = new SwitchScaleNoCrossRight(activeCollection);
-			test->Start();
-		}
-
-//		ELIMS EL PASO
-		else if (autoSelected == elimsSwL)
-		{
-			ElimsSwitchLeft * test = new ElimsSwitchLeft(activeCollection);
-			test->Start();
-		}
-		else if (autoSelected == elimsSwR)
-		{
-			ElimsSwitchRight * test = new ElimsSwitchRight(activeCollection);
-			test->Start();
-		}*/
-
-//		TESTING
-
-		else if (autoSelected == dylann)
-		{
-			Dylann *dylann = new Dylann(activeCollection);
-			dylann->Start();
-		}
-		else if (autoSelected == testNavX)
-		{
-			TestNavX *test  = new TestNavX(activeCollection);
-			test->Start();
-		}
-		else if (autoSelected == testEncoders)
-		{
-			TestEncoders *test  = new TestEncoders(activeCollection);
-			test->Start();
-		}
-		else if (autoSelected == pid)
-		{
-			RealNibbaShit *test = new RealNibbaShit(activeCollection);
-			test->Start();
-		}
-
-
-//		CHAMPS
-		else if (autoSelected == twocube)
-		{
-			ChampsTwoCube *test = new ChampsTwoCube(activeCollection);
-			test->Start();
-		}/*
-		else if (autoSelected == cLeft)
-		{
-			ChampsLeft *test = new ChampsLeft(activeCollection);
-			test->Start();
-		}
-		else if (autoSelected == cRight)
-		{
-			ChampsRight *test = new ChampsRight(activeCollection);
-			test->Start();
-		}
-*/
-
-//		DEFAULT
-		else
+		else //!< Default Autonomous
 		{
 			DriveStraight *driveStraight = new DriveStraight(activeCollection);
 			driveStraight->Start();
@@ -196,44 +88,25 @@ public:
     /**
     * Called when teleop starts
     **/
-   
 	void OperatorControl() override
 	{
 		cout << "OPERATOR REACHED" << endl;
 		InitializeDrive();
 	}
 
+	/**
+	 * Called when the Test period starts
+	**/
 	void Test() override {}
 
 private:
-	/** AUTON NAME DEFINITIONS **/
+	/** 
+	 * Autonomous name definitions 
+	**/
+
 	//TODO: Make this into it's own file
 
 	const string drivestraight = "drive";
-
-	const string tSwCenter = "SwitchCenter";
-
-	const string swLeft = "SwitchLeft";
-	const string swRight = "SwitchRight";
-	//const string swCenter = "SwitchCenter";
-
-	const string scLeft = "ScaleLeft";
-	const string scRight = "ScaleRight";
-
-	const string swScNCLeft = "NoCrossLeft";
-	const string swScNCRight = "NoCrossRight";
-
-	const string elimsSwL = "EPElimsSwitchLeft";
-	const string elimsSwR = "EPElimsSwitchRight";
-
-	const string dylann = "Dylann";
-	const string testNavX = "navx";
-	const string testEncoders = "encoders";
-	const string pid = "pid";
-
-	const string twocube = "TwoCube";
-	const string cLeft = "ChampsLeft";
-	const string cRight = "ChampsRight";
 };
 
 START_ROBOT_CLASS(Robot) //!< This identifies Robot as the main Robot starting class
