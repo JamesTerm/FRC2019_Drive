@@ -8,10 +8,9 @@ Copyright (c) BroncBotz.
 All rights reserved.
 
 Author(s): Ryan Cooper, Dylan Watson
-Email: cooper.ryan@centaurisoft.org, dylan.watson@broncbotz.org
+Email: cooper.ryan@centaurisoftware.co, dylan.watson@broncbotz.org
 \********************************************************************/
 
-//TODO: why do some imports have <> and others have ""
 #include <WPILib.h>
 #include <fstream>
 #include <thread>
@@ -72,8 +71,6 @@ public:
 		
 		string autoSelected = SmartDashboard::GetString("Auto Selector", drivestraight);
 		cout << autoSelected << endl;
-//TODO: What do the asterisks do for each auto type
-//TODO: POINTERS
 //		DRIVE STRAIGHT
 
 		if (autoSelected == drivestraight)
@@ -210,7 +207,7 @@ public:
 
 private:
 	/** AUTON NAME DEFINITIONS **/
-	//DONTREMOVETODO: Make this into it's own file
+	//TODO: Make this into it's own file
 
 	const string drivestraight = "drive";
 
