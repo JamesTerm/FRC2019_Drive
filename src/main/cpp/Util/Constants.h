@@ -14,6 +14,7 @@ Email: cooper.ryan@centaurisoftware.co, dylan.watson@broncbotz.org
 #define SRC_UTIL_CONSTANTS_H_
 
 #include <cmath>
+#include <limits>
 #include "Singleton.h"
 
 using namespace std;

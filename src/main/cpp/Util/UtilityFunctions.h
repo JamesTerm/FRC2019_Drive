@@ -7,12 +7,8 @@ Copyright (c) BroncBotz.
 All rights reserved.
 
 Author(s): Ryan Cooper, Dylann Ruiz
-<<<<<<< HEAD
 Comments added by Chris Weeks
 Email: cooper.ryan@centaurisoft.org, ruizdylann@gmail.com
-=======
-Email: cooper.ryan@centaurisoftware.co, ruizdylann@gmail.com
->>>>>>> 4c609031a571418e4dcb4d30322a425688fa1057
 \********************************************************************/
 
 #ifndef SRC_UTIL_UTILITYFUNCTIONS_H_
@@ -138,7 +134,7 @@ static void SlowStop(double left, double right, ActiveCollection *activeCollecti
 /* DriveForward
  * This method uses two PID loops to drive straight and the requesred encoder distance
  * The first PID loop runs for the 60% of requested distance, using the navx to correct angle
- * the second PID loop runs for the remaining distance, using the encoder to stop at requested distance. The robot will not correct for angle during this portion.
+ * the second PID loop runs for the remaining distance, at at a lower speed to improve accuracy.
  * 
  * What is a PID loop?
  * A PID loop is a feedback loop that uses an input stream to control an output stream. In our case, the NavX angle controls left/right motor speeds.
@@ -205,73 +201,81 @@ static void DriveForward(double dist, double power, ActiveCollection *activeColl
 			//cout<<"angle = " << currentValue << "	left = " << left << "	right = " << right << endl;
 		}
 
-		power = .1;
-		while(enc < dist && _IsAutononomous())
+		power = .1; //run the remaining distance at low power. This improves accuracy
+		while(enc < dist && _IsAutononomous()) //while encoder ticks is less than requested ticks AND while still in auton
 		{
-			error = setPoint - currentValue;
-			integ = integ + error;
-			deriv = (error - errorPrior);
-			output = (kp*error) + (ki*integ) + (kd*deriv);
-			errorPrior = error;
+			error = setPoint - currentValue; //set error value (P)
+			integ = integ + error; //add error to integral (I)
+			deriv = (error - errorPrior); //find current derivative (D)
+			output = (kp*error) + (ki*integ) + (kd*deriv); //output = PID * respective scalars
+			errorPrior = error; //set errorPrior for next iteration of loop
 
 			//cout << "output = " << output << endl;
 
-			left = power + output;
-			right = power - output;
+			left = power + output; //set left motor to desired power + output
+			right = power - output; //set right motor to desired power - output (+ and - to make robot turn slightly)
 
-			SetDrive(left, right, activeCollection);
+			SetDrive(left, right, activeCollection); //set drive to new powers
 
-			currentValue = navx->GetAngle();
-			enc = enc0->Get();
+			currentValue = navx->GetAngle(); //get new navx angle for next iter
+			enc = enc0->Get(); //get new encoder value for next iter
 
 			Wait(.05);
 			//cout<<"angle = " << currentValue << "	left = " << left << "	right = " << right << endl;
 		}
-		StopDrive(activeCollection);
+		StopDrive(activeCollection); //once finsihed, stop driving
 }
+/* Turn
+ * Uses a PID loop to turn the desired amount of degrees. PID input: Navx, output: motor power
+ * What's a PID loop? Read the explination above DriveForward()
+ */
 static void Turn(double target, ActiveCollection *activeCollection)
 {
-	NavX *navx = activeCollection->GetNavX();
-	navx->Reset();
+	NavX *navx = activeCollection->GetNavX(); //gets Navx pointer
+	navx->Reset(); //reset navx angle
 	Wait(.25);
 
 	//cout << "initial angle = " << navx->GetAngle() << endl;
 
-	double killTime = .5, elapsedTime = 0;
+	double killTime = .5, elapsedTime = 0; //killTime is the time allowed before Turn method times out. Used in case robot is stuck or code messes up.
 
-	double left, right, power = 0;
+	double left, right, power = 0; //left and right motor powers, and default pwoer
 
-	double currentValue = navx->GetAngle();
+	double currentValue = navx->GetAngle(); //get current navx angle
 
-	double kp = .0046, ki = 0, kd = .0046;
-	double allow = 2, errorPrior = 0, error, integ = 0, deriv, output;
-
+	double kp = .0046, ki = 0, kd = .0046; //PID constants
+	double allow = 2, errorPrior = 0, error, integ = 0, deriv, output;	//allow: +/- degrees of error allowed
+																		//errorPrior: error from previus loop iteration
+																		//error: target - current value (P)
+																		//(I)nteg and (D)eriv
+	//while current value is within target +/- allowed error && while time < killTime && we are still in auton period
 	while(((currentValue > target + allow) || (currentValue < target - allow)) && (elapsedTime < killTime) && _IsAutononomous())
 	{
-		error = target - currentValue;
-		integ = integ + error;
-		deriv = (error - errorPrior);
-		output = (kp*error) + (ki*integ) + (kd*deriv);
-		errorPrior = error;
+		error = target - currentValue; //P
+		integ = integ + error; //I
+		deriv = (error - errorPrior); //D
+		output = (kp*error) + (ki*integ) + (kd*deriv); //PID * scalars = output
+		errorPrior = error; //set errorPrior for next iteration of loop
 
 		//cout << "output = " << output << endl;
 
-		left = power + output;
-		right = power - output;
+		left = power + output;  //set left motor to desired power + output
+		right = power - output; //set right motor to desired power - output (+ and - to make robot turn slightly)
 
-		SetDrive(left, right, activeCollection);
+		SetDrive(left, right, activeCollection); //set drive to new powers
 
-		currentValue = navx->GetAngle();
+		currentValue = navx->GetAngle(); //get new navx angle
 
 		Wait(.04);
-		elapsedTime += .04;
+		elapsedTime += .04; //add time to elapsed
 		//cout<<"angle = " << currentValue << "	left = " << left << "	right = " << right << endl;
 	}
-	StopDrive(activeCollection);
+	StopDrive(activeCollection); //once finished, stop drive
 	Wait(.25);
-	currentValue = navx->GetAngle();
+	currentValue = navx->GetAngle(); //get final navx angle
 	//cout << "final angle = " << currentValue << endl;
 }
+//DriveLong is exactly the same as DriveForward except dist0 is 75% of dist
 static void DriveLong(double dist, double power, ActiveCollection *activeCollection)
 {
 	NavX *navx = activeCollection->GetNavX();
@@ -337,6 +341,8 @@ static void DriveLong(double dist, double power, ActiveCollection *activeCollect
 	}
 	StopDrive(activeCollection);
 }
+
+//TurnShort is the same as Turn except killTime is smaller
 static void TurnShort(double target, ActiveCollection *activeCollection)
 {
 	NavX *navx = activeCollection->GetNavX();
@@ -380,6 +386,7 @@ static void TurnShort(double target, ActiveCollection *activeCollection)
 	currentValue = navx->GetAngle();
 	//cout << "final angle = " << currentValue << endl;
 }
+//TurnLong is the same as Turn excpet killTime is larger
 static void TurnLong(double target, ActiveCollection *activeCollection)
 {
 	NavX *navx = activeCollection->GetNavX();
@@ -423,6 +430,8 @@ static void TurnLong(double target, ActiveCollection *activeCollection)
 	currentValue = navx->GetAngle();
 	//cout << "final angle = " << currentValue << endl;
 }
+
+//Turn2 is the same at Turn except killTime is longer (even longer than TurnLong)
 static void Turn2(double target, ActiveCollection *activeCollection)
 {
 	NavX *navx = activeCollection->GetNavX();
@@ -466,6 +475,8 @@ static void Turn2(double target, ActiveCollection *activeCollection)
 	currentValue = navx->GetAngle();
 	//cout << "final angle = " << currentValue << endl;
 }
+
+//TurnNoReset is the same as turn except NavX is not reset
 static void TurnNoReset(double target, ActiveCollection *activeCollection)
 {
 	NavX *navx = activeCollection->GetNavX();
