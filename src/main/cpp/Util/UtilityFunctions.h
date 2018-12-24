@@ -176,7 +176,10 @@ static void DriveForward(double dist, double power, ActiveCollection *activeColl
 		double setPoint = navx->GetAngle(), currentValue = navx->GetAngle(), enc = enc0->Get(); //setPoint: init angle, currentValue: current angle, enc: encoder value
 
 		double kp = .02, ki = 0, kd = .00005; //P, I, and D scalars. THESE ARE THE NUMBERS YOU TUNE
-		double errorPrior = 0, error, integ = 0, deriv, output; //error prior: error from prior loop iteration, error: current error, output: value to be added or subtracted from motors
+		double errorPrior = 0, error, integ = 0, deriv, output; //error prior: error from prior loop iteration
+																//error: current error
+																//(I)nteg, (D)eriv
+																//output: value to be added or subtracted from motors
 
 		//pid loop #1
 		while(enc < dist0 &&_IsAutononomous()) //while we are less than 60% of desired dist and still in auton
@@ -225,6 +228,27 @@ static void DriveForward(double dist, double power, ActiveCollection *activeColl
 		}
 		StopDrive(activeCollection); //once finsihed, stop driving
 }
+
+/*	
+ *          ,
+ *        _=|_		DEEP SPACE 2019
+ *      _[_## ]_
+ * _  +[_[_+_]P/    _    |_       ____      _=--|-~
+ *  ~---\_I_I_[=\--~ ~~--[o]--==-|##==]-=-~~  o]H
+ * -~ /[_[_|_]_]\\  -_  [[=]]    |====]  __  !j]H
+ *   /    "|"    \      ^U-U^  - |    - ~ .~  U/~
+ *  ~~--__~~~--__~~-__   H_H_    |_     --   _H_
+ * -. _  ~~~#######~~~     ~~~-    ~~--  ._ - ~~-=
+ *            ~~~=~~  -~~--  _     . -      _ _ -
+ *
+ *        ----------------------------------
+ *       |        June, 20th, 1969          |
+ *       |  Here Men from the Planet Earth  |
+ *       |   First set Foot upon the Moon   |
+ *       | We came in Peace for all Mankind |
+ *        ---------------------------=apx=--
+ */
+
 /* Turn
  * Uses a PID loop to turn the desired amount of degrees. PID input: Navx, output: motor power
  * What's a PID loop? Read the explination above DriveForward()
