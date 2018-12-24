@@ -11,7 +11,7 @@ Author(s): Dylan Watson
 Email: dylan.watson@broncbotz.org
 \********************************************************************/
 
-#include <PotentiometerItem.h>
+#include "PotentiometerItem.h"
 
 using namespace Components;
 

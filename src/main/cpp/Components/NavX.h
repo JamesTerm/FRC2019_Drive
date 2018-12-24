@@ -13,11 +13,9 @@ Email: dylan.watson@broncbotz.org
 #ifndef SRC_COMPONENTS_NAVX_H_
 #define SRC_COMPONENTS_NAVX_H_
 
-#include <string>
+#include <AHRS.h>
 
-#include "Components/NativeComponent.h"
-#include "WPILib.h"
-#include "AHRS.h"
+#include "NativeComponent.h"
 
 namespace Components{
 class NavX : public AHRS, public NativeComponent{

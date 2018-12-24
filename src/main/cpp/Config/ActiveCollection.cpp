@@ -10,22 +10,21 @@ Author(s): Ryan Cooper
 Email: cooper.ryan@centaurisoftware.co
 \********************************************************************/
 
-#include <string>
-#include <iostream>
-#include <utility>
-
-#include <ActiveCollection.h>
-
-#include "Components/VictorSPItem.h"
-#include "Components/TalonSRXItem.h"
-#include "Components/NavX.h"
+#include "ActiveCollection.h"
 
 using namespace std;
 using namespace Components;
 using namespace Configuration;
 
+/**
+ * Default Constructor
+**/
 ActiveCollection::ActiveCollection(){}
 
+/**
+ * Method to return a NativeComponent of a certain type and name
+**/
+//TODO: Does this even work?
 template <class T>
 T ActiveCollection::Get(string name){
 	try{
@@ -39,6 +38,10 @@ T ActiveCollection::Get(string name){
 	}
 }
 
+/**
+ * Method to return a VictorSP of a certain name
+**/
+//TODO: change all current instances of Victor to VictorSP as we will be adding Victor SPX very soon 
 VictorSPItem* ActiveCollection::GetVictor(string name){
 	try{
 		for(int i=0; i<(int)activeCollection.size();i++){
@@ -53,6 +56,9 @@ VictorSPItem* ActiveCollection::GetVictor(string name){
 	}
 }
 
+/**
+ * Method to return a TalonSRX of a certain name
+**/
 TalonSRXItem* ActiveCollection::GetTalon(string name){
 	try{
 		for(int i=0; i<(int)activeCollection.size();i++){
@@ -67,6 +73,9 @@ TalonSRXItem* ActiveCollection::GetTalon(string name){
 	}
 }
 
+/**
+ * Method to return a DigitalInput of a certain name
+**/
 DigitalInputItem* ActiveCollection::GetDI(string name){
 	try{
 		for(int i=0; i<(int)activeCollection.size();i++){
@@ -81,6 +90,9 @@ DigitalInputItem* ActiveCollection::GetDI(string name){
 	}
 }
 
+/**
+ * Method to return an Encoder of a certain name
+**/
 EncoderItem* ActiveCollection::GetEncoder(string name){
 	try{
 		for(int i=0; i<(int)activeCollection.size();i++){
@@ -95,10 +107,16 @@ EncoderItem* ActiveCollection::GetEncoder(string name){
 	}
 }
 
+/**
+ * Method to return the current size of the ActiveCollection list
+**/
 int ActiveCollection::GetSize(){
 	return activeCollection.size();
 }
 
+/**
+ * Method to return the NavX
+**/
 NavX* ActiveCollection::GetNavX(){
 	try{
 		for(int i=0; i<(int)activeCollection.size();i++){
@@ -113,6 +131,9 @@ NavX* ActiveCollection::GetNavX(){
 	}
 }
 
+/**
+ * Adds a component to the ActiveCollection
+**/
 void ActiveCollection::Add(NativeComponent *component){
 	try{
 		activeCollection.push_back(component);

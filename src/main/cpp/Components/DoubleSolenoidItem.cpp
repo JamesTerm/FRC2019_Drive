@@ -13,8 +13,8 @@ Email: dylan.watson@broncbotz.org
 
 #include <cmath>
 
-#include <DoubleSolenoidItem.h>
-#include "Util/Constants.h"
+#include "DoubleSolenoidItem.h"
+#include "../Util/Constants.h"
 
 using namespace std;
 using namespace frc;

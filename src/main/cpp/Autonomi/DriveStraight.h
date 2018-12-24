@@ -8,8 +8,17 @@
 #ifndef SRC_AUTONOMI_DRIVESTRAIGHT_H_
 #define SRC_AUTONOMI_DRIVESTRAIGHT_H_
 
-#include "Config/ActiveCollection.h"
 #include <string>
+#include <WPILib.h>
+#include <fstream>
+#include <thread>
+#include <iostream>
+
+#include "../Config/ActiveCollection.h"
+#include "../Util/UtilityFunctions.h"
+#include "../Config/ActiveCollection.h"
+#include "../Config/Config.h"
+#include "../Components/VictorSPItem.h"
 
 using namespace std;
 using namespace Configuration;

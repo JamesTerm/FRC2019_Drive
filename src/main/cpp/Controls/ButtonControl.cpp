@@ -11,12 +11,8 @@ Email:	dylan.watson@broncbotz.org
 \*********************************************************************/
 
 #include <iostream>
-#include <Controls/ButtonControl.h>
-#include "ControlItem.h"
-#include "Util/Constants.h"
-#include "WPILib.h"
-#include "Components/VictorSPItem.h"
-#include "Components/DoubleSolenoidItem.h"
+
+#include "ButtonControl.h"
 
 using namespace Controls;
 

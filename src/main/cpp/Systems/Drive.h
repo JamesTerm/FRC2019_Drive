@@ -12,12 +12,10 @@ Email:	cooper.ryan@centaurisoftware.co, dylan.watson@broncbotz.org
 #ifndef SYSTEMS_DRIVE_H_
 #define SYSTEMS_DRIVE_H_
 
-#include <string>
-#include <vector>
-#include <WPILib.h>
 #include "Preproc.h"
-#include "Controls/ControlItem.h"
-#include "Config/ActiveCollection.h"
+#include "../Util/LoopChecks.h"
+#include "../Controls/ControlItem.h"
+#include "../Config/ActiveCollection.h"
 
 using namespace std;
 using namespace Configuration;

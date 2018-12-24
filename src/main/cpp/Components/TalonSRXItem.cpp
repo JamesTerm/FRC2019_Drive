@@ -13,8 +13,7 @@ Email: dylan.watson@broncbotz.org
 
 #include <iostream>
 
-#include <TalonSRXItem.h>
-#include "WPILib.h"
+#include "TalonSRXItem.h"
 
 using namespace std;
 using namespace frc;

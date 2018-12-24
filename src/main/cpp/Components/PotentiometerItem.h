@@ -14,7 +14,6 @@ Email: dylan.watson@broncbotz.org
 #ifndef SRC_COMPONENTS_POTENTIOMETERITEM_H_
 #define SRC_COMPONENTS_POTENTIOMETERITEM_H_
 
-#include "WPILib.h"
 #include "InputComponent.h"
 
 namespace Components{

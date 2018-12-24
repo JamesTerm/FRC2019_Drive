@@ -11,8 +11,7 @@ Author(s): Dylan Watson
 Email: dylan.watson@broncbotz.org
 \********************************************************************/
 
-#include <EncoderItem.h>
-#include "WPILib.h"
+#include "EncoderItem.h"
 
 using namespace Components;
 

@@ -12,8 +12,7 @@ Email:	dylan.watson@broncbotz.org
 
 #include <iostream>
 
-#include "WPILib.h"
-#include <Controls/ControlItem.h>
+#include "ControlItem.h"
 
 using namespace std;
 using namespace Controls;

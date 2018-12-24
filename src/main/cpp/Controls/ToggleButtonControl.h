@@ -13,8 +13,7 @@ Email:	dylan.watson@broncbotz.org
 #ifndef SRC_CONTROLS_TOGGLEBUTTONCONTROL_H_
 #define SRC_CONTROLS_TOGGLEBUTTONCONTROL_H_
 
-#include "WPILib.h"
-#include "Controls/ControlItem.h"
+#include "ControlItem.h"
 
 using namespace frc;
 //TODO: actually write this

@@ -11,9 +11,6 @@ Email:	cooper.ryan@centaurisoftware.co, dylan.watson@broncbotz.org
 \*********************************************************************/
 
 #include "Drive.h"
-#include "LoopChecks.h"
-#include <iostream>
-#include <WPILib.h>
 
 using namespace std;
 using namespace Systems;
@@ -23,8 +20,6 @@ Drive::Drive(){}
 void Drive::Initialize()
 {
 	mainLoop();
-//	liftTalon = activeCollection->GetTalon("lift");
-//	encTest = new frc::Encoder(0,1);
 }
 
 void Drive::AddControlDrive(ControlItem *control){
@@ -45,9 +40,6 @@ void Drive::mainLoop()
 		for(int i=0; i<(int)operateControlCollection.size();i++)
 			(*operateControlCollection[i]).Update();
 
-//		cout << activeCollection->GetEncoder("enc0")->Get() << endl;
-
 		Wait(0.05);
 	}
 }
-

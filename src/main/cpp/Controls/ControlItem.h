@@ -13,10 +13,10 @@ Email:	dylan.watson@broncbotz.org
 #ifndef SRC_CONTROLS_CONTROLITEM_H_
 #define SRC_CONTROLS_CONTROLITEM_H_
 
-#include "WPILib.h"
-#include <string>
 #include <vector>
-#include "Components/OutputComponent.h"
+
+#include "../Components/OutputComponent.h"
+#include "../Util/Constants.h" 
 
 using namespace std;
 using namespace Components;

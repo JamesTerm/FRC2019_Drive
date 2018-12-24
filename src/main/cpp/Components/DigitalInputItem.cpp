@@ -11,8 +11,7 @@ Author(s): Dylan Watson
 Email: dylan.watson@broncbotz.org
 \********************************************************************/
 
-#include <DigitalInputItem.h>
-#include "WPILib.h"
+#include "DigitalInputItem.h"
 
 using namespace Components;
 

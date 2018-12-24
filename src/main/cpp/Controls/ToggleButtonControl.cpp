@@ -10,7 +10,7 @@ Author(s):	Dylan Watson
 Email:	dylan.watson@broncbotz.org
 \*********************************************************************/
 
-#include <Controls/ToggleButtonControl.h>
+#include "ToggleButtonControl.h"
 
 using namespace Controls;
 

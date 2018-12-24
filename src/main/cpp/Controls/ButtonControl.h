@@ -13,10 +13,9 @@ Email:	dylan.watson@broncbotz.org
 #ifndef SRC_CONTROLS_BUTTONCONTROL_H_
 #define SRC_CONTROLS_BUTTONCONTROL_H_
 
-#include <string>
-
-#include "WPILib.h"
 #include "ControlItem.h"
+#include "../Components/VictorSPItem.h"
+#include "../Components/DoubleSolenoidItem.h"
 
 namespace Controls{
 class ButtonControl : public ControlItem {
