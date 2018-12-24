@@ -14,6 +14,7 @@ Email:	dylan.watson@broncbotz.org
 #include <cmath>
 
 #include "AxisControl.h"
+#include "..\Util\Constants.h"
 
 bool stopped;
 
@@ -41,7 +42,7 @@ double AxisControl::Update(){
 	else{
 		limitDepressed = false;
 	}
-	double dz = deadZone + Constants::Instance().MINIMUM_JOYSTICK_RETURN;
+	double dz = deadZone + MINIMUM_JOYSTICK_RETURN;
 	if(name == "LiftControl"){
 		//cout << "LIMIT VAL: " << limit->GetBool() << endl;
 		//cout << "RAW: " << raw << endl;

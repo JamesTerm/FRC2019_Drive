@@ -20,7 +20,6 @@ Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 #include "Autonomi/Autons.h"
 #include "Config/ActiveCollection.h"
 #include "Config/Config.h"
-#include "Systems/Initializers.h"
 #include "Systems/SystemsCollection.h"
 
 using namespace frc;
@@ -37,7 +36,6 @@ using namespace Systems;
  */
 class Robot : public SampleRobot
 {
-	std::thread *drive; //!< Pointer to where we will allocate the drive task.
 
 public:
 
@@ -56,7 +54,7 @@ public:
 	
 	void RobotInit() override
 	{
-		
+		Initialize_Systems();
 		activeCollection = new ActiveCollection();
 		Config *config = new Config(activeCollection); //!< Pointer to the configuration file of the robot
 		cout << "Program Version: " << VERSION << " Revision: " << REVISION << endl;
@@ -91,7 +89,11 @@ public:
 	void OperatorControl() override
 	{
 		cout << "OPERATOR REACHED" << endl;
-		InitializeDrive();
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+		drive->Initialize();
+#pragma GCC diagnostic pop
 	}
 
 	/**

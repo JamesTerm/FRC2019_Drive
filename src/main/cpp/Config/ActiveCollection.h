@@ -22,7 +22,6 @@ Email: cooper.ryan@centaurisoftware.co
 #include "../Components/EncoderItem.h"
 #include "../Components/NavX.h"
 #include "../Components/DoubleSolenoidItem.h"
-#include "../Util/Singleton.h"
 
 using namespace std;
 using namespace Components;

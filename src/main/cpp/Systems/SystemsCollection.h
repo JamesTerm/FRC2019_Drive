@@ -15,30 +15,15 @@ Email:	cooper.ryan@centaurisoftware.co
 #define SYSTEMS_SYSTEMSCOLLECTION_H_
 
 #include "Drive.h"
-#include "../Util/Singleton.h"
 
 namespace Systems
 {
+ 	static Drive *drive;
 
-/*! SystemsCollection is a singleton that stores the active instances of all required independently run systems.*/
-class SystemsCollection final : public Singleton<SystemsCollection>
-{
-	friend class Singleton<SystemsCollection>;
-public:
-	SystemsCollection(){}//!< Default constructor.
-	~SystemsCollection(){ } //!< Destructor.
-
-	Drive *drive = new Drive(); //!< Creates and instance of the Drive system.
-
-
-	//testing to try and fix twitch bug, maybe these still run because we are using a singleton?
-	void Reset()
+	static void Initialize_Systems()
 	{
-		delete drive;
 		drive = new Drive();
 	}
-};
-
 } /* namespace Systems */
 
 #endif /* SYSTEMS_SYSTEMSCOLLECTION_H_ */
