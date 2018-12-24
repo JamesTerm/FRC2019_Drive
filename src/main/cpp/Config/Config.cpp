@@ -12,15 +12,16 @@ Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 \********************************************************************/
 
 #include "Config.h"
+#include "..\Systems\SystemsCollection.h"
 
 using namespace std;
+using namespace Systems;
 using namespace Configuration;
 
 Config::Config(ActiveCollection *_activeCollection) {
 	driveJoy = new Joystick(0);
 	operatorJoy = new Joystick(1);
 	activeCollection = _activeCollection;
-	systemsCollection = SystemsCollection::Instance();
 	AllocateComponents();
 }
 
@@ -87,8 +88,8 @@ void Config::AllocateComponents(){
 
 /*********************** DRIVE ADDITIONS ***************************/
 
-	systemsCollection.drive->AddControlDrive(leftDrive);
-	systemsCollection.drive->AddControlDrive(rightDrive);
+	drive->AddControlDrive(leftDrive);
+	drive->AddControlDrive(rightDrive);
 
 /*********************** DRIVE BINDINGS ****************************/
 	leftDrive->AddComponent(left_0);
@@ -113,15 +114,15 @@ void Config::AllocateComponents(){
 
 /*********************** SYSTEMS CONTROL OPERATOR *******************/
 
-	systemsCollection.drive->AddControlOperate(intakeDropControl);
-	systemsCollection.drive->AddControlOperate(liftControl);
-	systemsCollection.drive->AddControlOperate(intakeInControlRight);
-	systemsCollection.drive->AddControlOperate(intakeInControlLeft);
+	drive->AddControlOperate(intakeDropControl);
+	drive->AddControlOperate(liftControl);
+	drive->AddControlOperate(intakeInControlRight);
+	drive->AddControlOperate(intakeInControlLeft);
 //	systemsCollection.drive->AddControlOperate(intakeInControlLeftBump);
 //	systemsCollection.drive->AddControlOperate(intakeInControlRightBump);
-	systemsCollection.drive->AddControlOperate(intakeOutSlowControl);
-	systemsCollection.drive->AddControlOperate(climbControl);
-	systemsCollection.drive->AddControlOperate(intakeOutFastControl);
+	drive->AddControlOperate(intakeOutSlowControl);
+	drive->AddControlOperate(climbControl);
+	drive->AddControlOperate(intakeOutFastControl);
 
 /********************** OPERATOR BINDINGS **************************/
 
@@ -152,7 +153,7 @@ void Config::AllocateComponents(){
 
 /************ SYSTEMS COLLECTION ACTIVE COLLECTION ****************/
 
-	systemsCollection.drive->activeCollection = activeCollection;
+	drive->activeCollection = activeCollection;
 
 }
 

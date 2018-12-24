@@ -10,6 +10,8 @@ Author(s): Ryan Cooper
 Email: cooper.ryan@centaurisoftware.co
 \********************************************************************/
 
+#include <iostream>
+
 #include "ActiveCollection.h"
 
 using namespace std;

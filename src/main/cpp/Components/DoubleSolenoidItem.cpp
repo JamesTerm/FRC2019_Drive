@@ -12,6 +12,7 @@ Email: dylan.watson@broncbotz.org
 \********************************************************************/
 
 #include <cmath>
+#include <iostream>
 
 #include "DoubleSolenoidItem.h"
 #include "../Util/Constants.h"
@@ -61,16 +62,16 @@ void DoubleSolenoidItem::Set(double value){
 		inUse = true;
 		if (value >= -1 && value <= 1)
 		{
-			 if (abs(value + 1) < Constants::Instance().EPSILON_MIN)
+			 if (abs(value + 1) < EPSILON_MIN)
 				SetOff();
-			else if (abs(value) < Constants::Instance().EPSILON_MIN)
+			else if (abs(value) < EPSILON_MIN)
 			{
 				if (!reversed)
 					SetForward();
 				else
 					SetReverse();
 			}
-			else if (abs(value - 1) < Constants::Instance().EPSILON_MIN)
+			else if (abs(value - 1) < EPSILON_MIN)
 			{
 				if (!reversed)
 					SetReverse();

@@ -27,7 +27,6 @@ public:
 	Joystick *driveJoy;
 	Joystick *operatorJoy;
 	ActiveCollection *activeCollection;
-	SystemsCollection systemsCollection;
 	Config(ActiveCollection *_activeCollection);
 	//TODO: Make this a bool return
 	void AllocateComponents();
