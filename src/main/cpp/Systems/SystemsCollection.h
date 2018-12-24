@@ -15,7 +15,7 @@ Email:	cooper.ryan@centaurisoftware.co
 #define SYSTEMS_SYSTEMSCOLLECTION_H_
 
 #include "Drive.h"
-#include "Singleton.h"
+#include "../Util/Singleton.h"
 
 namespace Systems
 {

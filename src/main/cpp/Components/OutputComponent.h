@@ -13,10 +13,7 @@ Email: dylan.watson@broncbotz.org
 #ifndef SRC_COMPONENTS_OUTPUTCOMPONENT_H_
 #define SRC_COMPONENTS_OUTPUTCOMPONENT_H_
 
-#include <string>
-
 #include "NativeComponent.h"
-#include "WPILib.h"
 
 using namespace std;
 

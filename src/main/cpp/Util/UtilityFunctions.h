@@ -15,10 +15,8 @@ Email: cooper.ryan@centaurisoft.org, ruizdylann@gmail.com
 #define SRC_UTIL_UTILITYFUNCTIONS_H_
 
 
-#include "Config/ActiveCollection.h"
-#include <string>
-#include <WPILib.h>
-#include "Util/LoopChecks.h"
+#include "../Config/ActiveCollection.h"
+#include "LoopChecks.h"
 
 using namespace std;
 using namespace Configuration;

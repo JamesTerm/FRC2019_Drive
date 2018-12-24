@@ -14,9 +14,6 @@ Email: dylan.watson@broncbotz.org
 #ifndef SRC_COMPONENTS_DOUBLESOLENOIDITEM_H_
 #define SRC_COMPONENTS_DOUBLESOLENOIDITEM_H_
 
-#include <string>
-
-#include "WPILib.h"
 #include "OutputComponent.h"
 
 using namespace std;

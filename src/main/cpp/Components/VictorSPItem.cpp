@@ -11,10 +11,9 @@ Author(s): Dylan Watson
 Email: dylan.watson@broncbotz.org
 \********************************************************************/
 
-#include <Components/VictorSPItem.h>
 #include <iostream>
-#include <string>
-#include "WPILib.h"
+
+#include "VictorSPItem.h"
 
 using namespace std;
 using namespace Components;

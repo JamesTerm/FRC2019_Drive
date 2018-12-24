@@ -13,12 +13,7 @@ Email:	dylan.watson@broncbotz.org
 
 #include <cmath>
 
-#include <Controls/AxisControl.h>
-#include "ControlItem.h"
-#include "Components/DigitalInputItem.h"
-#include "Components/TalonSRXItem.h"
-#include "Util/Constants.h"
-#include <WPILib.h>
+#include "AxisControl.h"
 
 bool stopped;
 

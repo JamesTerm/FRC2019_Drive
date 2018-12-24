@@ -13,10 +13,8 @@ Email: dylan.watson@broncbotz.org
 
 #ifndef SRC_COMPONENTS_VICTORSPITEM_H_
 #define SRC_COMPONENTS_VICTORSPITEM_H_
-#include <OutputComponent.h>
-#include "WPILib.h"
-#include "VictorSP.h"
-#include <string>
+
+#include "OutputComponent.h"
 
 namespace Components{
 class VictorSPItem final : public OutputComponent

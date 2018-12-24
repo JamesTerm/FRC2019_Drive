@@ -15,7 +15,6 @@ Email: dylan.watson@broncbotz.org
 #define SRC_COMPONENTS_DIGITALINPUTITEM_H_
 
 #include "InputComponent.h"
-#include "WPILib.h"
 
 namespace Components{
 class DigitalInputItem : public InputComponent{

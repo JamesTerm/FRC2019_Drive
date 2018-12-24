@@ -14,9 +14,7 @@ Email: dylan.watson@broncbotz.org
 #ifndef SRC_COMPONENTS_ENCODERITEM_H_
 #define SRC_COMPONENTS_ENCODERITEM_H_
 
-#include "Components/InputComponent.h"
-#include <string>
-#include "WPILib.h"
+#include "InputComponent.h"
 
 namespace Components{
 class EncoderItem : public InputComponent{

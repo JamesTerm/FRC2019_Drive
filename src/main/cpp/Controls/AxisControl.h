@@ -14,12 +14,10 @@ Email:	dylan.watson@broncbotz.org
 #ifndef SRC_CONTROLS_AXISCONTROL_H_
 #define SRC_CONTROLS_AXISCONTROL_H_
 
-#include <string>
-
-#include "WPILib.h"
 #include "ControlItem.h"
-#include "Util/Constants.h"
-#include "Components/DigitalInputItem.h"
+#include "../Components/DigitalInputItem.h"
+#include "../Components/TalonSRXItem.h"
+
 
 using namespace std;
 

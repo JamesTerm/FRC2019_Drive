@@ -14,6 +14,7 @@ Email: dylan.watson@broncbotz.org
 #define SRC_COMPONENTS_NATIVECOMPONENT_H_
 
 #include <string>
+#include <WPILib.h>
 
 using namespace std;
 

@@ -14,9 +14,10 @@ Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 #ifndef SRC_CONFIG_CONFIG_H_
 #define SRC_CONFIG_CONFIG_H_
 
-#include "Systems/SystemsCollection.h"
-#include "WPILib.h"
-#include "Config/ActiveCollection.h"
+#include "ActiveCollection.h"
+#include "../Systems/SystemsCollection.h"
+#include "../Controls/ButtonControl.h"
+#include "../Controls/AxisControl.h"
 
 using namespace Systems;
 namespace Configuration{

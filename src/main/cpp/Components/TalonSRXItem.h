@@ -14,11 +14,8 @@ Email: dylan.watson@broncbotz.org
 #ifndef SRC_COMPONENTS_TALONSRXITEM_H_
 #define SRC_COMPONENTS_TALONSRXITEM_H_
 
-#include <string>
-
 #include "ctre/Phoenix.h"
 #include "OutputComponent.h"
-#include "WPILib.h"
 
 using namespace std;
 using namespace frc;

@@ -11,18 +11,7 @@ Author(s): Ryan Cooper, Dylan Watson
 Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 \********************************************************************/
 
-#include <vector>
-
-#include <Config/Config.h>
-#include "WPILib.h"
-#include "Components/VictorSPItem.h"
-#include "Components/TalonSRXItem.h"
-#include "Components/DigitalInputItem.h"
-#include "Controls/ButtonControl.h"
-#include "Controls/AxisControl.h"
-#include "Components/DoubleSolenoidItem.h"
-#include "Components/EncoderItem.h"
-#include "Components/NavX.h"
+#include "Config.h"
 
 using namespace std;
 using namespace Configuration;
