@@ -44,7 +44,9 @@ public:
 	/**
 	 * Constructor
 	 */
-	Robot() { }
+	Robot() {
+		cout << "CONSTRUCTOR 10" << endl;
+	 }
 
 	/**
 	 * Initialization method of the robot
@@ -54,9 +56,13 @@ public:
 	
 	void RobotInit() override
 	{
+		cout << "ROBOT INIT" << endl;
 		Initialize_Systems();
+		cout << "SYSTEM INITILIZATION COMPLETE" << endl;
 		activeCollection = new ActiveCollection();
+		cout << "ACTIVE COLLECTION COMPLETED" << endl;
 		Config *config = new Config(activeCollection); //!< Pointer to the configuration file of the robot
+		cout << "CONFIG COMPLETED" << endl;
 		cout << "Program Version: " << VERSION << " Revision: " << REVISION << endl;
 	}
 

@@ -11,14 +11,18 @@ Email:	cooper.ryan@centaurisoftware.co, dylan.watson@broncbotz.org
 \*********************************************************************/
 
 #include "Drive.h"
+#include <iostream>
 
 using namespace std;
 using namespace Systems;
 
-Drive::Drive(){}
+Drive::Drive(){
+	cout << "NEW DRIVE" << endl;
+}
 
 void Drive::Initialize()
 {
+	cout << "INITIALIZE DRIVE" << endl;
 	mainLoop();
 }
 

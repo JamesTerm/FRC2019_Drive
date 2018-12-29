@@ -23,10 +23,11 @@ Config::Config(ActiveCollection *_activeCollection) {
 	operatorJoy = new Joystick(1);
 	activeCollection = _activeCollection;
 	AllocateComponents();
+	cout << "CONFIG CONSTRUCTOR COMPLETE" << endl;
 }
 
 void Config::AllocateComponents(){
-
+	cout << "ALLOCATE COMPONENTS" << endl;
 	EncoderItem *enc0 = new EncoderItem("enc0", 2, 3, false);
 	activeCollection->Add(enc0);
 
@@ -35,9 +36,9 @@ void Config::AllocateComponents(){
 
 /********************** NAVX DEFINITIONS **************************/
 
-	NavX *navX = new NavX();
+/*	NavX *navX = new NavX();
 	activeCollection->Add(navX);
-
+*/
 /********************** MOTOR DEFINITIONS *************************/
 
 	VictorSPItem *left_0 = new VictorSPItem("Left_0", 0, false);
@@ -62,7 +63,7 @@ void Config::AllocateComponents(){
 	DigitalInputItem *liftSwitch = new DigitalInputItem(4, "InputTest");
 
 /***********************  SOLENOID DEFINITIONS  *******************/
-
+cout << "COMPONENT DEFINITIONS COMPLETED" << endl;
 /*********************** ACTIVECOLLECTION CALLS *******************/
 
 	activeCollection->Add(left_0);

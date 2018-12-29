@@ -15,6 +15,7 @@ Email:	cooper.ryan@centaurisoftware.co
 #define SYSTEMS_SYSTEMSCOLLECTION_H_
 
 #include "Drive.h"
+#include <iostream>
 
 namespace Systems
 {
@@ -22,6 +23,7 @@ namespace Systems
 
 	static void Initialize_Systems()
 	{
+		cout << "INITIALIZING SYSTEMS" << endl;
 		drive = new Drive();
 	}
 } /* namespace Systems */
