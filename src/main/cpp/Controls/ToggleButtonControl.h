@@ -7,7 +7,7 @@ Copyright (c) BroncBotz.
 All rights reserved.
 
 Author(s):	Dylan Watson
-Email:	dylan.watson@broncbotz.org
+Email:	dylantrwatson@gmail.com
 \*********************************************************************/
 
 #ifndef SRC_CONTROLS_TOGGLEBUTTONCONTROL_H_

@@ -1,9 +1,14 @@
-/*
- * Dylann.cpp
- *
- *  Created on: Mar 3, 2018
- *      Author: Dylann Ruiz
- */
+/****************************** Header ******************************\
+Class Name: DriveStraight
+File Name:	Drivestraight.cpp
+Summary:	An autonomous program to make the robot drive straight
+Project:     BroncBotzFRC2019
+Copyright (c) BroncBotz.
+All rights reserved.
+
+Author(s): Dylann Ruiz
+Email: ruizdylann@gmail.com
+\********************************************************************/
 
 #include "DriveStraight.h"
 

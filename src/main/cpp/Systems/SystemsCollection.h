@@ -1,5 +1,5 @@
 /****************************** Header ******************************\
-Class Name:  SystemsCollection inherits Singleton
+Class Name:  SystemsCollection
 File Name: SystemsCollection.h
 Summary: 	 Holds and instance of each major system, this is a singleton
 			 as we [should] only have one instance of each system, I cannot

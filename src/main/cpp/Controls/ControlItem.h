@@ -7,7 +7,7 @@ Copyright (c) BroncBotz.
 All rights reserved.
 
 Author(s):	Dylan Watson
-Email:	dylan.watson@broncbotz.org
+Email:	dylantrwatson@gmail.com
 \*********************************************************************/
 
 #ifndef SRC_CONTROLS_CONTROLITEM_H_

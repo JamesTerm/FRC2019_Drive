@@ -7,7 +7,7 @@ Copyright (c) BroncBotz.
 All rights reserved.
 
 Author(s):	Ryan Cooper, Dylan Watson
-Email:	cooper.ryan@centaurisoftware.co, dylan.watson@broncbotz.org
+Email:	cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 \*********************************************************************/
 
 #include "Drive.h"

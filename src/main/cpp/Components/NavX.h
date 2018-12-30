@@ -7,7 +7,7 @@ Copyright (c) BroncBotz.
 All rights reserved.
 
 Author(s): Dylan Watson
-Email: dylan.watson@broncbotz.org
+Email: dylantrwatson@gmail.com
 \********************************************************************/
 
 #ifndef SRC_COMPONENTS_NAVX_H_

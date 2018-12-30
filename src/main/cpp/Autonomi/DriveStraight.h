@@ -1,10 +1,14 @@
-/*
- * Dylann.h
- *
- *  Created on: Mar 3, 2018
- *      Author: Dylann Ruiz
- */
+/****************************** Header ******************************\
+Class Name: DriveStraight
+File Name:	Drivestraight.h
+Summary:	An autonomous program to make the robot drive straight
+Project:     BroncBotzFRC2019
+Copyright (c) BroncBotz.
+All rights reserved.
 
+Author(s): Dylann Ruiz
+Email: ruizdylann@gmail.com
+\********************************************************************/
 #ifndef SRC_AUTONOMI_DRIVESTRAIGHT_H_
 #define SRC_AUTONOMI_DRIVESTRAIGHT_H_
 

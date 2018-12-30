@@ -1,5 +1,5 @@
 /****************************** Header ******************************\
-Class Name: Constants inherits Singleton
+Class Name: Constants
 File Name: Constants.h
 Summary: File of constant values to be used throughout the program.
 Project: FRC2019CPP
@@ -7,7 +7,7 @@ Copyright (c) BroncBotz.
 All rights reserved.
 
 Author(s): Ryan Cooper, Dylan Watsonr
-Email: cooper.ryan@centaurisoftware.co, dylan.watson@broncbotz.org
+Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 \********************************************************************/
 
 #ifndef SRC_UTIL_CONSTANTS_H_
@@ -18,8 +18,6 @@ Email: cooper.ryan@centaurisoftware.co, dylan.watson@broncbotz.org
 
 using namespace std;
 
-//TODO: why is this a singleton??? Why did we do this...
-//Can probably make this a static class with static constants
 namespace Util
 {
 	static const double MINIMUM_JOYSTICK_RETURN = 0.04;
