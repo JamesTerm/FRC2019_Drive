@@ -27,7 +27,17 @@ void Drive::Initialize()
 }
 
 void Drive::AddControlDrive(ControlItem *control){
-	driveControlCollection.push_back(control);
+	cout << "ADD CONTROL DRIVE FINISHED" << endl;
+	try{
+		driveControlCollection.push_back(control);
+	}catch(const runtime_error& re){
+		cout << "RUNTIME ERROR: " << re.what() << endl;
+	}catch(const exception& ex){
+		cout << "EXCEPTION: " << ex.what() << endl;
+	}catch(...){
+		cout << "UNKNOWN" << endl;
+	}
+	cout << "MOTHERDUCKER" << endl;
 }
 
 void Drive::AddControlOperate(ControlItem *control){

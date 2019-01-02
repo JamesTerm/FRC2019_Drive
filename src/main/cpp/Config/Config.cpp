@@ -81,26 +81,27 @@ cout << "COMPONENT DEFINITIONS COMPLETED" << endl;
 	activeCollection->Add(intakeDrop);
 
 	activeCollection->Add(liftSwitch);
-
+cout << "ACTIVE COLLECTION ADDS COMPLETED" << endl;
 /*********************** DRIVE CONTROL DEFINITIONS ******************/
 
 	AxisControl *leftDrive = new AxisControl(driveJoy, "LeftDrive", 1, 0.07, true, 0.70);
 	AxisControl *rightDrive = new AxisControl(driveJoy, "RightDrive", 5, 0.07, true, 0.70);
-
+cout << "AXIS CONTROL COMPLETED" << endl;
 /*********************** DRIVE ADDITIONS ***************************/
 
 	drive->AddControlDrive(leftDrive);
+cout << "LEFT DRIVE" << endl;
 	drive->AddControlDrive(rightDrive);
-
+cout << "DRIVE ADDITIONS COMPLETED" << endl;
 /*********************** DRIVE BINDINGS ****************************/
 	leftDrive->AddComponent(left_0);
 	leftDrive->AddComponent(left_1);
 	leftDrive->AddComponent(left_2);
-
+cout << "DRIVE BINDINGS START" << endl;
 	rightDrive->AddComponent(right_0);
 	rightDrive->AddComponent(right_1);
 	rightDrive->AddComponent(right_2);
-
+cout << "DRIVE BINDINGS COMPLETE" << endl;
 /********************* OPERATE CONTROL DEFINITIONS ******************/
 
 	AxisControl *intakeDropControl = new AxisControl(operatorJoy, "IntakeDropControl", 5, 0.3, true, 0.50);

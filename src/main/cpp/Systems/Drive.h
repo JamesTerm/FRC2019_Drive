@@ -34,7 +34,7 @@ public:
 	    ActiveCollection *activeCollection;
 	    vector<ControlItem*> driveControlCollection;
 	    vector<ControlItem*> operateControlCollection;
-		void Initialize() __attribute__((deprecated(UNBOUNDED)));
+		void Initialize() /*__attribute__((deprecated(UNBOUNDED)))*/;
 
 private:
 		Joystick *driver;

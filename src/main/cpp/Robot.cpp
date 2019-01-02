@@ -45,7 +45,7 @@ public:
 	 * Constructor
 	 */
 	Robot() {
-		cout << "CONSTRUCTOR 10" << endl;
+		cout << "CONSTRUCTOR 20" << endl;
 	 }
 
 	/**
