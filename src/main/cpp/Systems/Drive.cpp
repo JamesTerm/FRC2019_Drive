@@ -37,7 +37,6 @@ void Drive::AddControlDrive(ControlItem *control){
 	}catch(...){
 		cout << "UNKNOWN" << endl;
 	}
-	cout << "MOTHERDUCKER" << endl;
 }
 
 void Drive::AddControlOperate(ControlItem *control){
