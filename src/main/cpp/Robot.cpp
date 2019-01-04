@@ -43,7 +43,6 @@ public:
 	 * Constructor
 	 */
 	Robot() {
-		cout << "CONSTRUCTOR 21" << endl;
 	 }
 
 	/**
@@ -54,12 +53,9 @@ public:
 	
 	void RobotInit() override
 	{
-		cout << "ROBOT INIT" << endl;
 		m_drive = new Drive();
 		m_activeCollection = new ActiveCollection();
-		cout << "ACTIVE COLLECTION COMPLETED" << endl;
 		Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
-		cout << "CONFIG COMPLETED" << endl;
 		cout << "Program Version: " << VERSION << " Revision: " << REVISION << endl;
 	}
 

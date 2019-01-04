@@ -16,27 +16,15 @@ Email:	cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 using namespace std;
 using namespace Systems;
 
-Drive::Drive(){
-	cout << "NEW DRIVE" << endl;
-}
+Drive::Drive(){}
 
 void Drive::Initialize()
 {
-	cout << "INITIALIZE DRIVE" << endl;
 	//reserved to initialize 
 }
 
 void Drive::AddControlDrive(ControlItem *control){
-	cout << "ADD CONTROL DRIVE FINISHED" << endl;
-	try{
-		driveControlCollection.push_back(control);
-	}catch(const runtime_error& re){
-		cout << "RUNTIME ERROR: " << re.what() << endl;
-	}catch(const exception& ex){
-		cout << "EXCEPTION: " << ex.what() << endl;
-	}catch(...){
-		cout << "UNKNOWN" << endl;
-	}
+	driveControlCollection.push_back(control);
 }
 
 void Drive::AddControlOperate(ControlItem *control){

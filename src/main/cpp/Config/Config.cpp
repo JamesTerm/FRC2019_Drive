@@ -22,11 +22,9 @@ Config::Config(ActiveCollection *_activeCollection, Drive *_drive) {
 	m_activeCollection = _activeCollection;
 	m_drive = _drive;
 	AllocateComponents();
-	cout << "CONFIG CONSTRUCTOR COMPLETE" << endl;
 }
 
 void Config::AllocateComponents(){
-	cout << "ALLOCATE COMPONENTS" << endl;
 	EncoderItem *enc0 = new EncoderItem("enc0", 2, 3, false);
 	m_activeCollection->Add(enc0);
 
@@ -62,7 +60,6 @@ void Config::AllocateComponents(){
 	DigitalInputItem *liftSwitch = new DigitalInputItem(4, "InputTest");
 
 /***********************  SOLENOID DEFINITIONS  *******************/
-cout << "COMPONENT DEFINITIONS COMPLETED" << endl;
 /*********************** m_activeCollection CALLS *******************/
 
 	m_activeCollection->Add(left_0);
@@ -80,27 +77,21 @@ cout << "COMPONENT DEFINITIONS COMPLETED" << endl;
 	m_activeCollection->Add(intakeDrop);
 
 	m_activeCollection->Add(liftSwitch);
-cout << "ACTIVE COLLECTION ADDS COMPLETED" << endl;
 /*********************** DRIVE CONTROL DEFINITIONS ******************/
 
 	AxisControl *leftDrive = new AxisControl(m_driveJoy, "LeftDrive", 1, 0.07, true, 0.70);
 	AxisControl *rightDrive = new AxisControl(m_driveJoy, "RightDrive", 5, 0.07, true, 0.70);
-cout << "AXIS CONTROL COMPLETED" << endl;
 /*********************** DRIVE ADDITIONS ***************************/
 
 	m_drive->AddControlDrive(leftDrive);
-cout << "LEFT DRIVE" << endl;
 	m_drive->AddControlDrive(rightDrive);
-cout << "DRIVE ADDITIONS COMPLETED" << endl;
 /*********************** DRIVE BINDINGS ****************************/
 	leftDrive->AddComponent(left_0);
 	leftDrive->AddComponent(left_1);
 	leftDrive->AddComponent(left_2);
-cout << "DRIVE BINDINGS START" << endl;
 	rightDrive->AddComponent(right_0);
 	rightDrive->AddComponent(right_1);
 	rightDrive->AddComponent(right_2);
-cout << "DRIVE BINDINGS COMPLETE" << endl;
 /********************* OPERATE CONTROL DEFINITIONS ******************/
 
 	AxisControl *intakeDropControl = new AxisControl(m_operatorJoy, "IntakeDropControl", 5, 0.3, true, 0.50);
