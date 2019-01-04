@@ -26,14 +26,15 @@ namespace Configuration{
 
 class Config {
 public:
-	Joystick *driveJoy;
-	Joystick *operatorJoy;
-	ActiveCollection *activeCollection;
-	Drive *drive;
 	Config(ActiveCollection *_activeCollection, Drive *_drive);
 	//TODO: Make this a bool return
 	void AllocateComponents();
 	virtual ~Config();
+private:
+	Joystick *m_driveJoy;
+	Joystick *m_operatorJoy;
+	ActiveCollection *m_activeCollection;
+	Drive *m_drive;
 };
 
 }

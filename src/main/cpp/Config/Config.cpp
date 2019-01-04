@@ -17,10 +17,10 @@ using namespace Systems;
 using namespace Configuration;
 
 Config::Config(ActiveCollection *_activeCollection, Drive *_drive) {
-	driveJoy = new Joystick(0);
-	operatorJoy = new Joystick(1);
-	activeCollection = _activeCollection;
-	drive = _drive;
+	m_driveJoy = new Joystick(0);
+	m_operatorJoy = new Joystick(1);
+	m_activeCollection = _activeCollection;
+	m_drive = _drive;
 	AllocateComponents();
 	cout << "CONFIG CONSTRUCTOR COMPLETE" << endl;
 }
@@ -28,15 +28,15 @@ Config::Config(ActiveCollection *_activeCollection, Drive *_drive) {
 void Config::AllocateComponents(){
 	cout << "ALLOCATE COMPONENTS" << endl;
 	EncoderItem *enc0 = new EncoderItem("enc0", 2, 3, false);
-	activeCollection->Add(enc0);
+	m_activeCollection->Add(enc0);
 
 	//EncoderItem *enc1 = new EncoderItem("enc1", 2, 3, false);
-	//activeCollection->Add(enc1);
+	//m_activeCollection->Add(enc1);
 
 /********************** NAVX DEFINITIONS **************************/
 
 /*	NavX *navX = new NavX();
-	activeCollection->Add(navX);
+	m_activeCollection->Add(navX);
 */
 /********************** MOTOR DEFINITIONS *************************/
 
@@ -63,34 +63,34 @@ void Config::AllocateComponents(){
 
 /***********************  SOLENOID DEFINITIONS  *******************/
 cout << "COMPONENT DEFINITIONS COMPLETED" << endl;
-/*********************** ACTIVECOLLECTION CALLS *******************/
+/*********************** m_activeCollection CALLS *******************/
 
-	activeCollection->Add(left_0);
-	activeCollection->Add(left_1);
-	activeCollection->Add(left_2);
-	activeCollection->Add(right_0);
-	activeCollection->Add(right_1);
-	activeCollection->Add(right_2);
+	m_activeCollection->Add(left_0);
+	m_activeCollection->Add(left_1);
+	m_activeCollection->Add(left_2);
+	m_activeCollection->Add(right_0);
+	m_activeCollection->Add(right_1);
+	m_activeCollection->Add(right_2);
 
-	activeCollection->Add(climb_0);
-	activeCollection->Add(climb_1);
-	activeCollection->Add(lift);
-	activeCollection->Add(leftIntake);
-	activeCollection->Add(rightIntake);
-	activeCollection->Add(intakeDrop);
+	m_activeCollection->Add(climb_0);
+	m_activeCollection->Add(climb_1);
+	m_activeCollection->Add(lift);
+	m_activeCollection->Add(leftIntake);
+	m_activeCollection->Add(rightIntake);
+	m_activeCollection->Add(intakeDrop);
 
-	activeCollection->Add(liftSwitch);
+	m_activeCollection->Add(liftSwitch);
 cout << "ACTIVE COLLECTION ADDS COMPLETED" << endl;
 /*********************** DRIVE CONTROL DEFINITIONS ******************/
 
-	AxisControl *leftDrive = new AxisControl(driveJoy, "LeftDrive", 1, 0.07, true, 0.70);
-	AxisControl *rightDrive = new AxisControl(driveJoy, "RightDrive", 5, 0.07, true, 0.70);
+	AxisControl *leftDrive = new AxisControl(m_driveJoy, "LeftDrive", 1, 0.07, true, 0.70);
+	AxisControl *rightDrive = new AxisControl(m_driveJoy, "RightDrive", 5, 0.07, true, 0.70);
 cout << "AXIS CONTROL COMPLETED" << endl;
 /*********************** DRIVE ADDITIONS ***************************/
 
-	drive->AddControlDrive(leftDrive);
+	m_drive->AddControlDrive(leftDrive);
 cout << "LEFT DRIVE" << endl;
-	drive->AddControlDrive(rightDrive);
+	m_drive->AddControlDrive(rightDrive);
 cout << "DRIVE ADDITIONS COMPLETED" << endl;
 /*********************** DRIVE BINDINGS ****************************/
 	leftDrive->AddComponent(left_0);
@@ -103,27 +103,27 @@ cout << "DRIVE BINDINGS START" << endl;
 cout << "DRIVE BINDINGS COMPLETE" << endl;
 /********************* OPERATE CONTROL DEFINITIONS ******************/
 
-	AxisControl *intakeDropControl = new AxisControl(operatorJoy, "IntakeDropControl", 5, 0.3, true, 0.50);
-	AxisControl *liftControl = new AxisControl(operatorJoy, "LiftControl", 1, 0.1, true, .9);
-	AxisControl *climbControl = new AxisControl(operatorJoy, "ClimbContol", 2, 0.07, false, 0.9);
-	AxisControl *intakeOutFastControl = new AxisControl(operatorJoy, "IntakeOutSlow", 3, .07, false, -.6);
-	ButtonControl *intakeOutSlowControl = new ButtonControl(operatorJoy, "IntakeOutSlow", 2, false, false, -.3, false);
-	ButtonControl *intakeInControlRight = new ButtonControl(operatorJoy, "IntakeIn", 3, true, false, .75, false);
-	ButtonControl *intakeInControlLeft = new ButtonControl(operatorJoy, "IntakeIn", 3, true, false, .9, false);
-//	ButtonControl *intakeInControlLeftBump = new ButtonControl(operatorJoy, "IntakeIn", 5, false, false, .5, false);
-//	ButtonControl *intakeInControlRightBump = new ButtonControl(operatorJoy, "IntakeIn", 6, false, false, .5, false);
+	AxisControl *intakeDropControl = new AxisControl(m_operatorJoy, "IntakeDropControl", 5, 0.3, true, 0.50);
+	AxisControl *liftControl = new AxisControl(m_operatorJoy, "LiftControl", 1, 0.1, true, .9);
+	AxisControl *climbControl = new AxisControl(m_operatorJoy, "ClimbContol", 2, 0.07, false, 0.9);
+	AxisControl *intakeOutFastControl = new AxisControl(m_operatorJoy, "IntakeOutSlow", 3, .07, false, -.6);
+	ButtonControl *intakeOutSlowControl = new ButtonControl(m_operatorJoy, "IntakeOutSlow", 2, false, false, -.3, false);
+	ButtonControl *intakeInControlRight = new ButtonControl(m_operatorJoy, "IntakeIn", 3, true, false, .75, false);
+	ButtonControl *intakeInControlLeft = new ButtonControl(m_operatorJoy, "IntakeIn", 3, true, false, .9, false);
+//	ButtonControl *intakeInControlLeftBump = new ButtonControl(m_operatorJoy, "IntakeIn", 5, false, false, .5, false);
+//	ButtonControl *intakeInControlRightBump = new ButtonControl(m_operatorJoy, "IntakeIn", 6, false, false, .5, false);
 
 /*********************** SYSTEMS CONTROL OPERATOR *******************/
 
-	drive->AddControlOperate(intakeDropControl);
-	drive->AddControlOperate(liftControl);
-	drive->AddControlOperate(intakeInControlRight);
-	drive->AddControlOperate(intakeInControlLeft);
+	m_drive->AddControlOperate(intakeDropControl);
+	m_drive->AddControlOperate(liftControl);
+	m_drive->AddControlOperate(intakeInControlRight);
+	m_drive->AddControlOperate(intakeInControlLeft);
 //	systemsCollection.drive->AddControlOperate(intakeInControlLeftBump);
 //	systemsCollection.drive->AddControlOperate(intakeInControlRightBump);
-	drive->AddControlOperate(intakeOutSlowControl);
-	drive->AddControlOperate(climbControl);
-	drive->AddControlOperate(intakeOutFastControl);
+	m_drive->AddControlOperate(intakeOutSlowControl);
+	m_drive->AddControlOperate(climbControl);
+	m_drive->AddControlOperate(intakeOutFastControl);
 
 /********************** OPERATOR BINDINGS **************************/
 
@@ -153,8 +153,9 @@ cout << "DRIVE BINDINGS COMPLETE" << endl;
 	liftControl->SetLift(liftSwitch, 3.0);
 
 /************ SYSTEMS COLLECTION ACTIVE COLLECTION ****************/
-
-	drive->activeCollection = activeCollection;
+	//TODO this shouldn't be accessing member variables
+	//This shouldn't be managed here either
+	m_drive->activeCollection = m_activeCollection;
 
 }
 
