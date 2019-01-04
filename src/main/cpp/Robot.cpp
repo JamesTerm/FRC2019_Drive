@@ -95,7 +95,19 @@ public:
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-		m_drive->Initialize();
+		double LastTime = GetTime();
+		while (IsOperatorControl() && !IsDisabled())
+		{
+			const double CurrentTime=GetTime();
+			//I'll keep this around as a synthetic time option for debug purposes
+			//const double DeltaTime=0.020;
+			const double DeltaTime=CurrentTime - LastTime;
+			LastTime=CurrentTime;
+			m_drive->Update(DeltaTime);
+			//using this from test runs from robo wranglers code
+			Wait(0.010);
+		}
+
 #pragma GCC diagnostic pop
 	}
 

@@ -23,7 +23,7 @@ Drive::Drive(){
 void Drive::Initialize()
 {
 	cout << "INITIALIZE DRIVE" << endl;
-	mainLoop();
+	//reserved to initialize 
 }
 
 void Drive::AddControlDrive(ControlItem *control){
@@ -43,16 +43,11 @@ void Drive::AddControlOperate(ControlItem *control){
 	operateControlCollection.push_back(control);
 }
 
-void Drive::mainLoop()
+void Drive::Update(double dTime_s)
 {
-	while(_IsTeleoporated())
-	{
-		for(int i=0; i<(int)driveControlCollection.size();i++)
-			(*driveControlCollection[i]).Update();
+	for(int i=0; i<(int)driveControlCollection.size();i++)
+		(*driveControlCollection[i]).Update();
 
-		for(int i=0; i<(int)operateControlCollection.size();i++)
-			(*operateControlCollection[i]).Update();
-
-		Wait(0.05);
-	}
+	for(int i=0; i<(int)operateControlCollection.size();i++)
+		(*operateControlCollection[i]).Update();
 }

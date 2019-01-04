@@ -28,7 +28,7 @@ public:
 		bool enabled = true;
 
 	    Drive();
-	    void mainLoop();
+	    void Update(double dTime_s);
 	    void AddControlDrive(ControlItem *control);
 	    void AddControlOperate(ControlItem *control);
 	    vector<ControlItem*> driveControlCollection;
