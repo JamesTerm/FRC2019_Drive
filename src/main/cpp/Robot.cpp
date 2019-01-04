@@ -39,9 +39,6 @@ class Robot : public SampleRobot
 
 public:
 
-	ActiveCollection *activeCollection; //!< Pointer to the only instantiation of the ActiveCollection Class in the program
-	Drive *drive;
-
 	/**
 	 * Constructor
 	 */
@@ -58,10 +55,10 @@ public:
 	void RobotInit() override
 	{
 		cout << "ROBOT INIT" << endl;
-		drive = new Drive();
-		activeCollection = new ActiveCollection();
+		m_drive = new Drive();
+		m_activeCollection = new ActiveCollection();
 		cout << "ACTIVE COLLECTION COMPLETED" << endl;
-		Config *config = new Config(activeCollection, drive); //!< Pointer to the configuration file of the robot
+		Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
 		cout << "CONFIG COMPLETED" << endl;
 		cout << "Program Version: " << VERSION << " Revision: " << REVISION << endl;
 	}
@@ -78,13 +75,13 @@ public:
 
 		if (autoSelected == drivestraight) //!< Drive Straight Autonomous
 		{
-			DriveStraight *driveStraight = new DriveStraight(activeCollection);
+			DriveStraight *driveStraight = new DriveStraight(m_activeCollection);
 			driveStraight->Start();
 		}
 
 		else //!< Default Autonomous
 		{
-			DriveStraight *driveStraight = new DriveStraight(activeCollection);
+			DriveStraight *driveStraight = new DriveStraight(m_activeCollection);
 			driveStraight->Start();
 		}
 	}
@@ -98,7 +95,7 @@ public:
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-		drive->Initialize();
+		m_drive->Initialize();
 #pragma GCC diagnostic pop
 	}
 
@@ -114,6 +111,8 @@ private:
 
 	//TODO: Make this into it's own file
 
+	ActiveCollection *m_activeCollection; //!< Pointer to the only instantiation of the ActiveCollection Class in the program
+	Drive *m_drive; //!< Pointer to the only instantiation of the Drive class in the program
 	const string drivestraight = "drive";
 };
 

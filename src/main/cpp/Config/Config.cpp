@@ -151,12 +151,6 @@ cout << "DRIVE BINDINGS COMPLETE" << endl;
 //	intakeInControlRightBump->SetRamp(0.1);
 
 	liftControl->SetLift(liftSwitch, 3.0);
-
-/************ SYSTEMS COLLECTION ACTIVE COLLECTION ****************/
-	//TODO this shouldn't be accessing member variables
-	//This shouldn't be managed here either
-	m_drive->activeCollection = m_activeCollection;
-
 }
 
 Config::~Config(){

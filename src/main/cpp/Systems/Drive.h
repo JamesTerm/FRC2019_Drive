@@ -31,14 +31,13 @@ public:
 	    void mainLoop();
 	    void AddControlDrive(ControlItem *control);
 	    void AddControlOperate(ControlItem *control);
-	    ActiveCollection *activeCollection;
 	    vector<ControlItem*> driveControlCollection;
 	    vector<ControlItem*> operateControlCollection;
-		void Initialize() /*__attribute__((deprecated(UNBOUNDED)))*/;
+		void Initialize() __attribute__((deprecated(UNBOUNDED)));
 
 private:
-		Joystick *driver;
-		Joystick *operateJoy;
+		Joystick *m_driver;
+		Joystick *m_operateJoy;
 };
 
 } /* namespace Systems */
