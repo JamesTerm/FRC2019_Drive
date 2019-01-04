@@ -20,7 +20,7 @@ Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 #include "Autonomi/Autons.h"
 #include "Config/ActiveCollection.h"
 #include "Config/Config.h"
-#include "Systems/SystemsCollection.h"
+#include "Systems/Drive.h"
 
 using namespace frc;
 using namespace std;
@@ -40,12 +40,13 @@ class Robot : public SampleRobot
 public:
 
 	ActiveCollection *activeCollection; //!< Pointer to the only instantiation of the ActiveCollection Class in the program
+	Drive *drive;
 
 	/**
 	 * Constructor
 	 */
 	Robot() {
-		cout << "CONSTRUCTOR 20" << endl;
+		cout << "CONSTRUCTOR 21" << endl;
 	 }
 
 	/**
@@ -57,11 +58,10 @@ public:
 	void RobotInit() override
 	{
 		cout << "ROBOT INIT" << endl;
-		Initialize_Systems();
-		cout << "SYSTEM INITILIZATION COMPLETE" << endl;
+		drive = new Drive();
 		activeCollection = new ActiveCollection();
 		cout << "ACTIVE COLLECTION COMPLETED" << endl;
-		Config *config = new Config(activeCollection); //!< Pointer to the configuration file of the robot
+		Config *config = new Config(activeCollection, drive); //!< Pointer to the configuration file of the robot
 		cout << "CONFIG COMPLETED" << endl;
 		cout << "Program Version: " << VERSION << " Revision: " << REVISION << endl;
 	}

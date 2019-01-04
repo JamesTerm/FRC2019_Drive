@@ -14,8 +14,10 @@ Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 #ifndef SRC_CONFIG_CONFIG_H_
 #define SRC_CONFIG_CONFIG_H_
 
+#include <iostream>
+
 #include "ActiveCollection.h"
-#include "../Systems/SystemsCollection.h"
+#include "../Systems/Drive.h"
 #include "../Controls/ButtonControl.h"
 #include "../Controls/AxisControl.h"
 
@@ -27,7 +29,8 @@ public:
 	Joystick *driveJoy;
 	Joystick *operatorJoy;
 	ActiveCollection *activeCollection;
-	Config(ActiveCollection *_activeCollection);
+	Drive *drive;
+	Config(ActiveCollection *_activeCollection, Drive *_drive);
 	//TODO: Make this a bool return
 	void AllocateComponents();
 	virtual ~Config();

@@ -1,4 +1,3 @@
-
 /****************************** Header ******************************\
 Class Name: Config
 File Name:	Config.h
@@ -12,16 +11,16 @@ Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 \********************************************************************/
 
 #include "Config.h"
-#include "..\Systems\SystemsCollection.h"
 
 using namespace std;
 using namespace Systems;
 using namespace Configuration;
 
-Config::Config(ActiveCollection *_activeCollection) {
+Config::Config(ActiveCollection *_activeCollection, Drive *_drive) {
 	driveJoy = new Joystick(0);
 	operatorJoy = new Joystick(1);
 	activeCollection = _activeCollection;
+	drive = _drive;
 	AllocateComponents();
 	cout << "CONFIG CONSTRUCTOR COMPLETE" << endl;
 }
