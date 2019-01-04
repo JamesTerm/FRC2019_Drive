@@ -24,35 +24,35 @@ VictorSPXItem::VictorSPXItem(int _channel, string _name, bool _reversed)
 	: OutputComponent(_name){
 	channel = _channel;
 	reversed = _reversed;
-	Victor = new VictorSPX(channel);
-	Victor->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
+	victor = new VictorSPX(channel);
+	victor->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
 }
 
 double VictorSPXItem::Get(){
     if (reversed)
-        return Victor->GetMotorOutputPercent() * -1;
-    return Victor->GetMotorOutputPercent();
+        return victor->GetMotorOutputPercent() * -1;
+    return victor->GetMotorOutputPercent();
 }
 
 int VictorSPXItem::GetQuadraturePosition(){
-	return Victor->GetSensorCollection().GetQuadraturePosition();
+	return victor->GetSensorCollection().GetQuadraturePosition();
 }
 
 void VictorSPXItem::SetQuadraturePosition(int val){
-	Victor->GetSensorCollection().SetQuadraturePosition(val, 10);
+	victor->GetSensorCollection().SetQuadraturePosition(val, 10);
 }
 
 void VictorSPXItem::Set(double val){
 	if((val<0 || val>0) && !inUse)
 	{
 		inUse = true;
-		if(reversed) Victor->Set(ControlMode::PercentOutput, -val);
-		else Victor->Set(ControlMode::PercentOutput, val);
+		if(reversed) victor->Set(ControlMode::PercentOutput, -val);
+		else victor->Set(ControlMode::PercentOutput, val);
 		inUse = false;
 	}
 	else if(!inUse){
 		inUse = true;
-		Victor->Set(ControlMode::PercentOutput, 0);
+		victor->Set(ControlMode::PercentOutput, 0);
 		inUse = false;
 	}
 }

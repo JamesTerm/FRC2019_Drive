@@ -22,7 +22,7 @@ using namespace frc;
 namespace Components{
 class VictorSPXItem : public OutputComponent{
 private:
-	VictorSPX *Victor;
+	VictorSPX *victor;
 	int channel;
 	bool reversed;
 
