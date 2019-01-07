@@ -18,6 +18,8 @@ Email: cooper.ryan@centaurisoftware.co
 
 #include "../Components/VictorSPItem.h"
 #include "../Components/TalonSRXItem.h"
+#include "../Components/EncoderItem.h"
+#include "../Components/DoubleSolenoidItem.h"
 
 using namespace std;
 using namespace Components;
@@ -34,12 +36,12 @@ namespace Configuration
 
 			ActiveCollection();
 			virtual ~ActiveCollection(){}
-
-	//TODO: Look into making the add methods bools
+			
 			template <class T>
 			T Get(string name);
 			VictorSPItem* GetVictor(string name);
 			TalonSRXItem* GetTalon(string name);
+			EncoderItem* GetEncoder(string name);
 			int GetSize();
 			vector<NativeComponent*> GetRawComponent();
 			void Add(NativeComponent *component);

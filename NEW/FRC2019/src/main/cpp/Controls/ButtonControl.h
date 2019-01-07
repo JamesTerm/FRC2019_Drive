@@ -15,8 +15,7 @@ Email:	dylantrwatson@gmail.com
 
 #include "ControlItem.h"
 #include "../Components/VictorSPItem.h"
-//TODO: Fix this
-//#include "../Components/DoubleSolenoidItem.h"
+#include "../Components/DoubleSolenoidItem.h"
 
 namespace Controls{
 class ButtonControl : public ControlItem {

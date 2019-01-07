@@ -19,7 +19,7 @@ Email: ruizdylann@gmail.com
 #include <iostream>
 
 #include "../Config/ActiveCollection.h"
-//#include "../Util/UtilityFunctions.h"
+#include "../Util/UtilityFunctions.h"
 #include "../Config/ActiveCollection.h"
 #include "../Config/Config.h"
 #include "../Components/VictorSPItem.h"

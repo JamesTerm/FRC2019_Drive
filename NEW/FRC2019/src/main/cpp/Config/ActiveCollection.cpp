@@ -74,6 +74,23 @@ TalonSRXItem* ActiveCollection::GetTalon(string name){
 }
 
 /**
+ * Method to return an Encoder of a certain name
+**/
+EncoderItem* ActiveCollection::GetEncoder(string name){
+	try{
+		for(int i=0; i<(int)activeCollection.size();i++){
+			if((*activeCollection[i]).name == (string)name){
+				return (EncoderItem*)activeCollection[i];
+			}
+		}
+		throw "AHHH";
+	}
+	catch(...){
+		cout << "Cannot find encoder " << name << ", it does not exist in the active collection!\n" << endl;
+	}
+}
+
+/**
  * Method to return the current size of the ActiveCollection list
 **/
 int ActiveCollection::GetSize(){
