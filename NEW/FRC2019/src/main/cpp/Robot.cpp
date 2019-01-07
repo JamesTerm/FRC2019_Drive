@@ -13,7 +13,7 @@ Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 
 #include <iostream>
 #include "Robot.h"
-
+//TODO: Potentiometer include, VictorSPX include
 using namespace std;
 
 	/**

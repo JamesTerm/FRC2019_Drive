@@ -91,6 +91,23 @@ EncoderItem* ActiveCollection::GetEncoder(string name){
 }
 
 /**
+ * Method to return the NavX
+**/
+NavX* ActiveCollection::GetNavX(){
+	try{
+		for(int i=0; i<(int)activeCollection.size();i++){
+			if((*activeCollection[i]).name == "NavX"){
+				return (NavX*)activeCollection[i];
+			}
+		}
+		throw "AHHH";
+	}
+	catch(...){
+		cout << "Cannot find the NavX, check the config." << endl;
+	}
+}
+
+/**
  * Method to return the current size of the ActiveCollection list
 **/
 int ActiveCollection::GetSize(){
