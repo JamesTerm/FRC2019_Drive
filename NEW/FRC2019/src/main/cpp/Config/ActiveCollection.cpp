@@ -15,7 +15,7 @@ Email: cooper.ryan@centaurisoftware.co
 #include "ActiveCollection.h"
 
 using namespace std;
-using namespace System;
+using namespace Configuration;
 
 /**
  * Default Constructor
@@ -42,7 +42,6 @@ T ActiveCollection::Get(string name){
 /**
  * Method to return a VictorSP of a certain name
 **/
-//TODO: change all current instances of Victor to VictorSP as we will be adding Victor SPX very soon 
 VictorSPItem* ActiveCollection::GetVictor(string name){
 	try{
 		for(int i=0; i<(int)activeCollection.size();i++){
@@ -54,6 +53,23 @@ VictorSPItem* ActiveCollection::GetVictor(string name){
 	}
 	catch(...){
 		cout << "Cannot find victor " << name << ", it does not exist in the active collection!\n" << endl;
+	}
+}
+
+/**
+ * Method to return a TalonSRX of a certain name
+**/
+TalonSRXItem* ActiveCollection::GetTalon(string name){
+	try{
+		for(int i=0; i<(int)activeCollection.size();i++){
+			if((*activeCollection[i]).name == (string)name){
+				return (TalonSRXItem*)activeCollection[i];
+			}
+		}
+		throw "AHHH";
+	}
+	catch(...){
+		cout << "Cannot find talon " << name << ", it does not exist in the active collection!\n" << endl;
 	}
 }
 

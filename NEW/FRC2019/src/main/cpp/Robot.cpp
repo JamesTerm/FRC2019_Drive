@@ -34,15 +34,16 @@ using namespace std;
 	{
 
 		cout << "Program Version: " << VERSION << " Revision: " << REVISION << endl;
-		CameraServer::GetInstance()->StartAutomaticCapture();
-		Joystick* testJoy = new Joystick(0);
+		//CameraServer::GetInstance()->StartAutomaticCapture();
+		Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
+/*		Joystick* testJoy = new Joystick(0);
 
 		VictorSPItem* testSP = new VictorSPItem("testSP", 0, false);
 		AxisControl* testAxis = new AxisControl(testJoy, "testAxis", 1, 0, false, 1);
 		testAxis->AddComponent(testSP);
 
 		//m_activeCollection->Add(testSP);
-		m_drive->AddControlDrive(testAxis);
+		m_drive->AddControlDrive(testAxis);*/
 	}
 
 	/**
@@ -52,6 +53,19 @@ using namespace std;
 	void Robot::Autonomous()
 	{
 		cout << "Autonomous Started." << endl;
+				string autoSelected = SmartDashboard::GetString("Auto Selector", m_driveStraight);
+		cout << autoSelected << endl;
+		if (autoSelected == m_driveStraight) //!< Drive Straight Autonomous
+		{
+			DriveStraight *driveStraight = new DriveStraight(m_activeCollection);
+			driveStraight->Start();
+		}
+
+		else //!< Default Autonomous
+		{
+			DriveStraight *driveStraight = new DriveStraight(m_activeCollection);
+			driveStraight->Start();
+		}
 	}
 
     /**

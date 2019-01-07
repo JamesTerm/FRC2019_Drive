@@ -16,12 +16,13 @@ Email: cooper.ryan@centaurisoftware.co
 #include <vector>
 #include <utility>
 
-#include "Components/VictorSPItem.h"
+#include "../Components/VictorSPItem.h"
+#include "../Components/TalonSRXItem.h"
 
 using namespace std;
 using namespace Components;
 
-namespace System
+namespace Configuration
 {
 	class ActiveCollection
 	{
@@ -38,6 +39,7 @@ namespace System
 			template <class T>
 			T Get(string name);
 			VictorSPItem* GetVictor(string name);
+			TalonSRXItem* GetTalon(string name);
 			int GetSize();
 			vector<NativeComponent*> GetRawComponent();
 			void Add(NativeComponent *component);

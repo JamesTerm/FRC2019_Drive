@@ -7,17 +7,21 @@
 
 #pragma once
 
-#include <frc/WPILib.h>
-
 #include <string>
+#include <frc/WPILib.h>
 #include <frc/SampleRobot.h>
-#include "ActiveCollection.h"
+
+#include "Config/Config.h"
+#include "Config/ActiveCollection.h"
 #include "Systems/Drive.h"
 #include "Controls/AxisControl.h"
+#include "Autonomi/Autons.h"
 
 using namespace frc;
 using namespace System;
 using namespace Controls;
+using namespace Configuration;
+using namespace Autonomi;
 
 #define VERSION 1 //!< Defines the program version for the entire program.
 #define REVISION "A" //!< Defines the revision of this version of the program.
@@ -36,4 +40,5 @@ class Robot : public SampleRobot
     private:
 	    Drive *m_drive;
 	    ActiveCollection *m_activeCollection; //!< Pointer to the only instantiation of the ActiveCollection Class in the program
+	    const string m_driveStraight = "drive";
 };
