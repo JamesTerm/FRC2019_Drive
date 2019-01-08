@@ -14,7 +14,7 @@ Email: dylantrwatson@gmail.com
 #ifndef SRC_COMPONENTS_TALONSRXITEM_H_
 #define SRC_COMPONENTS_TALONSRXITEM_H_
 
-#include "ctre/Phoenix.h"
+#include <ctre/Phoenix.h>
 #include "OutputComponent.h"
 
 using namespace std;

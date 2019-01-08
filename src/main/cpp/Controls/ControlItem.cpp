@@ -19,30 +19,36 @@ using namespace Controls;
 
 ControlItem::ControlItem(){}
 
-ControlItem::ControlItem(Joystick *_joy, string _name, bool _reversed, double _powerMultiplier){
+ControlItem::ControlItem(Joystick *_joy, string _name, bool _reversed, double _powerMultiplier)
+{
 	joy = _joy;
 	name = _name;
 	reversed = _reversed;
 	powerMultiplier = _powerMultiplier;
 }
 
-void ControlItem::AddComponent(OutputComponent *component){
+void ControlItem::AddComponent(OutputComponent *component)
+{
 	components.push_back(component);
 }
 
-vector<string> ControlItem::GetComponents(){
+vector<string> ControlItem::GetComponents()
+{
 	vector<string> componentNames;
 	for(int i=0; i<(int)components.size();i++)
 		componentNames.push_back((*components[i]).name);
 	return componentNames;
 }
 
-void ControlItem::SetToComponents(double val){
-	try{
+void ControlItem::SetToComponents(double val)
+{
+	try
+	{
 		for(int i=0; i<(int)components.size();i++)
 			(*components[i]).Set(val);
 	}
-	catch(...){
+	catch(...)
+	{
 		cout << "Error setting value to binding for " << name << " control!" << endl;
 	}
 }

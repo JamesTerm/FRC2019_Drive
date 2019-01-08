@@ -34,13 +34,13 @@ double VictorSPXItem::Get(){
     return victor->GetMotorOutputPercent();
 }
 
-int VictorSPXItem::GetQuadraturePosition(){
+/*int VictorSPXItem::GetQuadraturePosition(){
 	return victor->GetSensorCollection().GetQuadraturePosition();
 }
 
 void VictorSPXItem::SetQuadraturePosition(int val){
 	victor->GetSensorCollection().SetQuadraturePosition(val, 10);
-}
+}*/
 
 void VictorSPXItem::Set(double val){
 	if((val<0 || val>0) && !inUse)

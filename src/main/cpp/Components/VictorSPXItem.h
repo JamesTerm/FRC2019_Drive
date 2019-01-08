@@ -29,8 +29,8 @@ private:
 public:
 	VictorSPXItem();
 	VictorSPXItem(int channel, string name, bool reversed);
-	int GetQuadraturePosition();
-	void SetQuadraturePosition(int val);
+	/*int GetQuadraturePosition();
+	void SetQuadraturePosition(int val);*/
 	virtual double Get() override;
 	virtual void Set(double val) override;
 	virtual void Set(DoubleSolenoid::Value value) override;

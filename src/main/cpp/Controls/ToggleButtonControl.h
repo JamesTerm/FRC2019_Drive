@@ -16,20 +16,22 @@ Email:	dylantrwatson@gmail.com
 #include "ControlItem.h"
 
 using namespace frc;
-//TODO: actually write this
-namespace Controls{
-class ToggleButtonControl : public ControlItem{
-private:
-	Joystick *joy;
-	string name;
-	int button;
 
-public:
-	ToggleButtonControl();
-	ToggleButtonControl(Joystick *_joy, string _name, int _button);
-	virtual ~ToggleButtonControl();
-	virtual double Update() override;
-};
+namespace Controls
+{
+	class ToggleButtonControl : public ControlItem
+	{
+		private:
+			Joystick *joy;
+			string name;
+			int button;
+
+		public:
+			ToggleButtonControl();
+			ToggleButtonControl(Joystick *_joy, string _name, int _button);
+			virtual ~ToggleButtonControl();
+			virtual double Update() override;
+	};
 }
 
 #endif /* SRC_CONTROLS_TOGGLEBUTTONCONTROL_H_ */

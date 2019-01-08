@@ -18,7 +18,8 @@ Email: dylantrwatson@gmail.com
 using namespace std;
 using namespace Components;
 
-void VictorSPItem::Set(double val){
+void VictorSPItem::Set(double val)
+{
 	if((val<0 || val>0) && !inUse)
 	{
 		inUse = true;
@@ -26,40 +27,48 @@ void VictorSPItem::Set(double val){
 		else victor->Set(val);
 		inUse = false;
 	}
-	else if(!inUse){
+	else if(!inUse)
+	{
 		inUse = true;
 		victor->Set(0);
 		inUse = false;
 	}
 }
 
-void VictorSPItem::Stop(){
-	if(!inUse){
+void VictorSPItem::Stop()
+{
+	if(!inUse)
+	{
 		inUse = true;
 		victor->Set(0);
 		inUse = false;
 	}
 }
 
-double VictorSPItem::Get(){
+double VictorSPItem::Get()
+{
 	if(Reversed)
 		return victor->Get() * -1;
 	return victor->Get();
 }
 
-string VictorSPItem::GetName(){
+string VictorSPItem::GetName()
+{
 	return name;
 }
 
-int VictorSPItem::GetPolarity(){
+int VictorSPItem::GetPolarity()
+{
 	if(Reversed) return -1;
 	return 1;
 }
 
-void VictorSPItem::DefaultSet(){
+void VictorSPItem::DefaultSet()
+{
 	cout << "WHY DID YOU CALL THE DEFAULT SET FOR A MOTOR RETARD" << endl;
 }
 
-void VictorSPItem::Set(DoubleSolenoid::Value value){
+void VictorSPItem::Set(DoubleSolenoid::Value value)
+{
 	cout << "WHY DID YOU CALL THE SOLENOID SET FOR A MOTOR RETARD" << endl;
 }

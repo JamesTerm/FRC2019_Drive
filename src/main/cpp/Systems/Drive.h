@@ -12,34 +12,27 @@ Email:	cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 #ifndef SYSTEMS_DRIVE_H_
 #define SYSTEMS_DRIVE_H_
 
-#include "Preproc.h"
-#include "../Util/LoopChecks.h"
+#include <frc/WPILib.h>
+#include "../util/LoopChecks.h"
 #include "../Controls/ControlItem.h"
-#include "../Config/ActiveCollection.h"
 
+using namespace frc;
 using namespace std;
-using namespace Configuration;
+using namespace Util;
 using namespace Controls;
 
-namespace Systems{
-class Drive final
+namespace System
 {
-public:
-		bool enabled = true;
-
-	    Drive();
-	    void Update(double dTime_s);
-	    void AddControlDrive(ControlItem *control);
-	    void AddControlOperate(ControlItem *control);
-	    vector<ControlItem*> driveControlCollection;
-	    vector<ControlItem*> operateControlCollection;
-		void Initialize() __attribute__((deprecated(UNBOUNDED)));
-
-private:
-		Joystick *m_driver;
-		Joystick *m_operateJoy;
-};
-
+    class Drive final
+    {
+        public:
+	        Drive();
+	        void Update();
+	        void AddControlDrive(ControlItem *control);
+	        void AddControlOperate(ControlItem *control);
+	        vector<ControlItem*> driveControlCollection;
+	        vector<ControlItem*> operateControlCollection;
+    };
 } /* namespace Systems */
 
 #endif /* SYSTEMS_DRIVE_H_ */

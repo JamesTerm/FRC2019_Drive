@@ -15,7 +15,6 @@ Email: cooper.ryan@centaurisoftware.co
 #include "ActiveCollection.h"
 
 using namespace std;
-using namespace Components;
 using namespace Configuration;
 
 /**
@@ -43,7 +42,6 @@ T ActiveCollection::Get(string name){
 /**
  * Method to return a VictorSP of a certain name
 **/
-//TODO: change all current instances of Victor to VictorSP as we will be adding Victor SPX very soon 
 VictorSPItem* ActiveCollection::GetVictor(string name){
 	try{
 		for(int i=0; i<(int)activeCollection.size();i++){
@@ -76,23 +74,6 @@ TalonSRXItem* ActiveCollection::GetTalon(string name){
 }
 
 /**
- * Method to return a DigitalInput of a certain name
-**/
-DigitalInputItem* ActiveCollection::GetDI(string name){
-	try{
-		for(int i=0; i<(int)activeCollection.size();i++){
-			if((*activeCollection[i]).name == (string)name){
-				return (DigitalInputItem*)activeCollection[i];
-			}
-		}
-		throw "AHHH";
-	}
-	catch(...){
-		cout << "Cannot find DI " << name << ", it does not exist in the active collection!\n" << endl;
-	}
-}
-
-/**
  * Method to return an Encoder of a certain name
 **/
 EncoderItem* ActiveCollection::GetEncoder(string name){
@@ -107,13 +88,6 @@ EncoderItem* ActiveCollection::GetEncoder(string name){
 	catch(...){
 		cout << "Cannot find encoder " << name << ", it does not exist in the active collection!\n" << endl;
 	}
-}
-
-/**
- * Method to return the current size of the ActiveCollection list
-**/
-int ActiveCollection::GetSize(){
-	return activeCollection.size();
 }
 
 /**
@@ -134,6 +108,13 @@ NavX* ActiveCollection::GetNavX(){
 }
 
 /**
+ * Method to return the current size of the ActiveCollection list
+**/
+int ActiveCollection::GetSize(){
+	return activeCollection.size();
+}
+
+/**
  * Adds a component to the ActiveCollection
 **/
 void ActiveCollection::Add(NativeComponent *component){
@@ -143,17 +124,6 @@ void ActiveCollection::Add(NativeComponent *component){
 	catch(...){
 		cout << "Cannot add component " << (*component).name << endl;
 	}
-}
-
-void ActiveCollection::AddInput(InputComponent *component){
-	cout << "Adding " << component->GetName() << " to the input collection" << endl;
-	try{
-		inputCollection.push_back(component);
-	}
-	catch(...){
-		cout << "Cannot add component " << (*component).name << " to the inputCollection!" << endl;
-	}
-	cout << "INPUT SIZE: " << inputCollection.size() << endl;
 }
 
 vector<NativeComponent*> ActiveCollection::GetRawComponent(){

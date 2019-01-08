@@ -32,4 +32,3 @@ double PotentiometerItem::Get(){
 }
 
 PotentiometerItem::~PotentiometerItem() {}
-

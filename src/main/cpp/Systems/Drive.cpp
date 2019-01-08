@@ -14,24 +14,21 @@ Email:	cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 #include <iostream>
 
 using namespace std;
-using namespace Systems;
+using namespace System;
 
-Drive::Drive(){}
+Drive::Drive() { }
 
-void Drive::Initialize()
+void Drive::AddControlDrive(ControlItem *control)
 {
-	//reserved to initialize 
-}
-
-void Drive::AddControlDrive(ControlItem *control){
 	driveControlCollection.push_back(control);
 }
 
-void Drive::AddControlOperate(ControlItem *control){
+void Drive::AddControlOperate(ControlItem *control)
+{
 	operateControlCollection.push_back(control);
 }
 
-void Drive::Update(double dTime_s)
+void Drive::Update()
 {
 	for(int i=0; i<(int)driveControlCollection.size();i++)
 		(*driveControlCollection[i]).Update();

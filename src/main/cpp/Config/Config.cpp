@@ -13,7 +13,7 @@ Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 #include "Config.h"
 
 using namespace std;
-using namespace Systems;
+using namespace System;
 using namespace Configuration;
 
 Config::Config(ActiveCollection *_activeCollection, Drive *_drive) {
@@ -25,8 +25,8 @@ Config::Config(ActiveCollection *_activeCollection, Drive *_drive) {
 }
 
 void Config::AllocateComponents(){
-	EncoderItem *enc0 = new EncoderItem("enc0", 2, 3, false);
-	m_activeCollection->Add(enc0);
+//	EncoderItem *enc0 = new EncoderItem("enc0", 2, 3, false);
+//	m_activeCollection->Add(enc0);
 
 	//EncoderItem *enc1 = new EncoderItem("enc1", 2, 3, false);
 	//m_activeCollection->Add(enc1);
@@ -50,14 +50,14 @@ void Config::AllocateComponents(){
 	VictorSPItem *climb_1 = new VictorSPItem("Climb_1", 17, true);
 	//TalonSRXItem *climb_1 = new TalonSRXItem(0,"Climb_1", true);
 
-	TalonSRXItem *lift = new TalonSRXItem(24, "Lift", true);
+//	TalonSRXItem *lift = new TalonSRXItem(24, "Lift", true);
 
 	VictorSPItem *leftIntake = new VictorSPItem("LeftIntake", 6, false);
 	VictorSPItem *rightIntake = new VictorSPItem("RightIntake", 7, false);
 
 	VictorSPItem *intakeDrop = new VictorSPItem("IntakeDrop", 8, false);
 
-	DigitalInputItem *liftSwitch = new DigitalInputItem(4, "InputTest");
+//	DigitalInputItem *liftSwitch = new DigitalInputItem(4, "InputTest");
 
 /***********************  SOLENOID DEFINITIONS  *******************/
 /*********************** m_activeCollection CALLS *******************/
@@ -71,12 +71,12 @@ void Config::AllocateComponents(){
 
 	m_activeCollection->Add(climb_0);
 	m_activeCollection->Add(climb_1);
-	m_activeCollection->Add(lift);
+//	m_activeCollection->Add(lift);
 	m_activeCollection->Add(leftIntake);
 	m_activeCollection->Add(rightIntake);
 	m_activeCollection->Add(intakeDrop);
 
-	m_activeCollection->Add(liftSwitch);
+//	m_activeCollection->Add(liftSwitch);
 /*********************** DRIVE CONTROL DEFINITIONS ******************/
 
 	AxisControl *leftDrive = new AxisControl(m_driveJoy, "LeftDrive", 1, 0.07, true, 0.70);
@@ -101,8 +101,6 @@ void Config::AllocateComponents(){
 	ButtonControl *intakeOutSlowControl = new ButtonControl(m_operatorJoy, "IntakeOutSlow", 2, false, false, -.3, false);
 	ButtonControl *intakeInControlRight = new ButtonControl(m_operatorJoy, "IntakeIn", 3, true, false, .75, false);
 	ButtonControl *intakeInControlLeft = new ButtonControl(m_operatorJoy, "IntakeIn", 3, true, false, .9, false);
-//	ButtonControl *intakeInControlLeftBump = new ButtonControl(m_operatorJoy, "IntakeIn", 5, false, false, .5, false);
-//	ButtonControl *intakeInControlRightBump = new ButtonControl(m_operatorJoy, "IntakeIn", 6, false, false, .5, false);
 
 /*********************** SYSTEMS CONTROL OPERATOR *******************/
 
@@ -110,8 +108,6 @@ void Config::AllocateComponents(){
 	m_drive->AddControlOperate(liftControl);
 	m_drive->AddControlOperate(intakeInControlRight);
 	m_drive->AddControlOperate(intakeInControlLeft);
-//	systemsCollection.drive->AddControlOperate(intakeInControlLeftBump);
-//	systemsCollection.drive->AddControlOperate(intakeInControlRightBump);
 	m_drive->AddControlOperate(intakeOutSlowControl);
 	m_drive->AddControlOperate(climbControl);
 	m_drive->AddControlOperate(intakeOutFastControl);
@@ -120,12 +116,10 @@ void Config::AllocateComponents(){
 
 	intakeDropControl->AddComponent(intakeDrop);
 
-	liftControl->AddComponent(lift);
+//	liftControl->AddComponent(lift);
 
 	intakeInControlRight->AddComponent(rightIntake);
 	intakeInControlLeft->AddComponent(leftIntake);
-//	intakeInControlLeftBump->AddComponent(leftIntake);
-//	intakeInControlRightBump->AddComponent(rightIntake);
 
 	intakeOutSlowControl->AddComponent(rightIntake);
 	intakeOutSlowControl->AddComponent(leftIntake);
@@ -138,10 +132,8 @@ void Config::AllocateComponents(){
 
 	intakeInControlRight->SetRamp(0.1);
 	intakeInControlLeft->SetRamp(0.1);
-//	intakeInControlLeftBump->SetRamp(0.1);
-//	intakeInControlRightBump->SetRamp(0.1);
 
-	liftControl->SetLift(liftSwitch, 3.0);
+//	liftControl->SetLift(liftSwitch, 3.0);
 }
 
 Config::~Config(){

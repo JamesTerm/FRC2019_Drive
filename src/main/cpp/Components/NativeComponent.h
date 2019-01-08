@@ -14,22 +14,22 @@ Email: dylantrwatson@gmail.com
 #define SRC_COMPONENTS_NATIVECOMPONENT_H_
 
 #include <string>
-#include <WPILib.h>
+#include <frc/WPILib.h>
 
+using namespace frc;
 using namespace std;
 
-namespace Components{
-class NativeComponent
+namespace Components
 {
+	class NativeComponent
+	{
+		public:
+			string name;
+			NativeComponent(){}
+			NativeComponent(string _name){ name = _name; }
 
-public:
-	string name;
-	NativeComponent(){}
-	NativeComponent(string _name){
-		name = _name;
-	}
-	virtual ~NativeComponent(){}
-};
+			virtual ~NativeComponent(){}
+	};
 }
 
 #endif /* SRC_COMPONENTS_NATIVECOMPONENT_H_ */

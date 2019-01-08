@@ -14,17 +14,19 @@ Email:	dylantrwatson@gmail.com
 
 using namespace Controls;
 
-ToggleButtonControl::ToggleButtonControl() {}
+ToggleButtonControl::ToggleButtonControl() { }
 
-ToggleButtonControl::ToggleButtonControl(Joystick *_joy, string _name, int _button){
+ToggleButtonControl::ToggleButtonControl(Joystick *_joy, string _name, int _button)
+{
 	joy = _joy;
 	name = _name;
 	button = _button;
 }
 
-double ToggleButtonControl::Update(){
-return 0.0;
+double ToggleButtonControl::Update()
+{
+	return 0.0;
 }
 
-ToggleButtonControl::~ToggleButtonControl() {}
+ToggleButtonControl::~ToggleButtonControl() { }
 

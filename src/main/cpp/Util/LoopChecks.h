@@ -13,18 +13,22 @@ Email: cooper.ryan@centaurisoftware.co
 #ifndef SRC_INCLUDE_LOOPCHECKS_H_
 #define SRC_INCLUDE_LOOPCHECKS_H_
 
-#include <WPILib.h>
+#include <frc/WPILib.h>
 
-inline static bool _IsAutononomous()
+using namespace frc;
+
+namespace Util
 {
-	return DriverStation::GetInstance().IsAutonomous() && DriverStation::GetInstance().IsEnabled();
+	inline static bool _IsAutononomous()
+	{
+		return DriverStation::GetInstance().IsAutonomous() && DriverStation::GetInstance().IsEnabled();
+	}
+
+	inline static bool _IsTeleoporated()
+	{
+		return DriverStation::GetInstance().IsOperatorControl() && DriverStation::GetInstance().IsEnabled();
+	}
 }
 
-inline static bool _IsTeleoporated()
-{
-	return DriverStation::GetInstance().IsOperatorControl() && DriverStation::GetInstance().IsEnabled();
-}
-
-namespace Util{}
 
 #endif /* SRC_INCLUDE_LOOPCHECKS_H_ */

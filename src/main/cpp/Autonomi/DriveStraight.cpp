@@ -14,6 +14,7 @@ Email: ruizdylann@gmail.com
 
 using namespace std;
 using namespace Autonomi;
+using namespace Util;
 
 DriveStraight::DriveStraight(ActiveCollection *_activeCollection)
 {
@@ -24,5 +25,5 @@ void DriveStraight::Start()
 {
 	cout << "drive straight" << endl;
 	//DriveForward(500, .75, activeCollection);
-	DriveWithTimer(.5,.5,2, activeCollection);
+	DriveWithTimer(.5,.5,2,activeCollection);
 }

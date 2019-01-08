@@ -16,20 +16,22 @@ Email: dylantrwatson@gmail.com
 
 #include "InputComponent.h"
 
-namespace Components{
-class DigitalInputItem : public InputComponent{
-private:
-	DigitalInput *din;
-	int channel;
+namespace Components
+{
+    class DigitalInputItem : public InputComponent
+    {
+        private:
+	        DigitalInput *din;
+	        int channel;
 
-public:
-	DigitalInputItem(){}
-	DigitalInputItem(int _channel, string name);
-	bool GetBool();
-	virtual double Get() override;
-	virtual string GetName() override;
-	virtual ~DigitalInputItem();
-};
+        public:
+	        DigitalInputItem(){}
+	        DigitalInputItem(int _channel, string name);
+	        bool GetBool();
+	        virtual double Get() override;
+	        virtual string GetName() override;
+	        virtual ~DigitalInputItem();
+    };
 }
 
 #endif /* SRC_COMPONENTS_DIGITALINPUTITEM_H_ */

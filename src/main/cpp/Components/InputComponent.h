@@ -19,16 +19,17 @@ Email: dylantrwatson@gmail.com
 
 using namespace std;
 
-namespace Components{
-class InputComponent : public NativeComponent{
-public:
-	virtual double Get() = 0;
-	virtual string GetName() = 0;
-	InputComponent(){}
-	InputComponent(string name) : NativeComponent(name){
-	}
-	virtual ~InputComponent(){}
-};
+namespace Components
+{
+    class InputComponent : public NativeComponent
+    {
+        public:
+	        virtual double Get() = 0;
+	        virtual string GetName() = 0;
+	        InputComponent() { }
+	        InputComponent(string name) : NativeComponent(name) { }
+	        virtual ~InputComponent() { }
+    };
 }
 
 #endif /* SRC_COMPONENTS_INPUTCOMPONENT_H_ */

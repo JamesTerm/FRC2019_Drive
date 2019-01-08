@@ -11,65 +11,51 @@ Author(s): Ryan Cooper, Dylan Watson
 Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 \********************************************************************/
 
-#include <WPILib.h>
-#include <fstream>
-#include <thread>
 #include <iostream>
-#include <string>
-
-#include "Autonomi/Autons.h"
-#include "Config/ActiveCollection.h"
-#include "Config/Config.h"
-#include "Systems/Drive.h"
-
-using namespace frc;
+#include "Robot.h"
+//TODO: Potentiometer include, VictorSPX include
 using namespace std;
-using namespace Autonomi;
-using namespace Configuration;
-using namespace Systems;
-
-#define VERSION 1 //!< Defines the program version for the entire program.
-#define REVISION "A" //!< Defines the revision of this version of the program.
-
-/**
- * Main entry point of the program, inherits SampleRobot (WPILib) to control the robot
- */
-class Robot : public SampleRobot
-{
-
-public:
 
 	/**
 	 * Constructor
 	 */
-	Robot() {
-	 }
+	Robot::Robot() 
+	{
+		m_drive = new Drive();
+		m_activeCollection = new ActiveCollection();
+	}
 
 	/**
 	 * Initialization method of the robot
 	 * This runs right after Robot() when the code is started
 	 * Creates Config
 	 */
-	
-	void RobotInit() override
+	void Robot::RobotInit()
 	{
-		m_drive = new Drive();
-		m_activeCollection = new ActiveCollection();
-		Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
+
 		cout << "Program Version: " << VERSION << " Revision: " << REVISION << endl;
+		//CameraServer::GetInstance()->StartAutomaticCapture();
+		Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
+/*		Joystick* testJoy = new Joystick(0);
+
+		VictorSPItem* testSP = new VictorSPItem("testSP", 0, false);
+		AxisControl* testAxis = new AxisControl(testJoy, "testAxis", 1, 0, false, 1);
+		testAxis->AddComponent(testSP);
+
+		//m_activeCollection->Add(testSP);
+		m_drive->AddControlDrive(testAxis);*/
 	}
 
 	/**
 	 * Method that runs at the beginning of the autonomous mode
 	 * Uses the SmartDashboard to select the proper Autonomous mode to run
 	 */
-	void Autonomous() override
+	void Robot::Autonomous()
 	{
-		
-		string autoSelected = SmartDashboard::GetString("Auto Selector", drivestraight);
+		cout << "Autonomous Started." << endl;
+				string autoSelected = SmartDashboard::GetString("Auto Selector", m_driveStraight);
 		cout << autoSelected << endl;
-
-		if (autoSelected == drivestraight) //!< Drive Straight Autonomous
+		if (autoSelected == m_driveStraight) //!< Drive Straight Autonomous
 		{
 			DriveStraight *driveStraight = new DriveStraight(m_activeCollection);
 			driveStraight->Start();
@@ -85,43 +71,19 @@ public:
     /**
     * Called when teleop starts
     **/
-	void OperatorControl() override
+	void Robot::OperatorControl()
 	{
-		cout << "OPERATOR REACHED" << endl;
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-		double LastTime = GetTime();
+		cout << "Teleoperation Started." << endl;
 		while (IsOperatorControl() && !IsDisabled())
 		{
-			const double CurrentTime=GetTime();
-			//I'll keep this around as a synthetic time option for debug purposes
-			//const double DeltaTime=0.020;
-			const double DeltaTime=CurrentTime - LastTime;
-			LastTime=CurrentTime;
-			m_drive->Update(DeltaTime);
-			//using this from test runs from robo wranglers code
+			m_drive->Update();
 			Wait(0.010);
 		}
-
-#pragma GCC diagnostic pop
 	}
 
 	/**
 	 * Called when the Test period starts
 	**/
-	void Test() override {}
-
-private:
-	/** 
-	 * Autonomous name definitions 
-	**/
-
-	//TODO: Make this into it's own file
-
-	ActiveCollection *m_activeCollection; //!< Pointer to the only instantiation of the ActiveCollection Class in the program
-	Drive *m_drive; //!< Pointer to the only instantiation of the Drive class in the program
-	const string drivestraight = "drive";
-};
+	void Robot::Test() {}
 
 START_ROBOT_CLASS(Robot) //!< This identifies Robot as the main Robot starting class

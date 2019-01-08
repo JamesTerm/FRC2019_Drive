@@ -15,17 +15,20 @@ Email: dylantrwatson@gmail.com
 
 using namespace Components;
 
-DigitalInputItem::DigitalInputItem(int _channel, string name)  : InputComponent(name){
+DigitalInputItem::DigitalInputItem(int _channel, string name) : InputComponent(name)
+{
 	channel = _channel;
 	din = new DigitalInput(channel);
 
 }
 
-double DigitalInputItem::Get(){
+double DigitalInputItem::Get()
+{
 	return din->Get();
 }
 
-bool DigitalInputItem::GetBool(){
+bool DigitalInputItem::GetBool()
+{
 	int get = Get();
 	if(get == 1)
 		return false;
@@ -33,10 +36,12 @@ bool DigitalInputItem::GetBool(){
 		return true;
 }
 
-string DigitalInputItem::GetName(){
+string DigitalInputItem::GetName()
+{
 	return name;
 }
 
-DigitalInputItem::~DigitalInputItem() {
+DigitalInputItem::~DigitalInputItem() 
+{
 }
 

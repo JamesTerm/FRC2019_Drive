@@ -18,44 +18,39 @@ Email: cooper.ryan@centaurisoftware.co
 
 #include "../Components/VictorSPItem.h"
 #include "../Components/TalonSRXItem.h"
-#include "../Components/DigitalInputItem.h"
 #include "../Components/EncoderItem.h"
-#include "../Components/NavX.h"
 #include "../Components/DoubleSolenoidItem.h"
+#include "../Components/NavX.h"
 
 using namespace std;
 using namespace Components;
 
-namespace Configuration{
+namespace Configuration
+{
+	class ActiveCollection
+	{
+		public:
+			enum ComponentType
+			{
+				VictorSP
+			};
 
-class ActiveCollection{
-public:
+			ActiveCollection();
+			virtual ~ActiveCollection(){}
 
-	enum ComponentType{
-			VictorSP
+			template <class T>
+			T Get(string name);
+			VictorSPItem* GetVictor(string name);
+			TalonSRXItem* GetTalon(string name);
+			EncoderItem* GetEncoder(string name);
+			NavX* GetNavX();
+			int GetSize();
+			vector<NativeComponent*> GetRawComponent();
+			void Add(NativeComponent *component);
+
+	private:
+		vector<NativeComponent*> activeCollection;
 	};
-	vector<InputComponent*> inputCollection;
-
-	ActiveCollection();
-	virtual ~ActiveCollection(){}
-
-	//TODO: Look into making the add methods bools
-	template <class T>
-	T Get(string name);
-	VictorSPItem* GetVictor(string name);
-	TalonSRXItem* GetTalon(string name);
-	DigitalInputItem* GetDI(string name);
-	EncoderItem* GetEncoder(string name);
-	NavX* GetNavX();
-	int GetSize();
-	vector<NativeComponent*> GetRawComponent();
-	void Add(NativeComponent *component);
-	void AddInput(InputComponent *component);
-
-
-private:
-	vector<NativeComponent*> activeCollection;
-};
-
 }
+
 #endif /* SRC_CONFIG_ACTIVECOLLECTION_H_ */

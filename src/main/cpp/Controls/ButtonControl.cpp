@@ -157,4 +157,3 @@ int ButtonControl::getSign(double val){
 }
 
 ButtonControl::~ButtonControl() {}
-

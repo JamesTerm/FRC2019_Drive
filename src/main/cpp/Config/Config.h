@@ -21,7 +21,7 @@ Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 #include "../Controls/ButtonControl.h"
 #include "../Controls/AxisControl.h"
 
-using namespace Systems;
+using namespace System;
 namespace Configuration{
 
 class Config {

@@ -19,6 +19,7 @@ Email: cooper.ryan@centaurisoft.org, ruizdylann@gmail.com
 #include "LoopChecks.h"
 
 using namespace std;
+using namespace Util;
 using namespace Configuration;
 using namespace Components;
 
@@ -180,7 +181,7 @@ static void DriveForward(double dist, double power, ActiveCollection *activeColl
 																//output: value to be added or subtracted from motors
 
 		//pid loop #1
-		while(enc < dist0 &&_IsAutononomous()) //while we are less than 60% of desired dist and still in auton
+		while(enc < dist0 && _IsAutononomous()) //while we are less than 60% of desired dist and still in auton
 		{
 			error = setPoint - currentValue; //set error value (P)
 			integ = integ + error; //add error to integral (I)

@@ -16,34 +16,40 @@ Email: dylantrwatson@gmail.com
 
 #include "OutputComponent.h"
 
-namespace Components{
-class VictorSPItem final : public OutputComponent
+namespace Components
 {
-public:
-	VictorSPItem(){}
-	virtual ~VictorSPItem(){}
-	VictorSPItem(string name, int channel, bool reversed) : OutputComponent(name){
-		victor = new VictorSP(channel);
-		Reversed = reversed;
-		PDBChannel = 20;
-	}
-	VictorSPItem(string name, int channel, bool reversed, int _PDBChannel) : OutputComponent(name){
-			victor = new VictorSP(channel);
-			Reversed = reversed;
-			PDBChannel = _PDBChannel;
-		}
-	int GetPolarity();
-	string GetName();
-	int PDBChannel;
-	void Stop();
-	virtual void Set(double val) override;
-	virtual double Get() override;
-private:
-	VictorSP *victor;
-	bool Reversed;
-	virtual void DefaultSet() override;
-	virtual void Set(DoubleSolenoid::Value value) override;
-};
+	class VictorSPItem final : public OutputComponent
+	{
+		public:
+			VictorSPItem(){}
+			virtual ~VictorSPItem(){}
+			VictorSPItem(string name, int channel, bool reversed) : OutputComponent(name)
+			{
+				victor = new VictorSP(channel);
+				Reversed = reversed;
+				PDBChannel = 20;
+			}
+
+			VictorSPItem(string name, int channel, bool reversed, int _PDBChannel) : OutputComponent(name)
+			{
+					victor = new VictorSP(channel);
+					Reversed = reversed;
+					PDBChannel = _PDBChannel;
+			}
+
+			int GetPolarity();
+			string GetName();
+			int PDBChannel;
+			void Stop();
+			virtual void Set(double val) override;
+			virtual double Get() override;
+
+		private:
+			VictorSP *victor;
+			bool Reversed;
+			virtual void DefaultSet() override;
+			virtual void Set(DoubleSolenoid::Value value) override;
+	};
 }
 
 #endif /* SRC_COMPONENTS_VICTORSPITEM_H_ */
