@@ -17,6 +17,8 @@
 #include "Controls/AxisControl.h"
 #include "Autonomi/Autons.h"
 
+#include "Goal.h"
+
 using namespace frc;
 using namespace System;
 using namespace Controls;
