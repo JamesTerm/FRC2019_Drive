@@ -7,4 +7,19 @@
 
 #include "GoalManager.h"
 
-GoalManager::GoalManager() {}
+using namespace std;
+
+GoalManager::GoalManager() 
+{
+    
+}
+
+void GoalManager::addGoal(Generic_CompositeGoal* goal)
+{
+    m_goalStack.push(goal);
+}
+
+void execute()
+{
+    m_goalStack.pop();
+}
