@@ -47,17 +47,7 @@ void Robot::Autonomous()
 	cout << "Autonomous Started." << endl;
 	string autoSelected = SmartDashboard::GetString("Auto Selector", m_driveStraight);
 	cout << autoSelected << endl;
-	if (autoSelected == m_driveStraight) //!< Drive Straight Autonomous
-	{
-		DriveStraight *driveStraight = new DriveStraight(m_activeCollection);
-		driveStraight->Start();
-	}
-
-	else //!< Default Autonomous
-	{
-		DriveStraight *driveStraight = new DriveStraight(m_activeCollection);
-		driveStraight->Start();
-	}
+	
 }
 
 /**

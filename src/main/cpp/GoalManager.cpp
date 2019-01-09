@@ -14,7 +14,7 @@ GoalManager::GoalManager()
     
 }
 
-void GoalManager::addGoal(Generic_CompositeGoal* goal)
+void GoalManager::addGoal(Goal* goal)
 {
     m_goalStack.push(goal);
 }
