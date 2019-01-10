@@ -24,11 +24,11 @@ static bool PutString(wpi::StringRef keyName, wpi::StringRef value)
 //These have been depreciated in FRC, but we still support them by wrapping to the newer methods
 inline bool GetBoolean(const char *keyName)
 {
-    return frc::SmartDashboard::GetBoolean(KeyName,false);
+    //return frc::SmartDashboard::GetBoolean(KeyName,false);
 }
 inline double GetNumber(const char *keyName)
 {
-    return frc::SmartDashboard::GetNumber(KeyName,0.0);
+    //return frc::SmartDashboard::GetNumber(KeyName,0.0);
 }
 inline std::string GetString(wpi::StringRef keyName)
 {
