@@ -26,8 +26,9 @@ ActiveCollection::ActiveCollection(){}
  * Method to return a NativeComponent of a certain type and name
 **/
 //TODO: Does this even work?
-template <class T>
-T ActiveCollection::Get(string name){
+template <class NativeComponent>
+//FIXME: maybe call it GetActiveCollectionComponent or something?
+NativeComponent ActiveCollection::Get(string name){
 	try{
 		for(int i=0; i<(int)activeCollection.size();i++)
 			if((*activeCollection[i]).name == (string)name)
