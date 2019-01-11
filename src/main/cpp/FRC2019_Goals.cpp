@@ -1,10 +1,43 @@
-//TODO will start to integrate this
-//It looks vast, but if you type ctrl k-0 to collapse it is quite small
-//For VS2017 its ctrl m-o to collapse
+//It looks vast, but if you type ctrl k-0 to collapse it is quite small (use ctrl k-j to expand)
+//For VS2017 its ctrl m-o to collapse (m-p to expand)
+//You'll want to keep the Auton_Smart_ inline methods as a tool to quickly work with SmartDashboard
 
-#if 0
-#include "stdafx.h"
-#include "Robot_Tester.h"
+#include "Base/Base_Includes.h"
+#include <math.h>
+#include <assert.h>
+#include "Base/Vec2d.h"
+#include "Base/Misc.h"
+#include "Base/Event.h"
+#include "Base/EventMap.h"
+#include "Base/Script.h"
+#include "Common/Entity_Properties.h"
+#include "Common/Physics_1D.h"
+#include "Common/Physics_2D.h"
+#include "Common/Entity2D.h"
+#include "Common/Goal.h"
+#include "Common/Ship_1D.h"
+#include "Common/Ship.h"
+#include "Common/AI_Base_Controller.h"
+#include "Common/Vehicle_Drive.h"
+#include "Common/PIDController.h"
+#include "Common/Poly.h"
+#include "Common/Robot_Control_Interface.h"
+#include "Common/Rotary_System.h"
+#include "Common/Servo_System.h"
+#include "Base/Joystick.h"
+#include "Base/JoystickBinder.h"
+#include "Common/UI_Controller.h"
+#include "Common/PIDController.h"
+//#include "frc/WPILib.h"
+#include "Base/Joystick.h"
+#include "Base/JoystickBinder.h"
+//#include "Common/InOut_Interface.h"
+#include "Common/Debug.h"
+//TODO enable robot control
+//#include "Common/Robot_Control_Common.h"
+#include "TankDrive/Tank_Robot.h"
+
+
 //#define __UsingTankDrive__
 #define __EnableRobotArmDisable__
 #ifdef Robot_TesterCode
@@ -30,11 +63,12 @@ const double Pi2=M_PI*2.0;
 #else
 
 #include "FRC2019_Robot.h"
-#include "SmartDashboard/SmartDashboard.h"
+#include "Common/SmartDashboard.h"
 using namespace Framework::Base;
 using namespace std;
 #endif
 
+#define __UsingTankDrive__
 
 enum AutonType
 {
@@ -289,6 +323,9 @@ __inline void Auton_Smart_GetMultiValue(size_t NoItems,const char * const SmartN
 }
 
 
+//Use this class as an example template, and create your own... at the very bottom MainGoal->AddSubgoal() put your goal there
+//Collapse this to elimate most of the clutter.  Some goals and calls to parts not on this robot have been disabled, but
+//can be traced to determine how to integrate them 1/11/19 -James
 class FRC2019_Goals_Impl : public AtomicGoal
 {
 	private:
@@ -382,89 +419,32 @@ class FRC2019_Goals_Impl : public AtomicGoal
 			return new Goal_Ship_RotateToRelativePosition(Robot->GetController(),DEG_2_RAD(Degrees));
 		}
 
-		static Goal * Move_TurretPosition(FRC2019_Goals_Impl *Parent,double Angle_Deg, bool RelativePosition=false)
-		{
-			FRC2019_Robot *Robot=&Parent->m_Robot;
-			FRC2019_Robot::Robot_Arm &Arm=Robot->GetTurret();
-			const double PrecisionTolerance=Robot->GetRobotProps().GetRotaryProps(FRC2019_Robot::eTurret).GetRotaryProps().PrecisionTolerance;
-			Goal_Rotary_MoveToPosition *goal_arm=NULL;
-			const double position=Angle_Deg;
-			if (!RelativePosition)
-				goal_arm=new Goal_Rotary_MoveToPosition(Arm,DEG_2_RAD(position),PrecisionTolerance);
-			else
-				goal_arm=new Goal_Rotary_MoveToRelativePosition(Arm,DEG_2_RAD(position),PrecisionTolerance);
-			return goal_arm;
-		}
-		static Goal * Move_ArmXPosition(FRC2019_Goals_Impl *Parent,double length_in)
-		{
-			FRC2019_Robot *Robot=&Parent->m_Robot;
-			FRC2019_Robot::Robot_Arm &Arm=Robot->GetArmXpos();
-			const double PrecisionTolerance=Robot->GetRobotProps().GetRotaryProps(FRC2019_Robot::eArm_Ypos).GetRotaryProps().PrecisionTolerance;
-			Goal_Rotary_MoveToPosition *goal_arm=NULL;
-			const double position=length_in;
-			goal_arm=new Goal_Rotary_MoveToPosition(Arm,position,PrecisionTolerance);
-			return goal_arm;
-		}
-		static Goal * Move_ArmYPosition(FRC2019_Goals_Impl *Parent,double height_in)
-		{
-			FRC2019_Robot *Robot=&Parent->m_Robot;
-			FRC2019_Robot::Robot_Arm &Arm=Robot->GetArmYpos();
-			const double PrecisionTolerance=Robot->GetRobotProps().GetRotaryProps(FRC2019_Robot::eArm_Xpos).GetRotaryProps().PrecisionTolerance;
-			Goal_Rotary_MoveToPosition *goal_arm=NULL;
-			const double position=height_in;
-			goal_arm=new Goal_Rotary_MoveToPosition(Arm,position,PrecisionTolerance);
-			return goal_arm;
-		}
+		// static Goal * Move_TurretPosition(FRC2019_Goals_Impl *Parent,double Angle_Deg, bool RelativePosition=false)
+		// {
+		// 	FRC2019_Robot *Robot=&Parent->m_Robot;
+		// 	FRC2019_Robot::Robot_Arm &Arm=Robot->GetTurret();
+		// 	const double PrecisionTolerance=Robot->GetRobotProps().GetRotaryProps(FRC2019_Robot::eTurret).GetRotaryProps().PrecisionTolerance;
+		// 	Goal_Rotary_MoveToPosition *goal_arm=NULL;
+		// 	const double position=Angle_Deg;
+		// 	if (!RelativePosition)
+		// 		goal_arm=new Goal_Rotary_MoveToPosition(Arm,DEG_2_RAD(position),PrecisionTolerance);
+		// 	else
+		// 		goal_arm=new Goal_Rotary_MoveToRelativePosition(Arm,DEG_2_RAD(position),PrecisionTolerance);
+		// 	return goal_arm;
+		// }
 
-		static Goal * Move_BucketAngle(FRC2019_Goals_Impl *Parent,double Angle_Deg, double SpeedRatio=1.0)
-		{
-			FRC2019_Robot *Robot=&Parent->m_Robot;
-			FRC2019_Robot::Robot_Arm &Arm=Robot->GetBucketAngle();
-			const double PrecisionTolerance=Robot->GetRobotProps().GetRotaryProps(FRC2019_Robot::eBucket_Angle).GetRotaryProps().PrecisionTolerance;
-			Goal_Rotary_MoveToPosition *goal_arm=NULL;
-			const double position=Angle_Deg;
-			goal_arm=new Goal_Rotary_MoveToPosition(Arm,position,PrecisionTolerance,SpeedRatio,SpeedRatio);
-			return goal_arm;
-		}
 
-		static Goal * Move_ClaspAngle(FRC2019_Goals_Impl *Parent,double Angle_Deg)
-		{
-			FRC2019_Robot *Robot=&Parent->m_Robot;
-			FRC2019_Robot::Robot_Arm &Arm=Robot->GetClaspAngle();
-			const double PrecisionTolerance=Robot->GetRobotProps().GetRotaryProps(FRC2019_Robot::eClasp_Angle).GetRotaryProps().PrecisionTolerance;
-			Goal_Rotary_MoveToPosition *goal_arm=NULL;
-			const double position=Angle_Deg;
-			goal_arm=new Goal_Rotary_MoveToPosition(Arm,position,PrecisionTolerance);
-			return goal_arm;
-		}
-
-		static Goal * Move_ArmXYPosition(FRC2019_Goals_Impl *Parent,double length_in,double height_in)
-		{
-			MultitaskGoal *goal=new MultitaskGoal(true);
-			goal->AddGoal(Move_ArmXPosition(Parent,length_in));
-			goal->AddGoal(Move_ArmYPosition(Parent,height_in));
-			return goal;
-		}
-
-		static Goal * Move_BucketClaspAngle(FRC2019_Goals_Impl *Parent,double Bucket_Angle_Deg,double Clasp_Angle_Deg)
-		{
-			MultitaskGoal *goal=new MultitaskGoal(true);
-			goal->AddGoal(Move_BucketAngle(Parent,Bucket_Angle_Deg));
-			goal->AddGoal(Move_ClaspAngle(Parent,Clasp_Angle_Deg));
-			return goal;
-		}
-
-		static Goal * Move_ArmAndBucket(FRC2019_Goals_Impl *Parent,double length_in,double height_in,double Bucket_Angle_Deg,double Clasp_Angle_Deg,
-			double length_in_speed=1.0,double height_in_speed=1.0,double Bucket_Angle_Deg_speed=1.0,double Clasp_Angle_Deg_speed=1.0)
-		{
-			MultitaskGoal *goal=new MultitaskGoal(true);
-			//I could have added both multi task goals here, but its easier to debug keeping it more flat lined
-			goal->AddGoal(Move_ArmXPosition(Parent,length_in));
-			goal->AddGoal(Move_ArmYPosition(Parent,height_in));
-			goal->AddGoal(Move_BucketAngle(Parent,Bucket_Angle_Deg,Bucket_Angle_Deg_speed));
-			goal->AddGoal(Move_ClaspAngle(Parent,Clasp_Angle_Deg));
-			return goal;
-		}
+		// static Goal * Move_ArmAndBucket(FRC2019_Goals_Impl *Parent,double length_in,double height_in,double Bucket_Angle_Deg,double Clasp_Angle_Deg,
+		// 	double length_in_speed=1.0,double height_in_speed=1.0,double Bucket_Angle_Deg_speed=1.0,double Clasp_Angle_Deg_speed=1.0)
+		// {
+		// 	MultitaskGoal *goal=new MultitaskGoal(true);
+		// 	//I could have added both multi task goals here, but its easier to debug keeping it more flat lined
+		// 	goal->AddGoal(Move_ArmXPosition(Parent,length_in));
+		// 	goal->AddGoal(Move_ArmYPosition(Parent,height_in));
+		// 	goal->AddGoal(Move_BucketAngle(Parent,Bucket_Angle_Deg,Bucket_Angle_Deg_speed));
+		// 	goal->AddGoal(Move_ClaspAngle(Parent,Clasp_Angle_Deg));
+		// 	return goal;
+		// }
 
 		class RobotQuickNotify : public AtomicGoal, public SetUpProps
 		{
@@ -639,8 +619,8 @@ class FRC2019_Goals_Impl : public AtomicGoal
 				AddSubgoal(Move_BucketClaspAngle(m_Parent,bucket_Angle_deg,clasp_Angle_deg));
 				#else
 				AddSubgoal(new RobotArmHoldStill(m_Parent));
-				AddSubgoal(Move_ArmAndBucket(m_Parent,m_length_in,m_height_in,m_bucket_Angle_deg,m_clasp_Angle_deg,
-					m_length_in_speed,m_height_in_speed,m_bucket_Angle_deg_speed,m_clasp_Angle_deg_speed));
+				// AddSubgoal(Move_ArmAndBucket(m_Parent,m_length_in,m_height_in,m_bucket_Angle_deg,m_clasp_Angle_deg,
+				// 	m_length_in_speed,m_height_in_speed,m_bucket_Angle_deg_speed,m_clasp_Angle_deg_speed));
 				#endif
 				m_Status=eActive;
 			}
@@ -662,7 +642,7 @@ class FRC2019_Goals_Impl : public AtomicGoal
 			{
 				if (m_Status==eActive) return;  //allow for multiple calls
 				AddSubgoal(new Goal_Wait(0.500));
-				AddSubgoal(Move_TurretPosition(m_Parent,m_Turret_Angle_deg));
+				//AddSubgoal(Move_TurretPosition(m_Parent,m_Turret_Angle_deg));
 				AddSubgoal(new Goal_Wait(0.500));
 				m_Status=eActive;
 			}
@@ -729,10 +709,10 @@ class FRC2019_Goals_Impl : public AtomicGoal
 					{
 						const char * const SmartVar_YawAngle="YawAngle";
 						double YawAngle=Auton_Smart_GetSingleValue(SmartVar_YawAngle,0.0);
-						FRC2019_Robot::Robot_Arm &Arm=m_Robot.GetTurret();
-						const double YawAngleRad=DEG_2_RAD(YawAngle);
-						const double Position=Arm.GetActualPos()+YawAngleRad;  //set out new position
-						Arm.SetIntendedPosition(Position);
+						// FRC2019_Robot::Robot_Arm &Arm=m_Robot.GetTurret();
+						// const double YawAngleRad=DEG_2_RAD(YawAngle);
+						// const double Position=Arm.GetActualPos()+YawAngleRad;  //set out new position
+						// Arm.SetIntendedPosition(Position);
 					}
 					__super::Process(dTime_s);
 					if (EnableTurret)
@@ -743,8 +723,8 @@ class FRC2019_Goals_Impl : public AtomicGoal
 			virtual void Terminate() 
 			{
 				//pacify the set point on the turret
-				FRC2019_Robot::Robot_Arm &Arm=m_Robot.GetTurret();
-				Arm.SetIntendedPosition(Arm.GetActualPos());
+				// FRC2019_Robot::Robot_Arm &Arm=m_Robot.GetTurret();
+				// Arm.SetIntendedPosition(Arm.GetActualPos());
 				m_EventMap.Event_Map["StopAutonAbort"].Remove(*this, &FRC2019_Goals_Impl::ArmMoveToPosition::StopAuton);
 				__super::Terminate();
 			}
@@ -912,8 +892,8 @@ class FRC2019_Goals_Impl : public AtomicGoal
 			}
 			virtual void Activate()
 			{
-				FRC2019_Robot::Robot_Arm &Arm=m_Robot.GetTurret();
-				m_Position=Arm.GetActualPos(); //start out on the actual position
+				// FRC2019_Robot::Robot_Arm &Arm=m_Robot.GetTurret();
+				// m_Position=Arm.GetActualPos(); //start out on the actual position
 				m_LatencyCounter=0.0;
 				m_Status=eActive;
 				m_IsTargeting=false;
@@ -960,11 +940,11 @@ class FRC2019_Goals_Impl : public AtomicGoal
 						m_LatencyCounter+=dTime_s;
 						if (m_LatencyCounter>TrackLatency)
 						{
-							FRC2019_Robot::Robot_Arm &Arm=m_Robot.GetTurret();
-							const double YawAngleRad=DEG_2_RAD(YawAngle);
-							m_Position=Arm.GetActualPos()+(YawAngleRad*YawScaleFactor);  //set out new position
-							if (fabs(YawAngle)>YawTolerance*YawScaleFactor)
-								Arm.SetIntendedPosition(m_Position);
+							// FRC2019_Robot::Robot_Arm &Arm=m_Robot.GetTurret();
+							// const double YawAngleRad=DEG_2_RAD(YawAngle);
+							// m_Position=Arm.GetActualPos()+(YawAngleRad*YawScaleFactor);  //set out new position
+							// if (fabs(YawAngle)>YawTolerance*YawScaleFactor)
+							// 	Arm.SetIntendedPosition(m_Position);
 							m_LatencyCounter=0.0;
 						}
 					}
@@ -974,8 +954,8 @@ class FRC2019_Goals_Impl : public AtomicGoal
 			virtual void Terminate() 
 			{
 				//pacify the set point
-				FRC2019_Robot::Robot_Arm &Arm=m_Robot.GetTurret();
-				Arm.SetIntendedPosition(Arm.GetActualPos());
+				// FRC2019_Robot::Robot_Arm &Arm=m_Robot.GetTurret();
+				// Arm.SetIntendedPosition(Arm.GetActualPos());
 				m_Status=eInactive;  //this goal never really completes
 				SmartDashboard::PutBoolean("Main_Is_Targeting",false);
 			}
@@ -995,8 +975,8 @@ class FRC2019_Goals_Impl : public AtomicGoal
 			}
 			virtual void Activate()
 			{
-				FRC2019_Robot::Robot_Arm &Arm=m_Robot.GetTurret();
-				m_Position=Arm.GetActualPos(); //start out on the actual position
+				// FRC2019_Robot::Robot_Arm &Arm=m_Robot.GetTurret();
+				// m_Position=Arm.GetActualPos(); //start out on the actual position
 				m_LatencyCounter=0.0;
 				m_Status=eActive;
 				m_IsTargeting=false;
@@ -1015,7 +995,8 @@ class FRC2019_Goals_Impl : public AtomicGoal
 				{
 					//printf("AggresiveStop=%d\n",UseAgressiveStop);  //testing flooding
 					SmartDashboard::PutBoolean("UseAggresiveStop",UseAgressiveStop);  //monitor this
-					m_Robot.FRC2019_Robot_SetAggresiveStop(UseAgressiveStop);
+					//TODO add this function (see Curivator)
+					//m_Robot.FRC2019_Robot_SetAggresiveStop(UseAgressiveStop);
 					m_SAS_FloodControl=UseAgressiveStop;
 				}
 			}
@@ -1269,5 +1250,3 @@ Goal *FRC2019_Goals::Get_FRC2019_Autonomous(FRC2019_Robot *Robot)
 	//MainGoal->AddSubgoal(goal_waitforturret);
 	return MainGoal;
 }
-
-#endif

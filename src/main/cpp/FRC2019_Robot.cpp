@@ -1,5 +1,3 @@
-//TODO Fix this
-#if 0
 
 #ifdef Robot_TesterCode
 #include "stdafx.h"
@@ -34,19 +32,31 @@ const double Pi2=M_PI*2.0;
 #include "Common/Physics_2D.h"
 #include "Common/Entity2D.h"
 #include "Common/Goal.h"
+#include "Common/Ship_1D.h"
 #include "Common/Ship.h"
 #include "Common/AI_Base_Controller.h"
 #include "Common/Vehicle_Drive.h"
 #include "Common/PIDController.h"
 #include "Common/Poly.h"
-
+#include "Common/Robot_Control_Interface.h"
+#include "Common/Rotary_System.h"
+#include "Common/Servo_System.h"
 #include "Base/Joystick.h"
 #include "Base/JoystickBinder.h"
 #include "Common/UI_Controller.h"
-//#include "../Common/InOut_Interface.h"
+#include "Common/PIDController.h"
+//#include "frc/WPILib.h"
+#include "Base/Joystick.h"
+#include "Base/JoystickBinder.h"
+//#include "Common/InOut_Interface.h"
 #include "Common/Debug.h"
-//#include "../Common/Robot_Control_Common.h"
+//TODO enable robot control
+//#include "Common/Robot_Control_Common.h"
 #include "TankDrive/Tank_Robot.h"
+//This was depreciated and integrated ... stubbed out
+// #include "TankDrive/src/Tank_Robot_Control.h"
+//This isn't needed
+// #include "TankDrive/src/Servo_Robot_Control.h"
 
 #include "FRC2019_Robot.h"
 #include "Common/SmartDashboard.h"
@@ -85,117 +95,117 @@ static double PositionToVelocity_Tweak(double Value)
 #endif
 
   /***********************************************************************************************************************************/
- /*														FRC_2019_Robot::Turret														*/
+ /*														FRC2019_Robot::Turret														*/
 /***********************************************************************************************************************************/
 
-FRC_2019_Robot::Turret::Turret(FRC_2019_Robot *parent,Rotary_Control_Interface *robot_control) : 	m_pParent(parent),m_Velocity(0.0)
+FRC2019_Robot::Turret::Turret(FRC2019_Robot *parent,Rotary_Control_Interface *robot_control) : 	m_pParent(parent),m_Velocity(0.0)
 {
 }
 
 
-void FRC_2019_Robot::Turret::BindAdditionalEventControls(bool Bind)
+void FRC2019_Robot::Turret::BindAdditionalEventControls(bool Bind)
 {
 	Base::EventMap *em=m_pParent->GetEventMap(); //grrr had to explicitly specify which EventMap
 	if (Bind)
 	{
-		em->EventValue_Map["Turret_SetCurrentVelocity"].Subscribe(ehl,*this, &FRC_2019_Robot::Turret::Turret_SetRequestedVelocity);
+		em->EventValue_Map["Turret_SetCurrentVelocity"].Subscribe(ehl,*this, &FRC2019_Robot::Turret::Turret_SetRequestedVelocity);
 	}
 	else
 	{
-		em->EventValue_Map["Turret_SetCurrentVelocity"].Remove(*this, &FRC_2019_Robot::Turret::Turret_SetRequestedVelocity);
+		em->EventValue_Map["Turret_SetCurrentVelocity"].Remove(*this, &FRC2019_Robot::Turret::Turret_SetRequestedVelocity);
 	}
 }
 
-void FRC_2019_Robot::Turret::TimeChange(double dTime_s)
+void FRC2019_Robot::Turret::TimeChange(double dTime_s)
 {
 	m_Velocity=0.0;
 }
 
-void FRC_2019_Robot::Turret::ResetPos()
+void FRC2019_Robot::Turret::ResetPos()
 {
 	m_Velocity=0.0;
 }
 
   /***********************************************************************************************************************************/
- /*													FRC_2019_Robot::PitchRamp														*/
+ /*													FRC2019_Robot::PitchRamp														*/
 /***********************************************************************************************************************************/
-FRC_2019_Robot::PitchRamp::PitchRamp(FRC_2019_Robot *pParent,Rotary_Control_Interface *robot_control) : m_pParent(pParent),m_Velocity(0.0)
+FRC2019_Robot::PitchRamp::PitchRamp(FRC2019_Robot *pParent,Rotary_Control_Interface *robot_control) : m_pParent(pParent),m_Velocity(0.0)
 {
 }
 
 
-void FRC_2019_Robot::PitchRamp::TimeChange(double dTime_s)
+void FRC2019_Robot::PitchRamp::TimeChange(double dTime_s)
 {
 	m_Velocity=0.0;
 }
 
-void FRC_2019_Robot::PitchRamp::BindAdditionalEventControls(bool Bind)
+void FRC2019_Robot::PitchRamp::BindAdditionalEventControls(bool Bind)
 {
 	Base::EventMap *em=m_pParent->GetEventMap(); //grrr had to explicitly specify which EventMap
 	if (Bind)
 	{
-		em->EventValue_Map["PitchRamp_SetCurrentVelocity"].Subscribe(ehl,*this, &FRC_2019_Robot::PitchRamp::Pitch_SetRequestedVelocity);
+		em->EventValue_Map["PitchRamp_SetCurrentVelocity"].Subscribe(ehl,*this, &FRC2019_Robot::PitchRamp::Pitch_SetRequestedVelocity);
 	}
 	else
 	{
-		em->EventValue_Map["PitchRamp_SetCurrentVelocity"].Remove(*this, &FRC_2019_Robot::PitchRamp::Pitch_SetRequestedVelocity);
+		em->EventValue_Map["PitchRamp_SetCurrentVelocity"].Remove(*this, &FRC2019_Robot::PitchRamp::Pitch_SetRequestedVelocity);
 	}
 }
 
-void FRC_2019_Robot::PitchRamp::ResetPos()
+void FRC2019_Robot::PitchRamp::ResetPos()
 {
 	m_Velocity=0.0;
 }
 
   /***********************************************************************************************************************************/
- /*													FRC_2019_Robot::Kicker_Wheel													*/
+ /*													FRC2019_Robot::Kicker_Wheel													*/
 /***********************************************************************************************************************************/
 
-FRC_2019_Robot::Kicker_Wheel::Kicker_Wheel(FRC_2019_Robot *parent,Rotary_Control_Interface *robot_control) :
+FRC2019_Robot::Kicker_Wheel::Kicker_Wheel(FRC2019_Robot *parent,Rotary_Control_Interface *robot_control) :
 	Rotary_Velocity_Control("KickerWheel",robot_control,eKickerWheel),m_pParent(parent)
 {
 }
 
-void FRC_2019_Robot::Kicker_Wheel::TimeChange(double dTime_s)
+void FRC2019_Robot::Kicker_Wheel::TimeChange(double dTime_s)
 {
 	SetRequestedVelocity_FromNormalized(m_Velocity);
 	m_Velocity=0.0;
 	__super::TimeChange(dTime_s);
 }
 
-void FRC_2019_Robot::Kicker_Wheel::BindAdditionalEventControls(bool Bind)
+void FRC2019_Robot::Kicker_Wheel::BindAdditionalEventControls(bool Bind)
 {
 	Base::EventMap *em=GetEventMap(); //grrr had to explicitly specify which EventMap
 	if (Bind)
 	{
-		em->EventValue_Map["KickerWheel_SetCurrentVelocity"].Subscribe(ehl,*this, &FRC_2019_Robot::Kicker_Wheel::Kicker_Wheel_SetRequestedVelocity);
+		em->EventValue_Map["KickerWheel_SetCurrentVelocity"].Subscribe(ehl,*this, &FRC2019_Robot::Kicker_Wheel::Kicker_Wheel_SetRequestedVelocity);
 	}
 	else
 	{
-		em->EventValue_Map["KickerWheel_SetCurrentVelocity"].Remove(*this, &FRC_2019_Robot::Kicker_Wheel::Kicker_Wheel_SetRequestedVelocity);
+		em->EventValue_Map["KickerWheel_SetCurrentVelocity"].Remove(*this, &FRC2019_Robot::Kicker_Wheel::Kicker_Wheel_SetRequestedVelocity);
 	}
 }
 
   /***********************************************************************************************************************************/
- /*													FRC_2019_Robot::Robot_Arm														*/
+ /*													FRC2019_Robot::Robot_Arm														*/
 /***********************************************************************************************************************************/
 
-FRC_2019_Robot::Robot_Arm::Robot_Arm(FRC_2019_Robot *parent,Rotary_Control_Interface *robot_control) : 
+FRC2019_Robot::Robot_Arm::Robot_Arm(FRC2019_Robot *parent,Rotary_Control_Interface *robot_control) : 
 Rotary_Position_Control("Arm",robot_control,eArm),m_pParent(parent),m_Advance(false),m_Retract(false)
 {
 }
 
 
-void FRC_2019_Robot::Robot_Arm::Advance(bool on)
+void FRC2019_Robot::Robot_Arm::Advance(bool on)
 {
 	m_Advance=on;
 }
-void FRC_2019_Robot::Robot_Arm::Retract(bool on)
+void FRC2019_Robot::Robot_Arm::Retract(bool on)
 {
 	m_Retract=on;
 }
 
-bool FRC_2019_Robot::Robot_Arm::DidHitMinLimit() const
+bool FRC2019_Robot::Robot_Arm::DidHitMinLimit() const
 {
 	#ifndef Robot_TesterCode
 	return m_pParent->m_RobotControl->GetBoolSensorState(eDartLower);
@@ -204,7 +214,7 @@ bool FRC_2019_Robot::Robot_Arm::DidHitMinLimit() const
 	#endif
 }
 
-bool FRC_2019_Robot::Robot_Arm::DidHitMaxLimit() const
+bool FRC2019_Robot::Robot_Arm::DidHitMaxLimit() const
 {
 	#ifndef Robot_TesterCode
 	return m_pParent->m_RobotControl->GetBoolSensorState(eDartUpper);
@@ -213,7 +223,7 @@ bool FRC_2019_Robot::Robot_Arm::DidHitMaxLimit() const
 	#endif
 }
 
-void FRC_2019_Robot::Robot_Arm::TimeChange(double dTime_s)
+void FRC2019_Robot::Robot_Arm::TimeChange(double dTime_s)
 {
 	const double Accel=m_Ship_1D_Props.ACCEL;
 	const double Brake=m_Ship_1D_Props.BRAKE;
@@ -229,7 +239,7 @@ void FRC_2019_Robot::Robot_Arm::TimeChange(double dTime_s)
 #endif
 #endif
 #ifdef Robot_TesterCode
-	const FRC_2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
+	const FRC2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
 	const double c_GearToArmRatio=1.0/props.ArmToGearRatio;
 	double Pos_m=GetPos_m();
 	double height=AngleToHeight_m(Pos_m);
@@ -238,127 +248,127 @@ void FRC_2019_Robot::Robot_Arm::TimeChange(double dTime_s)
 }
 
 
-double FRC_2019_Robot::Robot_Arm::AngleToHeight_m(double Angle_r) const
+double FRC2019_Robot::Robot_Arm::AngleToHeight_m(double Angle_r) const
 {
-	const FRC_2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
+	const FRC2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
 	const double c_GearToArmRatio=1.0/props.ArmToGearRatio;
 
 	return (sin(Angle_r*c_GearToArmRatio)*props.ArmLength)+props.GearHeightOffset;
 }
-double FRC_2019_Robot::Robot_Arm::Arm_AngleToHeight_m(double Angle_r) const
+double FRC2019_Robot::Robot_Arm::Arm_AngleToHeight_m(double Angle_r) const
 {
-	const FRC_2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
+	const FRC2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
 	return (sin(Angle_r)*props.ArmLength)+props.GearHeightOffset;
 }
 
-double FRC_2019_Robot::Robot_Arm::HeightToAngle_r(double Height_m) const
+double FRC2019_Robot::Robot_Arm::HeightToAngle_r(double Height_m) const
 {
-	const FRC_2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
+	const FRC2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
 	return asin((Height_m-props.GearHeightOffset)/props.ArmLength) * props.ArmToGearRatio;
 }
 
-double FRC_2019_Robot::Robot_Arm::PotentiometerRaw_To_Arm_r(double raw) const
+double FRC2019_Robot::Robot_Arm::PotentiometerRaw_To_Arm_r(double raw) const
 {
-	const FRC_2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
+	const FRC2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
 	const int RawRangeHalf=512;
 	double ret=((raw / RawRangeHalf)-1.0) * DEG_2_RAD(270.0/2.0);  //normalize and use a 270 degree scalar (in radians)
 	ret*=props.PotentiometerToArmRatio;  //convert to arm's gear ratio
 	return ret;
 }
 
-void FRC_2019_Robot::Robot_Arm::SetPosRest()
+void FRC2019_Robot::Robot_Arm::SetPosRest()
 {
-	const FRC_2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
+	const FRC2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
 	SetIntendedPosition(HeightToAngle_r(Inches2Meters(props.ToteRestHeight))  );
 }
-void FRC_2019_Robot::Robot_Arm::SetTote2Height()
+void FRC2019_Robot::Robot_Arm::SetTote2Height()
 {
-	const FRC_2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
+	const FRC2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
 	SetIntendedPosition( HeightToAngle_r(Inches2Meters(props.Tote2Height)) );
 }
-void FRC_2019_Robot::Robot_Arm::SetTote3Height()
+void FRC2019_Robot::Robot_Arm::SetTote3Height()
 {
-	const FRC_2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
+	const FRC2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
 	SetIntendedPosition(HeightToAngle_r(Inches2Meters(props.Tote3Height)));
 }
-void FRC_2019_Robot::Robot_Arm::SetTote4Height()
+void FRC2019_Robot::Robot_Arm::SetTote4Height()
 {
-	const FRC_2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
+	const FRC2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
 	SetIntendedPosition( HeightToAngle_r(Inches2Meters(props.Tote4Height)) );
 }
-void FRC_2019_Robot::Robot_Arm::SetTote5Height()
+void FRC2019_Robot::Robot_Arm::SetTote5Height()
 {
-	const FRC_2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
+	const FRC2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
 	SetIntendedPosition( HeightToAngle_r(Inches2Meters(props.Tote5Height)) );
 }
-void FRC_2019_Robot::Robot_Arm::SetTote6Height()
+void FRC2019_Robot::Robot_Arm::SetTote6Height()
 {
-	const FRC_2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
+	const FRC2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
 	SetIntendedPosition( HeightToAngle_r(Inches2Meters(props.Tote6Height)) );
 }
 
-void FRC_2019_Robot::Robot_Arm::CloseForkRight(bool Close)
+void FRC2019_Robot::Robot_Arm::CloseForkRight(bool Close)
 {
 	m_pParent->m_RobotControl->CloseSolenoid(eForkRight,Close);
 }
-void FRC_2019_Robot::Robot_Arm::CloseForkLeft(bool Close)
+void FRC2019_Robot::Robot_Arm::CloseForkLeft(bool Close)
 {
 	m_pParent->m_RobotControl->CloseSolenoid(eForkLeft,Close);
 }
 
-void FRC_2019_Robot::Robot_Arm::CloseForkBoth(bool Close)
+void FRC2019_Robot::Robot_Arm::CloseForkBoth(bool Close)
 {
 	CloseForkLeft(Close);
 	CloseForkRight(Close);
 }
 
-void FRC_2019_Robot::Robot_Arm::BindAdditionalEventControls(bool Bind)
+void FRC2019_Robot::Robot_Arm::BindAdditionalEventControls(bool Bind)
 {
 	Base::EventMap *em=GetEventMap(); //grrr had to explicitly specify which EventMap
 	if (Bind)
 	{
-		em->EventValue_Map["Arm_SetCurrentVelocity"].Subscribe(ehl,*this, &FRC_2019_Robot::Robot_Arm::SetRequestedVelocity_FromNormalized);
-		em->EventOnOff_Map["Arm_SetPotentiometerSafety"].Subscribe(ehl,*this, &FRC_2019_Robot::Robot_Arm::SetPotentiometerSafety);
+		em->EventValue_Map["Arm_SetCurrentVelocity"].Subscribe(ehl,*this, &FRC2019_Robot::Robot_Arm::SetRequestedVelocity_FromNormalized);
+		em->EventOnOff_Map["Arm_SetPotentiometerSafety"].Subscribe(ehl,*this, &FRC2019_Robot::Robot_Arm::SetPotentiometerSafety);
 
-		em->Event_Map["Arm_SetPosRest"].Subscribe(ehl, *this, &FRC_2019_Robot::Robot_Arm::SetPosRest);
-		em->Event_Map["Arm_SetTote2Height"].Subscribe(ehl, *this, &FRC_2019_Robot::Robot_Arm::SetTote2Height);
-		em->Event_Map["Arm_SetTote3Height"].Subscribe(ehl, *this, &FRC_2019_Robot::Robot_Arm::SetTote3Height);
-		em->Event_Map["Arm_SetTote4Height"].Subscribe(ehl, *this, &FRC_2019_Robot::Robot_Arm::SetTote4Height);
-		em->Event_Map["Arm_SetTote5Height"].Subscribe(ehl, *this, &FRC_2019_Robot::Robot_Arm::SetTote5Height);
-		em->Event_Map["Arm_SetTote6Height"].Subscribe(ehl, *this, &FRC_2019_Robot::Robot_Arm::SetTote6Height);
+		em->Event_Map["Arm_SetPosRest"].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Arm::SetPosRest);
+		em->Event_Map["Arm_SetTote2Height"].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Arm::SetTote2Height);
+		em->Event_Map["Arm_SetTote3Height"].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Arm::SetTote3Height);
+		em->Event_Map["Arm_SetTote4Height"].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Arm::SetTote4Height);
+		em->Event_Map["Arm_SetTote5Height"].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Arm::SetTote5Height);
+		em->Event_Map["Arm_SetTote6Height"].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Arm::SetTote6Height);
 
-		em->EventOnOff_Map["Arm_Advance"].Subscribe(ehl,*this, &FRC_2019_Robot::Robot_Arm::Advance);
-		em->EventOnOff_Map["Arm_Retract"].Subscribe(ehl,*this, &FRC_2019_Robot::Robot_Arm::Retract);
+		em->EventOnOff_Map["Arm_Advance"].Subscribe(ehl,*this, &FRC2019_Robot::Robot_Arm::Advance);
+		em->EventOnOff_Map["Arm_Retract"].Subscribe(ehl,*this, &FRC2019_Robot::Robot_Arm::Retract);
 
-		em->EventOnOff_Map["Arm_ForkRight"].Subscribe(ehl, *this, &FRC_2019_Robot::Robot_Arm::CloseForkRight);
-		em->EventOnOff_Map["Arm_ForkLeft"].Subscribe(ehl, *this, &FRC_2019_Robot::Robot_Arm::CloseForkLeft);
-		em->EventOnOff_Map["Arm_ForkBoth"].Subscribe(ehl, *this, &FRC_2019_Robot::Robot_Arm::CloseForkBoth);
+		em->EventOnOff_Map["Arm_ForkRight"].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Arm::CloseForkRight);
+		em->EventOnOff_Map["Arm_ForkLeft"].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Arm::CloseForkLeft);
+		em->EventOnOff_Map["Arm_ForkBoth"].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Arm::CloseForkBoth);
 	}
 	else
 	{
-		em->EventValue_Map["Arm_SetCurrentVelocity"].Remove(*this, &FRC_2019_Robot::Robot_Arm::SetRequestedVelocity_FromNormalized);
-		em->EventOnOff_Map["Arm_SetPotentiometerSafety"].Remove(*this, &FRC_2019_Robot::Robot_Arm::SetPotentiometerSafety);
+		em->EventValue_Map["Arm_SetCurrentVelocity"].Remove(*this, &FRC2019_Robot::Robot_Arm::SetRequestedVelocity_FromNormalized);
+		em->EventOnOff_Map["Arm_SetPotentiometerSafety"].Remove(*this, &FRC2019_Robot::Robot_Arm::SetPotentiometerSafety);
 
-		em->Event_Map["Arm_SetPosRest"].Remove(*this, &FRC_2019_Robot::Robot_Arm::SetPosRest);
-		em->Event_Map["Arm_SetTote2Height"].Remove(*this, &FRC_2019_Robot::Robot_Arm::SetTote2Height);
-		em->Event_Map["Arm_SetTote3Height"].Remove(*this, &FRC_2019_Robot::Robot_Arm::SetTote3Height);
-		em->Event_Map["Arm_SetTote4Height"].Remove(*this, &FRC_2019_Robot::Robot_Arm::SetTote4Height);
-		em->Event_Map["Arm_SetTote5Height"].Remove(*this, &FRC_2019_Robot::Robot_Arm::SetTote5Height);
-		em->Event_Map["Arm_SetTote6Height"].Remove(*this, &FRC_2019_Robot::Robot_Arm::SetTote6Height);
+		em->Event_Map["Arm_SetPosRest"].Remove(*this, &FRC2019_Robot::Robot_Arm::SetPosRest);
+		em->Event_Map["Arm_SetTote2Height"].Remove(*this, &FRC2019_Robot::Robot_Arm::SetTote2Height);
+		em->Event_Map["Arm_SetTote3Height"].Remove(*this, &FRC2019_Robot::Robot_Arm::SetTote3Height);
+		em->Event_Map["Arm_SetTote4Height"].Remove(*this, &FRC2019_Robot::Robot_Arm::SetTote4Height);
+		em->Event_Map["Arm_SetTote5Height"].Remove(*this, &FRC2019_Robot::Robot_Arm::SetTote5Height);
+		em->Event_Map["Arm_SetTote6Height"].Remove(*this, &FRC2019_Robot::Robot_Arm::SetTote6Height);
 
-		em->EventOnOff_Map["Arm_Advance"].Remove(*this, &FRC_2019_Robot::Robot_Arm::Advance);
-		em->EventOnOff_Map["Arm_Retract"].Remove(*this, &FRC_2019_Robot::Robot_Arm::Retract);
+		em->EventOnOff_Map["Arm_Advance"].Remove(*this, &FRC2019_Robot::Robot_Arm::Advance);
+		em->EventOnOff_Map["Arm_Retract"].Remove(*this, &FRC2019_Robot::Robot_Arm::Retract);
 
-		em->EventOnOff_Map["Arm_ForkRight"]  .Remove(*this, &FRC_2019_Robot::Robot_Arm::CloseForkRight);
-		em->EventOnOff_Map["Arm_ForkLeft"]  .Remove(*this, &FRC_2019_Robot::Robot_Arm::CloseForkLeft);
-		em->EventOnOff_Map["Arm_ForkBoth"]  .Remove(*this, &FRC_2019_Robot::Robot_Arm::CloseForkBoth);
+		em->EventOnOff_Map["Arm_ForkRight"]  .Remove(*this, &FRC2019_Robot::Robot_Arm::CloseForkRight);
+		em->EventOnOff_Map["Arm_ForkLeft"]  .Remove(*this, &FRC2019_Robot::Robot_Arm::CloseForkLeft);
+		em->EventOnOff_Map["Arm_ForkBoth"]  .Remove(*this, &FRC2019_Robot::Robot_Arm::CloseForkBoth);
 	}
 }
 
 
 
   /***********************************************************************************************************************************/
- /*															FRC_2019_Robot															*/
+ /*															FRC2019_Robot															*/
 /***********************************************************************************************************************************/
 
 const double c_CourtLength=Feet2Meters(54);
@@ -366,7 +376,7 @@ const double c_CourtWidth=Feet2Meters(27);
 const double c_HalfCourtLength=c_CourtLength/2.0;
 const double c_HalfCourtWidth=c_CourtWidth/2.0;
 
-FRC_2019_Robot::FRC_2019_Robot(const char EntityName[],FRC_2019_Control_Interface *robot_control,bool IsAutonomous) : 
+FRC2019_Robot::FRC2019_Robot(const char EntityName[],FRC_2019_Control_Interface *robot_control,bool IsAutonomous) : 
 	Tank_Robot(EntityName,robot_control,IsAutonomous), m_RobotControl(robot_control), 
 		m_Turret(this,robot_control),m_PitchRamp(this,robot_control),
 		m_Kicker_Wheel(this,robot_control),m_Arm(this,robot_control),m_LatencyCounter(0.0),
@@ -382,20 +392,20 @@ FRC_2019_Robot::FRC_2019_Robot(const char EntityName[],FRC_2019_Control_Interfac
 	//We may want to add a prefix window to identify which window they are coming from, but this may not be necessary.
 }
 
-void FRC_2019_Robot::Initialize(Entity2D_Kind::EventMap& em, const Entity_Properties *props)
+void FRC2019_Robot::Initialize(Entity2D_Kind::EventMap& em, const Entity_Properties *props)
 {
 	__super::Initialize(em,props);
 	m_RobotControl->Initialize(props);
 
-	const FRC_2019_Robot_Properties *RobotProps=dynamic_cast<const FRC_2019_Robot_Properties *>(props);
+	const FRC2019_Robot_Properties *RobotProps=dynamic_cast<const FRC2019_Robot_Properties *>(props);
 	m_RobotProps=*RobotProps;  //Copy all the properties (we'll need them for high and low gearing)
 
 	//set to the default key position
-	//const FRC_2019_Robot_Props &robot2019props=RobotProps->GetFRC2019RobotProps();
+	//const FRC2019_Robot_Props &robot2019props=RobotProps->GetFRC2019RobotProps();
 	m_Kicker_Wheel.Initialize(em,RobotProps?&RobotProps->GetKickerWheelProps():NULL);
 	m_Arm.Initialize(em,RobotProps?&RobotProps->GetArmProps():NULL);
 }
-void FRC_2019_Robot::ResetPos()
+void FRC2019_Robot::ResetPos()
 {
 	__super::ResetPos();
 	m_Turret.ResetPos();
@@ -471,9 +481,9 @@ namespace VisionConversion
 
 }
 
-void FRC_2019_Robot::TimeChange(double dTime_s)
+void FRC2019_Robot::TimeChange(double dTime_s)
 {
-	//const FRC_2019_Robot_Props &robot_props=m_RobotProps.GetFRC2019RobotProps();
+	//const FRC2019_Robot_Props &robot_props=m_RobotProps.GetFRC2019RobotProps();
 
 	//For the simulated code this must be first so the simulators can have the correct times
 	m_RobotControl->Robot_Control_TimeChange(dTime_s);
@@ -510,17 +520,17 @@ void FRC_2019_Robot::TimeChange(double dTime_s)
 	m_RobotControl->UpdateVoltage(eCameraLED,LED_OnState?1.0:0.0);
 }
 
-const FRC_2019_Robot_Properties &FRC_2019_Robot::GetRobotProps() const
+const FRC2019_Robot_Properties &FRC2019_Robot::GetRobotProps() const
 {
 	return m_RobotProps;
 }
 
-FRC_2019_Robot_Props::Autonomous_Properties &FRC_2019_Robot::GetAutonProps()
+FRC2019_Robot_Props::Autonomous_Properties &FRC2019_Robot::GetAutonProps()
 {
 	return m_RobotProps.GetFRC2019RobotProps_rw().Autonomous_Props;
 }
 
-void FRC_2019_Robot::SetLowGear(bool on) 
+void FRC2019_Robot::SetLowGear(bool on) 
 {
 	if (m_IsAutonomous) return;  //We don't want to read joystick settings during autonomous
 	m_SetLowGear=on;
@@ -537,7 +547,7 @@ void FRC_2019_Robot::SetLowGear(bool on)
 	m_RobotControl->OpenSolenoid(eUseLowGear,on);
 }
 
-void FRC_2019_Robot::SetLowGearValue(double Value)
+void FRC2019_Robot::SetLowGearValue(double Value)
 {
 	if (m_IsAutonomous) return;  //We don't want to read joystick settings during autonomous
 	//printf("\r%f       ",Value);
@@ -559,7 +569,7 @@ void FRC_2019_Robot::SetLowGearValue(double Value)
 	}
 }
 
-void FRC_2019_Robot::SetDriverOverride(bool on) 
+void FRC2019_Robot::SetDriverOverride(bool on) 
 {
 	if (m_IsAutonomous) return;  //We don't want to read joystick settings during autonomous
 	//I am not yet certain if this if statement is necessary... I'll have to check what all is involved in setting a variable that is already equal
@@ -568,33 +578,33 @@ void FRC_2019_Robot::SetDriverOverride(bool on)
 	m_SetDriverOverride=on;
 }
 
-void FRC_2019_Robot::BindAdditionalEventControls(bool Bind)
+void FRC2019_Robot::BindAdditionalEventControls(bool Bind)
 {
 	Entity2D_Kind::EventMap *em=GetEventMap(); 
 	if (Bind)
 	{
-		em->EventOnOff_Map["Robot_SetLowGear"].Subscribe(ehl, *this, &FRC_2019_Robot::SetLowGear);
-		em->Event_Map["Robot_SetLowGearOn"].Subscribe(ehl, *this, &FRC_2019_Robot::SetLowGearOn);
-		em->Event_Map["Robot_SetLowGearOff"].Subscribe(ehl, *this, &FRC_2019_Robot::SetLowGearOff);
-		em->EventValue_Map["Robot_SetLowGearValue"].Subscribe(ehl,*this, &FRC_2019_Robot::SetLowGearValue);
-		em->EventOnOff_Map["Robot_SetDriverOverride"].Subscribe(ehl, *this, &FRC_2019_Robot::SetDriverOverride);
+		em->EventOnOff_Map["Robot_SetLowGear"].Subscribe(ehl, *this, &FRC2019_Robot::SetLowGear);
+		em->Event_Map["Robot_SetLowGearOn"].Subscribe(ehl, *this, &FRC2019_Robot::SetLowGearOn);
+		em->Event_Map["Robot_SetLowGearOff"].Subscribe(ehl, *this, &FRC2019_Robot::SetLowGearOff);
+		em->EventValue_Map["Robot_SetLowGearValue"].Subscribe(ehl,*this, &FRC2019_Robot::SetLowGearValue);
+		em->EventOnOff_Map["Robot_SetDriverOverride"].Subscribe(ehl, *this, &FRC2019_Robot::SetDriverOverride);
 
 		#ifdef Robot_TesterCode
-		em->Event_Map["TestAuton"].Subscribe(ehl, *this, &FRC_2019_Robot::TestAutonomous);
-		em->Event_Map["Complete"].Subscribe(ehl,*this,&FRC_2019_Robot::GoalComplete);
+		em->Event_Map["TestAuton"].Subscribe(ehl, *this, &FRC2019_Robot::TestAutonomous);
+		em->Event_Map["Complete"].Subscribe(ehl,*this,&FRC2019_Robot::GoalComplete);
 		#endif
 	}
 	else
 	{
-		em->EventOnOff_Map["Robot_SetLowGear"]  .Remove(*this, &FRC_2019_Robot::SetLowGear);
-		em->Event_Map["Robot_SetLowGearOn"]  .Remove(*this, &FRC_2019_Robot::SetLowGearOn);
-		em->Event_Map["Robot_SetLowGearOff"]  .Remove(*this, &FRC_2019_Robot::SetLowGearOff);
-		em->EventValue_Map["Robot_SetLowGearValue"].Remove(*this, &FRC_2019_Robot::SetLowGearValue);
-		em->EventOnOff_Map["Robot_SetDriverOverride"]  .Remove(*this, &FRC_2019_Robot::SetDriverOverride);
+		em->EventOnOff_Map["Robot_SetLowGear"]  .Remove(*this, &FRC2019_Robot::SetLowGear);
+		em->Event_Map["Robot_SetLowGearOn"]  .Remove(*this, &FRC2019_Robot::SetLowGearOn);
+		em->Event_Map["Robot_SetLowGearOff"]  .Remove(*this, &FRC2019_Robot::SetLowGearOff);
+		em->EventValue_Map["Robot_SetLowGearValue"].Remove(*this, &FRC2019_Robot::SetLowGearValue);
+		em->EventOnOff_Map["Robot_SetDriverOverride"]  .Remove(*this, &FRC2019_Robot::SetDriverOverride);
 
 		#ifdef Robot_TesterCode
-		em->Event_Map["TestAuton"]  .Remove(*this, &FRC_2019_Robot::TestAutonomous);
-		em->Event_Map["Complete"]  .Remove(*this, &FRC_2019_Robot::GoalComplete);
+		em->Event_Map["TestAuton"]  .Remove(*this, &FRC2019_Robot::TestAutonomous);
+		em->Event_Map["Complete"]  .Remove(*this, &FRC2019_Robot::GoalComplete);
 		#endif
 	}
 
@@ -609,13 +619,13 @@ void FRC_2019_Robot::BindAdditionalEventControls(bool Bind)
 	__super::BindAdditionalEventControls(Bind);
 }
 
-void FRC_2019_Robot::BindAdditionalUIControls(bool Bind,void *joy, void *key)
+void FRC2019_Robot::BindAdditionalUIControls(bool Bind,void *joy, void *key)
 {
 	m_RobotProps.Get_RobotControls().BindAdditionalUIControls(Bind,joy,key);
 	__super::BindAdditionalUIControls(Bind,joy,key);  //call super for more general control assignments
 }
 
-void FRC_2019_Robot::UpdateController(double &AuxVelocity,Vec2D &LinearAcceleration,double &AngularAcceleration,bool &LockShipHeadingToOrientation,double dTime_s)
+void FRC2019_Robot::UpdateController(double &AuxVelocity,Vec2D &LinearAcceleration,double &AngularAcceleration,bool &LockShipHeadingToOrientation,double dTime_s)
 {
 	//Call predecessor (e.g. tank steering) to get some preliminary values
 	__super::UpdateController(AuxVelocity,LinearAcceleration,AngularAcceleration,LockShipHeadingToOrientation,dTime_s);
@@ -632,7 +642,7 @@ void FRC_2019_Robot::UpdateController(double &AuxVelocity,Vec2D &LinearAccelerat
 }
 
 #ifdef Robot_TesterCode
-void FRC_2019_Robot::TestAutonomous()
+void FRC2019_Robot::TestAutonomous()
 {
 	Goal *oldgoal=ClearGoal();
 	if (oldgoal)
@@ -649,7 +659,7 @@ void FRC_2019_Robot::TestAutonomous()
 	}
 }
 
-void FRC_2019_Robot::GoalComplete()
+void FRC2019_Robot::GoalComplete()
 {
 	printf("Goals completed!\n");
 	m_controller->GetUIController_RW()->SetAutoPilot(false);
@@ -657,13 +667,13 @@ void FRC_2019_Robot::GoalComplete()
 #endif
 
   /***********************************************************************************************************************************/
- /*													FRC_2019_Robot_Properties														*/
+ /*													FRC2019_Robot_Properties														*/
 /***********************************************************************************************************************************/
 
 const double c_WheelDiameter=Inches2Meters(6);
 const double c_MotorToWheelGearRatio=12.0/36.0;
 
-FRC_2019_Robot_Properties::FRC_2019_Robot_Properties()  : m_TurretProps(
+FRC2019_Robot_Properties::FRC2019_Robot_Properties()  : m_TurretProps(
 	"Turret",
 	2.0,    //Mass
 	0.0,   //Dimension  (this really does not matter for this, there is currently no functionality for this property, although it could impact limits)
@@ -701,7 +711,7 @@ FRC_2019_Robot_Properties::FRC_2019_Robot_Properties()  : m_TurretProps(
 		//const double c_ArmToGearRatio=72.0/28.0;
 		//const double c_PotentiometerToArmRatio=36.0/54.0;
 
-		FRC_2019_Robot_Props props;
+		FRC2019_Robot_Props props;
 
 		{	//arm potentiometer and arm ratios
 			const double c_OptimalAngleUp_r=DEG_2_RAD(70.0);
@@ -739,7 +749,7 @@ FRC_2019_Robot_Properties::FRC_2019_Robot_Properties()  : m_TurretProps(
 			m_FRC2019RobotProps=props;
 		}
 
-		FRC_2019_Robot_Props::Autonomous_Properties &auton=props.Autonomous_Props;
+		FRC2019_Robot_Props::Autonomous_Properties &auton=props.Autonomous_Props;
 		auton.FirstMove_ft=5.0;
 		auton.SideMove_rad=20.0;
 		auton.ArmMove_in=0.0;  //safe default
@@ -771,7 +781,7 @@ FRC_2019_Robot_Properties::FRC_2019_Robot_Properties()  : m_TurretProps(
 	}
 }
 
-const char *ProcessVec2D(FRC_2019_Robot_Props &m_FRC2019RobotProps,Scripting::Script& script,Vec2d &Dest)
+const char *ProcessVec2D(FRC2019_Robot_Props &m_FRC2019RobotProps,Scripting::Script& script,Vec2d &Dest)
 {
 	const char *err;
 	double length, width;	
@@ -826,13 +836,13 @@ const char * const g_FRC_2019_Controls_Events[] =
 	"TestAuton"
 };
 
-const char *FRC_2019_Robot_Properties::ControlEvents::LUA_Controls_GetEvents(size_t index) const
+const char *FRC2019_Robot_Properties::ControlEvents::LUA_Controls_GetEvents(size_t index) const
 {
 	return (index<_countof(g_FRC_2019_Controls_Events))?g_FRC_2019_Controls_Events[index] : NULL;
 }
-FRC_2019_Robot_Properties::ControlEvents FRC_2019_Robot_Properties::s_ControlsEvents;
+FRC2019_Robot_Properties::ControlEvents FRC2019_Robot_Properties::s_ControlsEvents;
 
-void FRC_2019_Robot_Props::Autonomous_Properties::ShowAutonParameters()
+void FRC2019_Robot_Props::Autonomous_Properties::ShowAutonParameters()
 {
 	if (ShowParameters)
 	{
@@ -873,9 +883,9 @@ void FRC_2019_Robot_Props::Autonomous_Properties::ShowAutonParameters()
 	}
 }
 
-void FRC_2019_Robot_Properties::LoadFromScript(Scripting::Script& script)
+void FRC2019_Robot_Properties::LoadFromScript(Scripting::Script& script)
 {
-	FRC_2019_Robot_Props &props=m_FRC2019RobotProps;
+	FRC2019_Robot_Props &props=m_FRC2019RobotProps;
 
 	const char* err=NULL;
 	{
@@ -884,8 +894,8 @@ void FRC_2019_Robot_Properties::LoadFromScript(Scripting::Script& script)
 		if (!err)
 			printf ("Version=%.2f\n",version);
 	}
-
-	m_ControlAssignmentProps.LoadFromScript(script);
+//TODO enable controls
+//	m_ControlAssignmentProps.LoadFromScript(script);
 	__super::LoadFromScript(script);
 	err = script.GetFieldTable("robot_settings");
 	double fTest;
@@ -952,7 +962,7 @@ void FRC_2019_Robot_Properties::LoadFromScript(Scripting::Script& script)
 		err = script.GetFieldTable("auton");
 		if (!err)
 		{
-			struct FRC_2019_Robot_Props::Autonomous_Properties &auton=m_FRC2019RobotProps.Autonomous_Props;
+			struct FRC2019_Robot_Props::Autonomous_Properties &auton=m_FRC2019RobotProps.Autonomous_Props;
 			{
 				err = script.GetField("first_move_ft", NULL, NULL,&fTest);
 				if (!err)
@@ -992,15 +1002,15 @@ void FRC_2019_Robot_Properties::LoadFromScript(Scripting::Script& script)
 class FRC_2019_Goals_Impl : public AtomicGoal
 {
 	private:
-		FRC_2019_Robot &m_Robot;
+		FRC2019_Robot &m_Robot;
 		double m_Timer;
 
 		class SetUpProps
 		{
 		protected:
 			FRC_2019_Goals_Impl *m_Parent;
-			FRC_2019_Robot &m_Robot;
-			FRC_2019_Robot_Props::Autonomous_Properties m_AutonProps;
+			FRC2019_Robot &m_Robot;
+			FRC2019_Robot_Props::Autonomous_Properties m_AutonProps;
 			Entity2D_Kind::EventMap &m_EventMap;
 		public:
 			SetUpProps(FRC_2019_Goals_Impl *Parent)	: m_Parent(Parent),m_Robot(Parent->m_Robot),m_EventMap(*m_Robot.GetEventMap())
@@ -1036,7 +1046,7 @@ class FRC_2019_Goals_Impl : public AtomicGoal
 
 		static Goal * Move_Straight(FRC_2019_Goals_Impl *Parent,double length_ft)
 		{
-			FRC_2019_Robot *Robot=&Parent->m_Robot;
+			FRC2019_Robot *Robot=&Parent->m_Robot;
 			//Construct a way point
 			WayPoint wp;
 			const Vec2d Local_GoalTarget(0.0,Feet2Meters(length_ft));
@@ -1052,8 +1062,8 @@ class FRC_2019_Goals_Impl : public AtomicGoal
 
 		static Goal * Move_Sideways(FRC_2019_Goals_Impl *Parent,double length_ft)
 		{
-			FRC_2019_Robot *Robot=&Parent->m_Robot;
-			FRC_2019_Robot::Kicker_Wheel &KickerWheel=Robot->GetKickerWheel();
+			FRC2019_Robot *Robot=&Parent->m_Robot;
+			FRC2019_Robot::Kicker_Wheel &KickerWheel=Robot->GetKickerWheel();
 			//const double PrecisionTolerance=Robot->GetRobotProps().GetTankRobotProps().PrecisionTolerance;
 			Goal_Ship1D_MoveToPosition *goal_kicker=NULL;
 			goal_kicker=new Goal_Ship1D_MoveToRelativePosition(KickerWheel,length_ft);
@@ -1062,11 +1072,11 @@ class FRC_2019_Goals_Impl : public AtomicGoal
 
 		static Goal * Move_ArmPosition(FRC_2019_Goals_Impl *Parent,double height_in)
 		{
-			FRC_2019_Robot *Robot=&Parent->m_Robot;
-			FRC_2019_Robot::Robot_Arm &Arm=Robot->GetArm();
+			FRC2019_Robot *Robot=&Parent->m_Robot;
+			FRC2019_Robot::Robot_Arm &Arm=Robot->GetArm();
 			//const double PrecisionTolerance=Robot->GetRobotProps().GetTankRobotProps().PrecisionTolerance;
 			Goal_Ship1D_MoveToPosition *goal_arm=NULL;
-			const double position=FRC_2019_Robot::Robot_Arm::HeightToAngle_r(&Arm,Inches2Meters(height_in));
+			const double position=FRC2019_Robot::Robot_Arm::HeightToAngle_r(&Arm,Inches2Meters(height_in));
 			goal_arm=new Goal_Ship1D_MoveToPosition(Arm,position);
 			return goal_arm;
 		}
@@ -1101,7 +1111,7 @@ class FRC_2019_Goals_Impl : public AtomicGoal
 			CanSteal(FRC_2019_Goals_Impl *Parent)	: SetUpProps(Parent) {	m_Status=eActive;	}
 			virtual void Activate()
 			{
-				const FRC_2019_Robot_Props &props=m_Robot.GetRobotProps().GetFRC2019RobotProps();
+				const FRC2019_Robot_Props &props=m_Robot.GetRobotProps().GetFRC2019RobotProps();
 				AddSubgoal(Move_Straight(m_Parent,-m_AutonProps.FirstMove_ft));
 				AddSubgoal(new Goal_Wait(0.500));  //may not be needed
 				AddSubgoal(Move_ArmPosition(m_Parent,m_AutonProps.ArmMove_in));
@@ -1115,7 +1125,7 @@ class FRC_2019_Goals_Impl : public AtomicGoal
 			SimpleOneTote(FRC_2019_Goals_Impl *Parent)	: SetUpProps(Parent) {	m_Status=eActive;	}
 			virtual void Activate()
 			{
-				const FRC_2019_Robot_Props &props=m_Robot.GetRobotProps().GetFRC2019RobotProps();
+				const FRC2019_Robot_Props &props=m_Robot.GetRobotProps().GetFRC2019RobotProps();
 				AddSubgoal(Move_Straight(m_Parent,-m_AutonProps.FirstMove_ft));
 				AddSubgoal(Move_ArmPosition(m_Parent,props.Tote2Height));
 				AddSubgoal(new Goal_Wait(0.500));  //may not be needed
@@ -1141,7 +1151,7 @@ class FRC_2019_Goals_Impl : public AtomicGoal
 			ePosition_Right
 		} m_RobotPosition;
 	public:
-		FRC_2019_Goals_Impl(FRC_2019_Robot &robot) : m_Robot(robot), m_Timer(0.0), 
+		FRC_2019_Goals_Impl(FRC2019_Robot &robot) : m_Robot(robot), m_Timer(0.0), 
 			m_Primer(false),  //who ever is done first on this will complete the goals (i.e. if time runs out)
 			m_IsHot(false),m_HasSecondShotFired(false)
 		{
@@ -1180,7 +1190,7 @@ class FRC_2019_Goals_Impl : public AtomicGoal
 				SmartDashboard::PutNumber("Auton Position",0.0);
 			}
 
-			FRC_2019_Robot_Props::Autonomous_Properties &auton=m_Robot.GetAutonProps();
+			FRC2019_Robot_Props::Autonomous_Properties &auton=m_Robot.GetAutonProps();
 			auton.ShowAutonParameters();  //Grab again now in case user has tweaked values
 
 			printf("ball count=%d position=%d\n",m_AutonType,m_RobotPosition);
@@ -1220,23 +1230,26 @@ class FRC_2019_Goals_Impl : public AtomicGoal
 		}
 };
 
-Goal *FRC_2019_Goals::Get_FRC2019_Autonomous(FRC_2019_Robot *Robot)
-{
-	Goal_NotifyWhenComplete *MainGoal=new Goal_NotifyWhenComplete(*Robot->GetEventMap(),(char *)"Complete");
-	SmartDashboard::PutNumber("Sequence",1.0);  //ensure we are on the right sequence
-	//Inserted in reverse since this is LIFO stack list
-	MainGoal->AddSubgoal(new FRC_2019_Goals_Impl(*Robot));
-	//MainGoal->AddSubgoal(goal_waitforturret);
-	return MainGoal;
-}
+//Moved to Goals file
+// Goal *FRC2019_Goals::Get_FRC2019_Autonomous(FRC2019_Robot *Robot)
+// {
+// 	Goal_NotifyWhenComplete *MainGoal=new Goal_NotifyWhenComplete(*Robot->GetEventMap(),(char *)"Complete");
+// 	SmartDashboard::PutNumber("Sequence",1.0);  //ensure we are on the right sequence
+// 	//Inserted in reverse since this is LIFO stack list
+// 	MainGoal->AddSubgoal(new FRC_2019_Goals_Impl(*Robot));
+// 	//MainGoal->AddSubgoal(goal_waitforturret);
+// 	return MainGoal;
+// }
 
+//TODO enable robot control
+#if 0
   /***********************************************************************************************************************************/
- /*													FRC_2019_Robot_Control															*/
+ /*													FRC2019_Robot_Control															*/
 /***********************************************************************************************************************************/
 
 
 
-void FRC_2019_Robot_Control::ResetPos()
+void FRC2019_Robot_Control::ResetPos()
 {
 	//Enable this code if we have a compressor 
 	m_Compressor->Stop();
@@ -1250,20 +1263,20 @@ void FRC_2019_Robot_Control::ResetPos()
 		m_Compressor->Start();
 	}
 	//Set the solenoids to their default positions
-	OpenSolenoid(FRC_2019_Robot::eUseLowGear,true);
+	OpenSolenoid(FRC2019_Robot::eUseLowGear,true);
 }
 
-void FRC_2019_Robot_Control::UpdateVoltage(size_t index,double Voltage)
+void FRC2019_Robot_Control::UpdateVoltage(size_t index,double Voltage)
 {
 	switch (index)
 	{
-	case FRC_2019_Robot::eKickerWheel:
+	case FRC2019_Robot::eKickerWheel:
 		Victor_UpdateVoltage(index,Voltage);
 		//TODO change to KickerWheel once I have a 2019 layout in SmartDashboard
 		//  [1/24/2019 JamesK]
 		SmartDashboard::PutNumber("RollerVoltage",Voltage);
 		break;
-	case FRC_2019_Robot::eArm:
+	case FRC2019_Robot::eArm:
 		Voltage=Voltage * m_RobotProps.GetArmProps().GetRotaryProps().VoltageScalar;
 		Victor_UpdateVoltage(index,Voltage);
 		SmartDashboard::PutNumber("ArmVoltage",Voltage);
@@ -1272,7 +1285,7 @@ void FRC_2019_Robot_Control::UpdateVoltage(size_t index,double Voltage)
 		m_Potentiometer.TimeChange();  //have this velocity immediately take effect
 		#endif
 		break;
-	case FRC_2019_Robot::eCameraLED:
+	case FRC2019_Robot::eCameraLED:
 		TranslateToRelay(index,Voltage);
 		//I don't need this since we have another variable that represents it, but enable for diagnostics
 		//SmartDashboard::PutBoolean("CameraLED",Voltage==0.0?false:true);
@@ -1280,15 +1293,15 @@ void FRC_2019_Robot_Control::UpdateVoltage(size_t index,double Voltage)
 	}
 }
 
-bool FRC_2019_Robot_Control::GetBoolSensorState(size_t index) const
+bool FRC2019_Robot_Control::GetBoolSensorState(size_t index) const
 {
 	bool ret;
 	switch (index)
 	{
-	case FRC_2019_Robot::eDartUpper:
+	case FRC2019_Robot::eDartUpper:
 		ret=m_Limit_DartUpper;
 		break;
-	case FRC_2019_Robot::eDartLower:
+	case FRC2019_Robot::eDartLower:
 		ret=m_Limit_DartLower;
 		break;
 	default:
@@ -1297,27 +1310,27 @@ bool FRC_2019_Robot_Control::GetBoolSensorState(size_t index) const
 	return ret;
 }
 
-FRC_2019_Robot_Control::FRC_2019_Robot_Control(bool UseSafety) : m_TankRobotControl(UseSafety),m_pTankRobotControl(&m_TankRobotControl),
+FRC2019_Robot_Control::FRC2019_Robot_Control(bool UseSafety) : m_TankRobotControl(UseSafety),m_pTankRobotControl(&m_TankRobotControl),
 		m_Compressor(NULL),m_RoboRIO_Accelerometer(NULL)
 {
 }
 
-FRC_2019_Robot_Control::~FRC_2019_Robot_Control()
+FRC2019_Robot_Control::~FRC2019_Robot_Control()
 {
-	//Encoder_Stop(FRC_2019_Robot::eWinch);
+	//Encoder_Stop(FRC2019_Robot::eWinch);
 	DestroyCompressor(m_Compressor);
 	m_Compressor=NULL;
 	DestroyBuiltInAccelerometer(m_RoboRIO_Accelerometer);
 	m_RoboRIO_Accelerometer=NULL;
 }
 
-void FRC_2019_Robot_Control::Reset_Rotary(size_t index)
+void FRC2019_Robot_Control::Reset_Rotary(size_t index)
 {
 	Encoder_Reset(index);  //This will check for encoder existence implicitly
 
 	switch (index)
 	{
-	case FRC_2019_Robot::eArm:
+	case FRC2019_Robot::eArm:
 		m_KalFilter_Arm.Reset();
 		#ifdef Robot_TesterCode
 		m_Potentiometer.ResetPos();
@@ -1327,17 +1340,17 @@ void FRC_2019_Robot_Control::Reset_Rotary(size_t index)
 }
 
 #ifdef Robot_TesterCode
-void FRC_2019_Robot_Control::BindAdditionalEventControls(bool Bind,Base::EventMap *em,IEvent::HandlerList &ehl)
+void FRC2019_Robot_Control::BindAdditionalEventControls(bool Bind,Base::EventMap *em,IEvent::HandlerList &ehl)
 {
 }
 #endif
 
-void FRC_2019_Robot_Control::Initialize(const Entity_Properties *props)
+void FRC2019_Robot_Control::Initialize(const Entity_Properties *props)
 {
 	Tank_Drive_Control_Interface *tank_interface=m_pTankRobotControl;
 	tank_interface->Initialize(props);
 
-	const FRC_2019_Robot_Properties *robot_props=dynamic_cast<const FRC_2019_Robot_Properties *>(props);
+	const FRC2019_Robot_Properties *robot_props=dynamic_cast<const FRC2019_Robot_Properties *>(props);
 	//TODO this is to be changed to an assert once we handle low gear properly
 	if (robot_props)
 	{
@@ -1366,8 +1379,8 @@ void FRC_2019_Robot_Control::Initialize(const Entity_Properties *props)
 		m_Compressor=CreateCompressor();
 		//Note: RobotControlCommon_Initialize() must occur before calling any encoder startup code
 		//const double EncoderPulseRate=(1.0/360.0);
-		//Encoder_SetDistancePerPulse(FRC_2019_Robot::eWinch,EncoderPulseRate);
-		//Encoder_Start(FRC_2019_Robot::eWinch);
+		//Encoder_SetDistancePerPulse(FRC2019_Robot::eWinch,EncoderPulseRate);
+		//Encoder_Start(FRC2019_Robot::eWinch);
 		ResetPos(); //must be called after compressor is created
 		SmartDashboard::PutNumber("Arm_Raw_high",4013.0);
 		SmartDashboard::PutNumber("Arm_Raw_Range",24.0);
@@ -1375,11 +1388,11 @@ void FRC_2019_Robot_Control::Initialize(const Entity_Properties *props)
 
 }
 
-void FRC_2019_Robot_Control::Robot_Control_TimeChange(double dTime_s)
+void FRC2019_Robot_Control::Robot_Control_TimeChange(double dTime_s)
 {
-	m_Limit_DartUpper=BoolSensor_GetState(FRC_2019_Robot::eDartUpper);
+	m_Limit_DartUpper=BoolSensor_GetState(FRC2019_Robot::eDartUpper);
 	SmartDashboard::PutBoolean("LimitDartUpper",m_Limit_DartUpper);
-	m_Limit_DartLower=BoolSensor_GetState(FRC_2019_Robot::eDartLower);
+	m_Limit_DartLower=BoolSensor_GetState(FRC2019_Robot::eDartLower);
 	SmartDashboard::PutBoolean("LimitDartLower",m_Limit_DartLower);
 
 	#ifdef Robot_TesterCode
@@ -1397,36 +1410,36 @@ void FRC_2019_Robot_Control::Robot_Control_TimeChange(double dTime_s)
 	#endif
 }
 
-void FRC_2019_Robot_Control::UpdateLeftRightVoltage(double LeftVoltage,double RightVoltage) 
+void FRC2019_Robot_Control::UpdateLeftRightVoltage(double LeftVoltage,double RightVoltage) 
 {
 	#ifdef __USING_6CIMS__
 	const Tank_Robot_Props &TankRobotProps=m_RobotProps.GetTankRobotProps();
 	if (!TankRobotProps.ReverseSteering)
 	{
-		Victor_UpdateVoltage(FRC_2019_Robot::eLeftDrive3,(float)LeftVoltage * TankRobotProps.VoltageScalar_Left);
-		Victor_UpdateVoltage(FRC_2019_Robot::eRightDrive3,-(float)RightVoltage * TankRobotProps.VoltageScalar_Right);
+		Victor_UpdateVoltage(FRC2019_Robot::eLeftDrive3,(float)LeftVoltage * TankRobotProps.VoltageScalar_Left);
+		Victor_UpdateVoltage(FRC2019_Robot::eRightDrive3,-(float)RightVoltage * TankRobotProps.VoltageScalar_Right);
 	}
 	else
 	{
-		Victor_UpdateVoltage(FRC_2019_Robot::eLeftDrive3,(float)RightVoltage * TankRobotProps.VoltageScalar_Right);
-		Victor_UpdateVoltage(FRC_2019_Robot::eRightDrive3,-(float)LeftVoltage * TankRobotProps.VoltageScalar_Left);
+		Victor_UpdateVoltage(FRC2019_Robot::eLeftDrive3,(float)RightVoltage * TankRobotProps.VoltageScalar_Right);
+		Victor_UpdateVoltage(FRC2019_Robot::eRightDrive3,-(float)LeftVoltage * TankRobotProps.VoltageScalar_Left);
 	}
 	#endif
 	m_pTankRobotControl->UpdateLeftRightVoltage(LeftVoltage,RightVoltage);
 }
 
-double FRC_2019_Robot_Control::GetRotaryCurrentPorV(size_t index)
+double FRC2019_Robot_Control::GetRotaryCurrentPorV(size_t index)
 {
 	double result=0.0;
-	const FRC_2019_Robot_Props &props=m_RobotProps.GetFRC2019RobotProps();
+	const FRC2019_Robot_Props &props=m_RobotProps.GetFRC2019RobotProps();
 
 	switch (index)
 	{
-		case FRC_2019_Robot::eArmPotentiometer:
+		case FRC2019_Robot::eArmPotentiometer:
 		{
 			#ifndef Robot_TesterCode
 			//double raw_value = (double)m_Potentiometer.GetAverageValue();
-			double raw_value=(double)Analog_GetAverageValue(FRC_2019_Robot::eArmPotentiometer);
+			double raw_value=(double)Analog_GetAverageValue(FRC2019_Robot::eArmPotentiometer);
 			raw_value = m_KalFilter_Arm(raw_value);  //apply the Kalman filter
 			raw_value=m_ArmAverager.GetAverage(raw_value); //and Ricks x element averager
 			//Note: we keep the raw value in its native form... just averaging at most for less noise
@@ -1460,7 +1473,7 @@ double FRC_2019_Robot_Control::GetRotaryCurrentPorV(size_t index)
 			SmartDashboard::PutNumber("Arm_Raw",raw_value);
 			SmartDashboard::PutNumber("Arm_PotRaw",PotentiometerRaw_To_Arm);
 
-			//Now to compute the result... we start with the normalized value and give it the apprioriate offset and scale
+			//Now to compute the result... we start with the normalized value and give it the appropriate offset and scale
 			//the offset is delegated in script in the final scale units, and the scale is the total range in radians
 			result=PotentiometerRaw_To_Arm;
 			//get scale
@@ -1518,63 +1531,62 @@ double FRC_2019_Robot_Control::GetRotaryCurrentPorV(size_t index)
 	return result;
 }
 
-void FRC_2019_Robot_Control::OpenSolenoid(size_t index,bool Open)
+void FRC2019_Robot_Control::OpenSolenoid(size_t index,bool Open)
 {
 	switch (index)
 	{
-	case FRC_2019_Robot::eUseLowGear:
+	case FRC2019_Robot::eUseLowGear:
 		SmartDashboard::PutBoolean("UseHighGear",!Open);
 		Solenoid_Open(index,Open);
 		break;
-	case FRC_2019_Robot::eForkLeft:
+	case FRC2019_Robot::eForkLeft:
 		SmartDashboard::PutBoolean("ForkLeft",!Open);
 		Solenoid_Open(index,Open);
 		break;
-	case FRC_2019_Robot::eForkRight:
+	case FRC2019_Robot::eForkRight:
 		SmartDashboard::PutBoolean("ForkRight",!Open);
 		Solenoid_Open(index,Open);
 		break;
 	}
 }
-
+#endif
 
 #ifdef Robot_TesterCode
   /***************************************************************************************************************/
- /*												FRC_2019_Robot_UI												*/
+ /*												FRC2019_Robot_UI												*/
 /***************************************************************************************************************/
 
-FRC_2019_Robot_UI::FRC_2019_Robot_UI(const char EntityName[]) : FRC_2019_Robot(EntityName,this),FRC_2019_Robot_Control(),
+FRC2019_Robot_UI::FRC2019_Robot_UI(const char EntityName[]) : FRC2019_Robot(EntityName,this),FRC2019_Robot_Control(),
 		m_TankUI(this)
 {
 }
 
-void FRC_2019_Robot_UI::TimeChange(double dTime_s) 
+void FRC2019_Robot_UI::TimeChange(double dTime_s) 
 {
 	__super::TimeChange(dTime_s);
 	m_TankUI.TimeChange(dTime_s);
 }
-void FRC_2019_Robot_UI::Initialize(Entity2D::EventMap& em, const Entity_Properties *props)
+void FRC2019_Robot_UI::Initialize(Entity2D::EventMap& em, const Entity_Properties *props)
 {
 	__super::Initialize(em,props);
 	m_TankUI.Initialize(em,props);
 }
 
-void FRC_2019_Robot_UI::UI_Init(Actor_Text *parent) 
+void FRC2019_Robot_UI::UI_Init(Actor_Text *parent) 
 {
 	m_TankUI.UI_Init(parent);
 }
-void FRC_2019_Robot_UI::custom_update(osg::NodeVisitor *nv, osg::Drawable *draw,const osg::Vec3 &parent_pos) 
+void FRC2019_Robot_UI::custom_update(osg::NodeVisitor *nv, osg::Drawable *draw,const osg::Vec3 &parent_pos) 
 {
 	m_TankUI.custom_update(nv,draw,parent_pos);
 }
-void FRC_2019_Robot_UI::Text_SizeToUse(double SizeToUse) 
+void FRC2019_Robot_UI::Text_SizeToUse(double SizeToUse) 
 {
 	m_TankUI.Text_SizeToUse(SizeToUse);
 }
-void FRC_2019_Robot_UI::UpdateScene (osg::Geode *geode, bool AddOrRemove) 
+void FRC2019_Robot_UI::UpdateScene (osg::Geode *geode, bool AddOrRemove) 
 {
 	m_TankUI.UpdateScene(geode,AddOrRemove);
 }
 
-#endif
 #endif
