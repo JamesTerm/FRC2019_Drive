@@ -38,6 +38,7 @@ public:
 	void SetOff();
 	virtual void Set(double value) override;
 	virtual double Get() override;
+	DoubleSolenoid::Value GetState();
 	virtual ~DoubleSolenoidItem();
 };
 }

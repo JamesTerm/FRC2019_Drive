@@ -57,6 +57,10 @@ void DoubleSolenoidItem::Set(DoubleSolenoid::Value value){
 
 double DoubleSolenoidItem::Get(){return 0;}
 
+DoubleSolenoid::Value DoubleSolenoidItem::GetState(){
+ return DoubleSolenoid::Value::kOff;
+}
+
 void DoubleSolenoidItem::Set(double value){
 	if(!inUse){
 		inUse = true;

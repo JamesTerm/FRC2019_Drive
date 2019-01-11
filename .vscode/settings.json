@@ -15,7 +15,18 @@
   "files.associations": {
     "string": "cpp",
     "iostream": "cpp",
-    "vector": "cpp"
+    "vector": "cpp",
+    "xutility": "cpp",
+    "array": "cpp",
+    "istream": "cpp",
+    "memory": "cpp",
+    "tuple": "cpp",
+    "type_traits": "cpp",
+    "utility": "cpp",
+    "xlocmes": "cpp",
+    "xlocmon": "cpp",
+    "xlocnum": "cpp",
+    "xloctime": "cpp"
   },
   "C_Cpp.configurationWarnings": "Disabled"
 }
