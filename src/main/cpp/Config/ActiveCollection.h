@@ -38,8 +38,8 @@ namespace Configuration
 			ActiveCollection();
 			virtual ~ActiveCollection(){}
 
-			template <class T>
-			T Get(string name);
+			template <class NativeComponent>
+			NativeComponent Get(string name);
 			VictorSPItem* GetVictor(string name);
 			TalonSRXItem* GetTalon(string name);
 			EncoderItem* GetEncoder(string name);
