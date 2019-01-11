@@ -7,7 +7,9 @@
 /// of some of these methods will reside in a cpp file.  Once the decision is final they will either stay in a cpp, or change to an 'hpp' file
 /// using a nested include technique to work with a templated class.  Hopefully this will not be necessary.
 //  [2/23/2010 James]
-class COMMON_API Goal
+
+//I removed COMMON_API from the 4 basic goal classes for right now. ~chris
+class Goal
 {
 	public:
 		virtual ~Goal() {}
@@ -44,7 +46,7 @@ class COMMON_API Goal
 		//TODO see if Owner and Type are necessary
 }; 
 
-class  COMMON_API AtomicGoal : public Goal
+class   AtomicGoal : public Goal
 {
 	protected:  //from Goal
 		virtual void Activate() {}
@@ -54,7 +56,7 @@ class  COMMON_API AtomicGoal : public Goal
 
 };
 
-class  COMMON_API CompositeGoal : public Goal
+class   CompositeGoal : public Goal
 {
 	protected:  //from Goal
 		~CompositeGoal();
@@ -76,7 +78,7 @@ class  COMMON_API CompositeGoal : public Goal
 };
 
 //Similar to a Composite goal where it is composed of a list of goals, but this one will process all goals simultaneously
-class COMMON_API MultitaskGoal : public Goal
+class  MultitaskGoal : public Goal
 {
 	public:
 		/// \param WaitAll if true the goal is active when the state of all objects are no longer active; If false it will either be the first
