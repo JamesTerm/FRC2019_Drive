@@ -1,0 +1,22 @@
+This document describes on overview on the tasks to port the AI code:
+
+In the first step I've put all the code over, and make sure it builds within the new WPI environment. 
+
+Initial pruning of RobotControlCommon
+ I have commented out RobotControlCommon class as this interfaces with the Robot WPI library calls, and we may need to change this, but then again we may not need to, but for this first iteration I do not need to worry about this as I want the simulation to work. (More on this later).  The thing to know about this is that all applied voltage and all encoder, digital input, and analog inputs come through this interface, and can be delegated or simulated, and stubbed out.
+
+Initial pruning of Joystick
+The same is true for the joystick inputs, it will be easy for us to share functionality to these, or handle this externally, once again this is not important at the moment as goals do not need to worry about this.
+
+About FRC2019 robot:
+The way this works is that this class is a container for all the systems we intend to use, it currently has systems for the 2015 robot and we'll want to change some of the subsystems as we know what they will be.  What will be common is the drive and most likely the arm, so we can set up some simple set point goals for these to get started, and then change the subsystems once we know what they are.
+
+Simulation:
+Fortunately, the simulation already works in the simulation folder... it's just a matter of making it run in VS2017 without any ties to OSG.  In the first iteration it will call the goals process directly, and perhaps we can make it command driven to switch the goals.  I may then have it simply call the Robot main code directly, and it run through its paces through teleop and auton as we integrate the goals to the actual running environment.
+
+More on RobotControl:
+The robot control is the interface where all the voltage is applied, as well as pulling sensor data.  It is very generic, so it will be very easy to co-exist with the environment used already.  We can discuss how to do that once we get a good proof of concept working in the goals.
+
+FRC2019_Goals.cpp
+We should have one file for all the goals.  I've done this in 2014 and for Curivator, so I can demonstrate how it interfaces with the robot, and explain how all the base tools are easily accessible, as we start a goal library... it can all be in one class, the trick is that the IDE can collapse well to work.  It's conceivable to develope them in VS2017, fortunately VS Code has ctrl k-'0' to collapse.  Essentially all the code is declared and implemented in the same place so its easy to quickly change the goals as needed.
+
