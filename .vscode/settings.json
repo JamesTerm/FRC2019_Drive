@@ -16,7 +16,21 @@
     "string": "cpp",
     "iostream": "cpp",
     "vector": "cpp",
+<<<<<<< HEAD
     "xstring": "cpp"
+=======
+    "xutility": "cpp",
+    "array": "cpp",
+    "istream": "cpp",
+    "memory": "cpp",
+    "tuple": "cpp",
+    "type_traits": "cpp",
+    "utility": "cpp",
+    "xlocmes": "cpp",
+    "xlocmon": "cpp",
+    "xlocnum": "cpp",
+    "xloctime": "cpp"
+>>>>>>> master
   },
   "C_Cpp.configurationWarnings": "Disabled",
   "C_Cpp.default.configurationProvider": "vscode-wpilib"
