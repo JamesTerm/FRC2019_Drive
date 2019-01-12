@@ -42,7 +42,7 @@ class COMMON_API UI_Controller
 		#ifdef Robot_TesterCode
 		UI_Controller(AI_Base_Controller *base_controller=NULL,bool AddJoystickDefaults=true);
 		#else
-		UI_Controller(Framework::UI::JoyStick_Binder &joy,AI_Base_Controller *base_controller=NULL);
+		UI_Controller(Framework::UI::JoyStick_Binder *joy,AI_Base_Controller *base_controller=NULL);
 		#endif
 
 		virtual ~UI_Controller();
@@ -185,7 +185,7 @@ class COMMON_API UI_Controller
 		#ifdef Robot_TesterCode
 		Mouse_ShipDriver *m_mouseDriver;
 		#else
-		UI::JoyStick_Binder &m_JoyStick_Binder;
+		UI::JoyStick_Binder *m_JoyStick_Binder;
 		#endif
 
 		double m_LastSliderTime[2]; //Keep track of the slider to help it stay smooth;

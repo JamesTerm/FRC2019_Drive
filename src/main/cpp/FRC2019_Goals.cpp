@@ -379,7 +379,9 @@ class FRC2019_Goals_Impl : public AtomicGoal
 			{
 				if (m_Status==eActive)
 				{
-					bool SafetyLock=SmartDashboard::GetBoolean("SafetyLock_Arm") || SmartDashboard::GetBoolean("SafetyLock_Drive");
+					//May want to have a safety lock
+					const bool SafetyLock = false;
+					//bool SafetyLock=SmartDashboard::GetBoolean("SafetyLock_Arm") || SmartDashboard::GetBoolean("SafetyLock_Drive");
 					if (SafetyLock)
 						m_Status=eFailed;
 				}

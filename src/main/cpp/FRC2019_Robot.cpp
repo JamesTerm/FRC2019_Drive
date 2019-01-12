@@ -483,6 +483,25 @@ namespace VisionConversion
 
 void FRC2019_Robot::TimeChange(double dTime_s)
 {
+	//monitor the AutonTest CheckBox
+	if (m_SmartDashboard_AutonTest_Valve)
+	{
+		//check if it's turned off now
+		if (!SmartDashboard::GetBoolean("Test_Auton"))
+		{
+			//Fire as event so that other people can listen to this event
+			//I do not care about the freeze arm 
+			//We have other check boxes now, and each goal can control how it wants to work without needing to modify robot code
+			GetEventMap()->EventOnOff_Map["StopAuton"].Fire(false);
+		}
+	}
+	else
+	{
+		//check if it is now on
+		if (SmartDashboard::GetBoolean("Test_Auton"))
+			TestAutonomous();
+	}
+
 	//const FRC2019_Robot_Props &robot_props=m_RobotProps.GetFRC2019RobotProps();
 
 	//For the simulated code this must be first so the simulators can have the correct times
@@ -589,10 +608,10 @@ void FRC2019_Robot::BindAdditionalEventControls(bool Bind)
 		em->EventValue_Map["Robot_SetLowGearValue"].Subscribe(ehl,*this, &FRC2019_Robot::SetLowGearValue);
 		em->EventOnOff_Map["Robot_SetDriverOverride"].Subscribe(ehl, *this, &FRC2019_Robot::SetDriverOverride);
 
-		#ifdef Robot_TesterCode
+		//no longer restricted to simulation
 		em->Event_Map["TestAuton"].Subscribe(ehl, *this, &FRC2019_Robot::TestAutonomous);
 		em->Event_Map["Complete"].Subscribe(ehl,*this,&FRC2019_Robot::GoalComplete);
-		#endif
+		em->EventOnOff_Map["StopAuton"].Subscribe(ehl, *this, &FRC2019_Robot::StopAuton);
 	}
 	else
 	{
@@ -602,10 +621,9 @@ void FRC2019_Robot::BindAdditionalEventControls(bool Bind)
 		em->EventValue_Map["Robot_SetLowGearValue"].Remove(*this, &FRC2019_Robot::SetLowGearValue);
 		em->EventOnOff_Map["Robot_SetDriverOverride"]  .Remove(*this, &FRC2019_Robot::SetDriverOverride);
 
-		#ifdef Robot_TesterCode
 		em->Event_Map["TestAuton"]  .Remove(*this, &FRC2019_Robot::TestAutonomous);
 		em->Event_Map["Complete"]  .Remove(*this, &FRC2019_Robot::GoalComplete);
-		#endif
+		em->EventOnOff_Map["StopAuton"].Remove(*this, &FRC2019_Robot::StopAuton);
 	}
 
 	m_Turret.BindAdditionalEventControls(Bind);
@@ -640,17 +658,29 @@ void FRC2019_Robot::UpdateController(double &AuxVelocity,Vec2D &LinearAccelerati
 		AuxVelocity+=PitchVelocity;
 	}
 }
+void FRC2019_Robot::StopAuton(bool isOn)
+{
+	m_SmartDashboard_AutonTest_Valve = false;
+	SmartDashboard::PutBoolean("Test_Auton", false);
+	//FreezeArm(isOn);
+	m_controller->GetUIController_RW()->SetAutoPilot(false);
+	GetEventMap()->Event_Map["StopAutonAbort"].Fire();
+	ClearGoal();
+	//LockPosition(false);
+}
 
-#ifdef Robot_TesterCode
+//No longer are these restricted to simulation
 void FRC2019_Robot::TestAutonomous()
 {
+	m_SmartDashboard_AutonTest_Valve = true;
+	SmartDashboard::PutBoolean("Test_Auton", true);
 	Goal *oldgoal=ClearGoal();
 	if (oldgoal)
 		delete oldgoal;
 
 	{
 		Goal *goal=NULL;
-		goal=FRC_2019_Goals::Get_FRC2019_Autonomous(this);
+		goal=FRC2019_Goals::Get_FRC2019_Autonomous(this);
 		if (goal)
 			goal->Activate(); //now with the goal(s) loaded activate it
 		SetGoal(goal);
@@ -664,7 +694,6 @@ void FRC2019_Robot::GoalComplete()
 	printf("Goals completed!\n");
 	m_controller->GetUIController_RW()->SetAutoPilot(false);
 }
-#endif
 
   /***********************************************************************************************************************************/
  /*													FRC2019_Robot_Properties														*/
@@ -833,7 +862,7 @@ const char * const g_FRC_2019_Controls_Events[] =
 	"Arm_SetCurrentVelocity","Arm_SetPotentiometerSafety","Arm_SetPosRest",
 	"Arm_SetTote2Height","Arm_SetTote3Height","Arm_SetTote4Height","Arm_SetTote5Height","Arm_SetTote6Height",
 	"Arm_ForkRight","Arm_ForkLeft","Arm_ForkBoth","Arm_Advance","Arm_Retract",
-	"TestAuton"
+	"TestAuton","StopAuton"
 };
 
 const char *FRC2019_Robot_Properties::ControlEvents::LUA_Controls_GetEvents(size_t index) const
@@ -998,7 +1027,7 @@ void FRC2019_Robot_Properties::LoadFromScript(Scripting::Script& script)
  /*															FRC_2019_Goals															*/
 /***********************************************************************************************************************************/
 
-
+//I'm keeping this as a reference to see how its evolved over the years
 class FRC_2019_Goals_Impl : public AtomicGoal
 {
 	private:

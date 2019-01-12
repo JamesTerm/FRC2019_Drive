@@ -301,10 +301,11 @@ class FRC2019_Robot : public Tank_Robot
 		bool  m_SetDriverOverride;
 		void SetDriverOverride(bool on);
 
-		#ifdef Robot_TesterCode
+		//No longer are these restricted to simulation
 		void TestAutonomous();
+		void StopAuton(bool isOn);
 		void GoalComplete();
-		#endif
+		bool m_SmartDashboard_AutonTest_Valve=false; //Value used to detect change of AutonTest CheckBox
 };
 
 namespace FRC2019_Goals

@@ -277,7 +277,7 @@ void UI_Controller::Init_AutoPilotControls()
 #ifdef Robot_TesterCode
 UI_Controller::UI_Controller(AI_Base_Controller *base_controller,bool AddJoystickDefaults) : 
 #else
-UI_Controller::UI_Controller(JoyStick_Binder &joy,AI_Base_Controller *base_controller) : 
+UI_Controller::UI_Controller(JoyStick_Binder *joy,AI_Base_Controller *base_controller) : 
 #endif
 	m_Base(NULL),
 	#ifdef Robot_TesterCode
@@ -436,7 +436,7 @@ UI::JoyStick_Binder &UI_Controller::GetJoyStickBinder()
 	#ifdef Robot_TesterCode
 	return MainWindow::GetMainWindow()->GetJoystick();
 	#else
-	return m_JoyStick_Binder;
+	return *m_JoyStick_Binder;
 	#endif
 }
 
@@ -549,7 +549,8 @@ void UI_Controller::Set_AI_Base_Controller(AI_Base_Controller *controller)
 
 		m_ship->BindAdditionalEventControls(true);
 		m_FieldCentricDrive.BindAdditionalEventControls(true,em,ehl);
-		m_ship->BindAdditionalUIControls(true,&GetJoyStickBinder(),GetKeyboardBinder());
+		if (m_JoyStick_Binder)
+			m_ship->BindAdditionalUIControls(true,&GetJoyStickBinder(),GetKeyboardBinder());
 	}
 }
 

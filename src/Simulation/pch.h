@@ -42,3 +42,44 @@
 #include <thread>
 #include <chrono>
 
+#include "../main/cpp/Base/Base_Includes.h"
+#include <math.h>
+#include <assert.h>
+#include "../main/cpp/Base/Vec2d.h"
+#include "../main/cpp/Base/Misc.h"
+#include "../main/cpp/Base/Event.h"
+#include "../main/cpp/Base/EventMap.h"
+#include "../main/cpp/Base/Script.h"
+#include "../main/cpp/Common/Entity_Properties.h"
+#include "../main/cpp/Common/Physics_1D.h"
+#include "../main/cpp/Common/Physics_2D.h"
+#include "../main/cpp/Common/Entity2D.h"
+#include "../main/cpp/Common/Goal.h"
+#include "../main/cpp/Common/Ship_1D.h"
+#include "../main/cpp/Common/Ship.h"
+#include "../main/cpp/Common/AI_Base_Controller.h"
+#include "../main/cpp/Common/Vehicle_Drive.h"
+#include "../main/cpp/Common/PIDController.h"
+#include "../main/cpp/Common/Poly.h"
+#include "../main/cpp/Common/Robot_Control_Interface.h"
+#include "../main/cpp/Common/Rotary_System.h"
+#include "../main/cpp/Common/Servo_System.h"
+#include "../main/cpp/Base/Joystick.h"
+#include "../main/cpp/Base/JoystickBinder.h"
+#include "../main/cpp/Common/UI_Controller.h"
+#include "../main/cpp/Common/PIDController.h"
+//#include "frc/WPILib.h"
+#include "../main/cpp/Base/Joystick.h"
+#include "../main/cpp/Base/JoystickBinder.h"
+//#include "Common/InOut_Interface.h"
+#include "../main/cpp/Common/Debug.h"
+//TODO enable robot control
+//#include "Common/Robot_Control_Common.h"
+#include "../main/cpp/TankDrive/Tank_Robot.h"
+//This was depreciated and integrated ... stubbed out
+// #include "TankDrive/src/Tank_Robot_Control.h"
+//This isn't needed
+// #include "TankDrive/src/Servo_Robot_Control.h"
+
+#include "../main/cpp/FRC2019_Robot.h"
+#include "../main/cpp/Common/SmartDashboard.h"

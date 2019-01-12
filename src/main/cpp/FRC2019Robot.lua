@@ -75,7 +75,7 @@ MainRobot = {
 			id_1 = { name= "left_drive_1",  a_channel=3, b_channel=4},
 			id_2 = { name="right_drive_1",  a_channel=1, b_channel=2},
 		},
-		compressor	=	{ relay=8, limit=14 }
+		compressor	=	{ relay=8, limit=14 },
 		accelerometer	=	{ gRange=1 }
 	},
 	--Version helps to identify a positive update to lua
