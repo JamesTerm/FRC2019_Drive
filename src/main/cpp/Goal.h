@@ -83,3 +83,8 @@ protected:
   double m_left, m_right;
   ActiveCollection* m_activeCollection;
 };
+
+class GoalWaitThenDrive : public CompositeGoal
+{
+  
+};
