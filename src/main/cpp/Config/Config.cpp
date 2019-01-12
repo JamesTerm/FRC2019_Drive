@@ -26,10 +26,10 @@ Config::Config(ActiveCollection *_activeCollection, Drive *_drive) {
 
 void Config::AllocateComponents(){
 
-	VictorSPItem *left_0 = new VictorSPItem("Left_0", 2, false);
-	VictorSPItem *left_1 = new VictorSPItem("Left_1", 3, false);
-	VictorSPItem *right_0 = new VictorSPItem("Right_0", 0, true);
-	VictorSPItem *right_1 = new VictorSPItem("Right_1", 1, true);
+	VictorSPItem *left_0 = new VictorSPItem("Left_0", 2, true);
+	VictorSPItem *left_1 = new VictorSPItem("Left_1", 3, true);
+	VictorSPItem *right_0 = new VictorSPItem("Right_0", 0, false);
+	VictorSPItem *right_1 = new VictorSPItem("Right_1", 1, false);
 
 	m_activeCollection->Add(left_0);
 	m_activeCollection->Add(left_1);
