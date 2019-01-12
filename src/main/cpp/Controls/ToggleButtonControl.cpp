@@ -79,10 +79,13 @@ double ToggleButtonControl::Update()
 					SetToComponents(-current);
 				}
 			}
-			else{
+			else if(!IsReversed){
 				if(Val){
 					SetToComponents(current);
 				}
+			}
+			else{
+				SetToComponents(0);
 			}
 		}
 		else{
