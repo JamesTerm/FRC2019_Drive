@@ -1,6 +1,9 @@
 #pragma once
 
+#ifndef _Win32
 typedef long long __int64;
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -1814,8 +1817,12 @@ typedef struct Table {
 #define lmod(s,size) \
 	(check_exp((size&(size-1))==0, (cast(int, (s) & ((size)-1)))))
 
-
+#ifdef _WIN64
+#define twoto(x)	(1LL<<(x))
+#else
 #define twoto(x)	(1<<(x))
+#endif
+
 #define sizenode(t)	(twoto((t)->lsizenode))
 
 
