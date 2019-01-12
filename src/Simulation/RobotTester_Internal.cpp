@@ -85,8 +85,13 @@ void RobotTester::RobotTester_init()
 	m_p_RobotTester = std::make_shared<RobotTester_Internal>();
 }
 
+//Testing static library access
+#include "../main/cpp/Base/Time_Type.h"
+#pragma comment (lib,"x64/debug/RobotLibraries")
+
 void RobotTester::Test()
 {
+	time_type Test = time_type::get_current_time();
 	//TODO instantiate robot here
 	//might as well start it
 	m_p_RobotTester->StartStreaming();
