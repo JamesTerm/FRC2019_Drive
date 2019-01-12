@@ -30,6 +30,9 @@
     <ClInclude Include="Robot_Tester.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\cpp\FRC2019_Robot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -39,6 +42,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RobotTester_Internal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\cpp\FRC2019_Goals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\cpp\FRC2019_Robot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

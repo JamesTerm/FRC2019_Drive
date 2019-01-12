@@ -31,6 +31,9 @@
     <Filter Include="Common\Source Files">
       <UniqueIdentifier>{0825d07d-12ab-4f19-b89d-6c06fbb354a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="TankDrive">
+      <UniqueIdentifier>{927dc43f-1f3f-46db-ac5a-ae5e8522799f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\main\cpp\Base\EventMap.cpp">
@@ -101,6 +104,15 @@
     </ClCompile>
     <ClCompile Include="..\..\main\cpp\Common\Vehicle_Drive.cpp">
       <Filter>Common\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\TankDrive\Servo_Robot_Control.cpp">
+      <Filter>TankDrive</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\TankDrive\Tank_Robot.cpp">
+      <Filter>TankDrive</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\TankDrive\Tank_Robot_Control.cpp">
+      <Filter>TankDrive</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -193,6 +205,15 @@
     </ClInclude>
     <ClInclude Include="..\..\main\cpp\Common\Vehicle_Drive.h">
       <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\TankDrive\Servo_Robot_Control.h">
+      <Filter>TankDrive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\TankDrive\Tank_Robot.h">
+      <Filter>TankDrive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\TankDrive\Tank_Robot_Control.h">
+      <Filter>TankDrive</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

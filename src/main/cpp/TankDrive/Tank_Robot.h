@@ -144,7 +144,7 @@ class DRIVE_API Tank_Robot : public Ship_Tester,
 	protected:
 		bool m_IsAutonomous;
 	private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef  Ship_Tester __super;
 		#endif
 		Tank_Drive_Control_Interface * const m_RobotControl;
@@ -189,9 +189,10 @@ class DRIVE_API Tank_Robot_Properties : public UI_Ship_Properties
 		//Control_Assignment_Properties m_ControlAssignmentProps;
 		Tank_Robot_Props m_TankRobotProps;
 	private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef Ship_Properties __super;
-		#else
+		#endif
+		#ifdef Robot_TesterCode
 		EncoderSimulation_Properties m_EncoderSimulation;
 		#endif
 };

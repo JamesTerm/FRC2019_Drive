@@ -195,7 +195,7 @@ __inline bool Auton_Smart_GetSingleValue_Bool(const char *SmartName,bool default
 	//Can't use try catch on cRIO since Thunder RIO has issue with using catch(...)
 	//RoboRio uses SetDefault*() to accomplish same effect
 	//Simulation can use try catch method, but we could modify smart dashboard to allow using the new method
-	#if defined Robot_TesterCode
+	#if defined _Win32
 	try
 	{
 		result=SmartDashboard::GetBoolean(SmartName);
@@ -223,7 +223,7 @@ __inline bool Auton_Smart_GetSingleValue_Bool(const char *SmartName,bool default
 __inline void Auton_Smart_GetMultiValue_Bool(size_t NoItems,const char * const SmartNames[],bool * const SmartVariables[])
 {
 	//Remember can't do this on cRIO since Thunder RIO has issue with using catch(...)
-#if defined Robot_TesterCode
+#if defined _Win32
 	for (size_t i=0;i<NoItems;i++)
 	{
 		try
@@ -262,7 +262,7 @@ __inline double Auton_Smart_GetSingleValue(const char *SmartName,double default_
 	//Can't use try catch on cRIO since Thunder RIO has issue with using catch(...)
 	//RoboRio uses SetDefault*() to accomplish same effect
 	//Simulation can use try catch method, but we could modify smart dashboard to allow using the new method
-	#if defined Robot_TesterCode
+	#if defined _Win32
 	try
 	{
 		result=SmartDashboard::GetNumber(SmartName);
@@ -290,7 +290,7 @@ __inline double Auton_Smart_GetSingleValue(const char *SmartName,double default_
 __inline void Auton_Smart_GetMultiValue(size_t NoItems,const char * const SmartNames[],double * const SmartVariables[])
 {
 	//Remember can't do this on cRIO since Thunder RIO has issue with using catch(...)
-	#if defined Robot_TesterCode
+	#if defined _Win32
 	for (size_t i=0;i<NoItems;i++)
 	{
 		try
@@ -667,7 +667,7 @@ class FRC2019_Goals_Impl : public AtomicGoal
 		class ArmMoveToPosition : public SetArmWaypoint
 		{
 		private:
-			#ifndef Robot_TesterCode
+			#ifndef _Win32
 			typedef SetArmWaypoint __super;
 			#endif
 
@@ -1156,7 +1156,7 @@ class FRC2019_Goals_Impl : public AtomicGoal
 
 			AutonType AutonTest = (AutonType)auton.AutonTest;
 			const char * const AutonTestSelection="AutonTest";
-			#if defined Robot_TesterCode
+			#if defined _Win32
 			try
 			{
 				AutonTest=(AutonType)((size_t)SmartDashboard::GetNumber(AutonTestSelection));

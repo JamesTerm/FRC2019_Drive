@@ -89,6 +89,7 @@ void RobotTester::RobotTester_init()
 #include "../main/cpp/Base/Time_Type.h"
 #pragma comment (lib,"x64/debug/RobotLibraries")
 
+
 void RobotTester::Test()
 {
 	time_type Test = time_type::get_current_time();
