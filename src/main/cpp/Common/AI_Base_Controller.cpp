@@ -236,7 +236,7 @@ void LUA_Controls_Properties::LoadFromScript(Scripting::Script& script)
 		size_t i=1;
 		std::string Slot;
 		std::string SlotValue;
-		while ( Slot="slot_",Slot+=itoa(i++,Buffer,10) ,	(err = script.GetField(Slot.c_str(),&SlotValue,NULL,NULL))==NULL)
+		while ( Slot="slot_",Slot+=itoa((int)i++,Buffer,10) ,	(err = script.GetField(Slot.c_str(),&SlotValue,NULL,NULL))==NULL)
 			m_DriverStation_SlotList.push_back(SlotValue);
 		assert(m_DriverStation_SlotList.size()<=4); //only up to 4 slots supported
 		script.Pop();
@@ -249,7 +249,7 @@ void LUA_Controls_Properties::LoadFromScript(Scripting::Script& script)
 	size_t i=1,j=0;
 	std::string Controls;
 	const char * Events;
-	while ( Controls="Joystick_",Controls+=itoa(i++,Buffer,10) ,	(err = script.GetFieldTable(Controls.c_str()))==NULL)
+	while ( Controls="Joystick_",Controls+=itoa((int)i++,Buffer,10) ,	(err = script.GetFieldTable(Controls.c_str()))==NULL)
 	{
 		size_t AxisCount=6;
 		Control_Props control;
@@ -375,9 +375,9 @@ void LUA_Controls_Properties::BindAdditionalUIControls(bool Bind,void *joy,void 
 					if ((p_key) && (button.WhichKey!=(size_t)-1))
 					{
 						if (Bind)
-							p_key->AddKeyBindingR(button.useOnOff,element.Event.c_str(),button.WhichKey);
+							p_key->AddKeyBindingR(button.useOnOff,element.Event.c_str(),(int)button.WhichKey);
 						else
-							p_key->RemoveKeyBinding(button.WhichKey,element.Event.c_str(),button.useOnOff);
+							p_key->RemoveKeyBinding((int)button.WhichKey,element.Event.c_str(),button.useOnOff);
 					}
 				}
 				else
@@ -388,9 +388,9 @@ void LUA_Controls_Properties::BindAdditionalUIControls(bool Bind,void *joy,void 
 				{
 					const Controller_Element_Properties::ElementTypeSpecific::KeyboardSpecifics_rw &button=element.Specifics.Keyboard;
 					if (Bind)
-						p_key->AddKeyBindingR(button.useOnOff,element.Event.c_str(),button.WhichKey);
+						p_key->AddKeyBindingR(button.useOnOff,element.Event.c_str(), (int)button.WhichKey);
 					else
-						p_key->RemoveKeyBinding(button.WhichKey,element.Event.c_str(),button.useOnOff);
+						p_key->RemoveKeyBinding((int)button.WhichKey,element.Event.c_str(),button.useOnOff);
 				}
 				break;
 			}

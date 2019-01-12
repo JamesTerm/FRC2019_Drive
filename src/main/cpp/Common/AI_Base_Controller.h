@@ -106,7 +106,7 @@ public:
 	//Note: It is important for client code not to activate this... let process activate it... so that it sets the heading at the correct time and current heading
 	virtual void Activate();
 private:
-#ifndef Robot_TesterCode
+#ifndef _Win32
 	typedef Goal_Ship_RotateToPosition __super;
 #endif
 };
@@ -161,7 +161,7 @@ public:
 	//Note: It is important for client code not to activate this... let process activate it... so that it sets the point at the correct time and current position
 	virtual void Activate();
 private:
-	#ifndef Robot_TesterCode
+	#ifndef _Win32
 	typedef Goal_Ship_MoveToPosition __super;
 	#endif
 };
@@ -216,7 +216,7 @@ class COMMON_API Goal_Wait : public AtomicGoal
 class COMMON_API Goal_NotifyWhenComplete : public CompositeGoal
 {
 	private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef CompositeGoal __super;
 		#endif
 		std::string m_EventName,m_FailedEventName;  //name to fire when complete

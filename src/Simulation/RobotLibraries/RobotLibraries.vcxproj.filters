@@ -22,6 +22,15 @@
     <Filter Include="Base\SourceFiles">
       <UniqueIdentifier>{33bd3455-a2d5-4899-a1e3-9141dc2553f5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{86a73297-242f-49f6-be98-f5ec2287c040}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\Header Files">
+      <UniqueIdentifier>{916738b8-b58b-477b-976e-0178ae1094e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\Source Files">
+      <UniqueIdentifier>{0825d07d-12ab-4f19-b89d-6c06fbb354a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\main\cpp\Base\EventMap.cpp">
@@ -41,6 +50,57 @@
     </ClCompile>
     <ClCompile Include="..\..\main\cpp\Base\Time_Type.cpp">
       <Filter>Base\SourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Common\AI_Base_Controller.cpp">
+      <Filter>Common\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Common\Calibration_Testing.cpp">
+      <Filter>Common\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Common\Debug.cpp">
+      <Filter>Common\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Common\Entity_Properties.cpp">
+      <Filter>Common\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Common\Entity2D.cpp">
+      <Filter>Common\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Common\Goal.cpp">
+      <Filter>Common\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Common\InOut_Interface.cpp">
+      <Filter>Common\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Common\Physics_1D.cpp">
+      <Filter>Common\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Common\Physics_2D.cpp">
+      <Filter>Common\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Common\PIDController.cpp">
+      <Filter>Common\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Common\Robot_Control_Common.cpp">
+      <Filter>Common\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Common\Rotary_System.cpp">
+      <Filter>Common\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Common\Servo_System.cpp">
+      <Filter>Common\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Common\Ship.cpp">
+      <Filter>Common\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Common\Ship_1D.cpp">
+      <Filter>Common\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Common\UI_Controller.cpp">
+      <Filter>Common\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Common\Vehicle_Drive.cpp">
+      <Filter>Common\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -73,6 +133,66 @@
     </ClInclude>
     <ClInclude Include="..\..\main\cpp\Base\Vec2d.h">
       <Filter>Base\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\AI_Base_Controller.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\Calibration_Testing.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\Debug.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\Entity_Properties.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\Entity2D.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\Goal.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\InOut_Interface.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\Physics_1D.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\Physics_2D.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\PIDController.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\Poly.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\Robot_Control_Common.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\Robot_Control_Interface.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\Rotary_System.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\Servo_System.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\Ship.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\Ship_1D.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\SmartDashboard.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\UI_Controller.h">
+      <Filter>Common\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Common\Vehicle_Drive.h">
+      <Filter>Common\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -84,7 +84,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>_MBCS;_Win32;_WIN64;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_MBCS;_Win32;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -124,6 +124,23 @@
     </ClCompile>
     <ClCompile Include="..\..\main\cpp\Base\Script.cpp" />
     <ClCompile Include="..\..\main\cpp\Base\Time_Type.cpp" />
+    <ClCompile Include="..\..\main\cpp\Common\AI_Base_Controller.cpp" />
+    <ClCompile Include="..\..\main\cpp\Common\Calibration_Testing.cpp" />
+    <ClCompile Include="..\..\main\cpp\Common\Debug.cpp" />
+    <ClCompile Include="..\..\main\cpp\Common\Entity2D.cpp" />
+    <ClCompile Include="..\..\main\cpp\Common\Entity_Properties.cpp" />
+    <ClCompile Include="..\..\main\cpp\Common\Goal.cpp" />
+    <ClCompile Include="..\..\main\cpp\Common\InOut_Interface.cpp" />
+    <ClCompile Include="..\..\main\cpp\Common\Physics_1D.cpp" />
+    <ClCompile Include="..\..\main\cpp\Common\Physics_2D.cpp" />
+    <ClCompile Include="..\..\main\cpp\Common\PIDController.cpp" />
+    <ClCompile Include="..\..\main\cpp\Common\Robot_Control_Common.cpp" />
+    <ClCompile Include="..\..\main\cpp\Common\Rotary_System.cpp" />
+    <ClCompile Include="..\..\main\cpp\Common\Servo_System.cpp" />
+    <ClCompile Include="..\..\main\cpp\Common\Ship.cpp" />
+    <ClCompile Include="..\..\main\cpp\Common\Ship_1D.cpp" />
+    <ClCompile Include="..\..\main\cpp\Common\UI_Controller.cpp" />
+    <ClCompile Include="..\..\main\cpp\Common\Vehicle_Drive.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main\cpp\Base\Base_Includes.h" />
@@ -136,6 +153,26 @@
     <ClInclude Include="..\..\main\cpp\Base\Script.h" />
     <ClInclude Include="..\..\main\cpp\Base\Time_Type.h" />
     <ClInclude Include="..\..\main\cpp\Base\Vec2d.h" />
+    <ClInclude Include="..\..\main\cpp\Common\AI_Base_Controller.h" />
+    <ClInclude Include="..\..\main\cpp\Common\Calibration_Testing.h" />
+    <ClInclude Include="..\..\main\cpp\Common\Debug.h" />
+    <ClInclude Include="..\..\main\cpp\Common\Entity2D.h" />
+    <ClInclude Include="..\..\main\cpp\Common\Entity_Properties.h" />
+    <ClInclude Include="..\..\main\cpp\Common\Goal.h" />
+    <ClInclude Include="..\..\main\cpp\Common\InOut_Interface.h" />
+    <ClInclude Include="..\..\main\cpp\Common\Physics_1D.h" />
+    <ClInclude Include="..\..\main\cpp\Common\Physics_2D.h" />
+    <ClInclude Include="..\..\main\cpp\Common\PIDController.h" />
+    <ClInclude Include="..\..\main\cpp\Common\Poly.h" />
+    <ClInclude Include="..\..\main\cpp\Common\Robot_Control_Common.h" />
+    <ClInclude Include="..\..\main\cpp\Common\Robot_Control_Interface.h" />
+    <ClInclude Include="..\..\main\cpp\Common\Rotary_System.h" />
+    <ClInclude Include="..\..\main\cpp\Common\Servo_System.h" />
+    <ClInclude Include="..\..\main\cpp\Common\Ship.h" />
+    <ClInclude Include="..\..\main\cpp\Common\Ship_1D.h" />
+    <ClInclude Include="..\..\main\cpp\Common\SmartDashboard.h" />
+    <ClInclude Include="..\..\main\cpp\Common\UI_Controller.h" />
+    <ClInclude Include="..\..\main\cpp\Common\Vehicle_Drive.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1073,7 +1073,7 @@ void Rotary_Properties::LoadFromScript(Scripting::Script& script, bool NoDefault
 
 		err=script.GetField("tolerance_count", NULL, NULL, &fValue);
 		if (!err)
-			arm.ToleranceConsecutiveCount=(size_t)fValue;
+			arm.ToleranceConsecutiveCount=fValue;
 
 		err=script.GetField("ds_display_row", NULL, NULL, &fValue);
 		if (!err)
@@ -1168,8 +1168,8 @@ void Rotary_Properties::LoadFromScript(Scripting::Script& script, bool NoDefault
 			SCRIPT_INIT_DOUBLE_NoDefault(arm.PulseBurstTimeMs,		"voltage_stall_safety_on_time");
 			SCRIPT_INIT_DOUBLE_NoDefault(arm_voltage_safety.ErrorThreshold, "voltage_stall_safety_error_threshold");
 			SCRIPT_INIT_DOUBLE_NoDefault(arm_voltage_safety.OnBurstLevel, "voltage_stall_safety_on_burst_level");
-			SCRIPT_INIT_DOUBLE_NoDefault(arm_voltage_safety.PulseBurstTimeOut, "voltage_stall_safety_burst_timeout");
-			SCRIPT_INIT_DOUBLE_NoDefault(arm_voltage_safety.StallCounterThreshold, "voltage_stall_safety_stall_count");
+			SCRIPT_INIT_SIZET_NoDefault(arm_voltage_safety.PulseBurstTimeOut, "voltage_stall_safety_burst_timeout");
+			SCRIPT_INIT_SIZET_NoDefault(arm_voltage_safety.StallCounterThreshold, "voltage_stall_safety_stall_count");
 		}
 
 		#ifdef Robot_TesterCode

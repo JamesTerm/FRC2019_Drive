@@ -270,6 +270,10 @@ __inline T Enum_GetValue(const char *value,const char * const Table[],size_t NoI
 	if (!err) x=fValue; \
 	else if (!NoDefaults) x=0.0;
 
+#define SCRIPT_INIT_SIZET_NoDefault(x,y) err=script.GetField(y, NULL, NULL, &fValue); \
+	if (!err) x=(size_t)fValue; \
+	else if (!NoDefaults) x=0;
+
 #define SCRIPT_INIT_DOUBLE2_NoDefault(x,y,z) err=script.GetField(y, NULL, NULL, &fValue); \
 	if (!err) x=fValue; \
 	else if (!NoDefaults) x=z;

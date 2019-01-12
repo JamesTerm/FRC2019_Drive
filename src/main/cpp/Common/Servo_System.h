@@ -14,7 +14,7 @@ struct Servo_Props
 class COMMON_API Servo_Position_Control : public Ship_1D
 {
 	private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef Ship_1D __super;
 		#endif 
 		//Copy these lines to the subclass that binds the events
@@ -65,7 +65,7 @@ class COMMON_API Servo_Properties : public Ship_1D_Properties
 	protected:
 		Servo_Props m_ServoProps;
 	private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef Ship_1D_Properties __super;
 		#endif
 };

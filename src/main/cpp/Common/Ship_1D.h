@@ -33,7 +33,7 @@ class Ship_1D;
 class COMMON_API Ship_1D_Properties : public Entity1D_Properties
 {
 	private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef Entity1D_Properties __super;
 		#endif
 		Ship_1D_Props m_Ship_1D_Props;
@@ -185,7 +185,7 @@ class COMMON_API Ship_1D : public Entity1D
 		//Only used with SetRequestedVelocity_FromNormalized()
 		//this is managed direct from being set to avoid need for precision tolerance
 		double m_LastNormalizedVelocity;  
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef Entity1D __super;
 		#endif
 		bool m_LockShipToPosition; ///< Locks the ship to intended position (Joystick and Keyboard controls use this)
@@ -220,7 +220,7 @@ public:
 	//Note: It is important for client code not to activate this... let process activate it... so that it sets the point at the correct time and current position
 	virtual void Activate();
 private:
-#ifndef Robot_TesterCode
+#ifndef _Win32
 	typedef Goal_Ship1D_MoveToPosition __super;
 #endif
 };

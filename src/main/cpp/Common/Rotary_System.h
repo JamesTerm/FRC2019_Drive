@@ -79,7 +79,7 @@ struct Rotary_Props
 class COMMON_API Rotary_System : public Ship_1D
 {
 	private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef Ship_1D __super;
 		#endif
 		bool m_UsingRange_props;
@@ -115,7 +115,7 @@ class COMMON_API Rotary_Position_Control : public Rotary_System
 		//Give client code access to the actual position, as the position of the entity cannot be altered for its projected position
 		double GetActualPos() const;
 	private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef Rotary_System __super;
 		#endif
 
@@ -177,7 +177,7 @@ class COMMON_API Rotary_Velocity_Control : public Rotary_System
 			eActive, //Will attempt to match predicted velocity to actual velocity
 		};
 	private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef Rotary_System __super;
 		#endif
 
@@ -256,7 +256,7 @@ class COMMON_API Rotary_Properties : public Ship_1D_Properties
 		EncoderSimulation_Properties m_EncoderSimulation;
 		#endif
 	private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef Ship_1D_Properties __super;
 		#endif
 };
@@ -290,7 +290,7 @@ class COMMON_API Rotary_Pot_Properties : public Rotary_Properties
 	protected:
 		Rotary_Pot_Props m_RotaryPotProps;
 	private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef Rotary_Properties __super;
 		#endif
 };
@@ -326,7 +326,7 @@ public:
 	//Note: It is important for client code not to activate this... let process activate it... so that it sets the point at the correct time and current position
 	virtual void Activate();
 private:
-#ifndef Robot_TesterCode
+#ifndef _Win32
 	typedef Goal_Rotary_MoveToPosition __super;
 #endif
 };

@@ -57,8 +57,8 @@ class Vec2d
 
         inline void set( value_type x, value_type y ) { _v[0]=x; _v[1]=y; }
 
-        inline value_type& operator [] (int i) { return _v[i]; }
-        inline value_type operator [] (int i) const { return _v[i]; }
+        inline value_type& operator [] (size_t i) { return _v[i]; }
+        inline value_type operator [] (size_t i) const { return _v[i]; }
 
         inline value_type& x() { return _v[0]; }
         inline value_type& y() { return _v[1]; }

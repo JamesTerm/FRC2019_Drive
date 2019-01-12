@@ -1,6 +1,15 @@
 #if 1
 #include "LUA.h"
 
+#ifdef _Win32
+// No C library depreciation warnings
+#pragma warning ( disable : 4995 )
+#pragma warning ( disable : 4996 )
+#pragma warning ( disable : 4477 )
+
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 //-------------------------------------------------------------lfunc.c------------------------------------------------------
 //from lgc.h
 LUAI_FUNC size_t luaC_separateudata (lua_State *L, int all);

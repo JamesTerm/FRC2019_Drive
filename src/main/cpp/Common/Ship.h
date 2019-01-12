@@ -265,7 +265,7 @@ class COMMON_API LUA_ShipControls_Properties : public LUA_Controls_Properties
 		const LUA_ShipControls_Props &GetLUA_ShipControls_Props() const {return m_ShipControlsProps;}
 	private:
 		LUA_ShipControls_Props m_ShipControlsProps;
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef LUA_Controls_Properties __super;
 		#endif
 };
@@ -299,7 +299,7 @@ class COMMON_API Ship_Properties : public Entity_Properties
 		Ship_Props &GetShipProps_rw() {return m_ShipProps;}
 		const LUA_ShipControls_Properties &Get_ShipControls() const {return m_ShipControls;}
 	private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef Entity_Properties __super;
 		#endif
 		
@@ -476,7 +476,7 @@ class COMMON_API Ship_2D : public Ship
 		Vec2D m_Last_RequestedVelocity;  ///< This monitors the last caught requested velocity from a speed delta change
 
 	private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef Entity2D __super;
 		#endif
 		//A counter to count how many times the predicted position and intended position are withing tolerance consecutively
@@ -503,7 +503,7 @@ class COMMON_API Ship_Tester : public Ship_2D
 
 		virtual void BindAdditionalEventControls(bool Bind);
 	private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef Ship_2D __super;
 		#endif
 };

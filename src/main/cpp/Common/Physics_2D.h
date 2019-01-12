@@ -185,7 +185,7 @@ class COMMON_API FlightDynamics_2D : public PhysicsEntity_2D
 		double G_Dampener;
 
 	private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef PhysicsEntity_2D __super;
 		#endif
 		double m_DefaultHeading;
