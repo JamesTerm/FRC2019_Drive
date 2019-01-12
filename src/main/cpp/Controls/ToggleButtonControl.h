@@ -13,6 +13,7 @@ Email:	dylantrwatson@gmail.com, irobbot983@gmail.com
 #ifndef SRC_CONTROLS_TOGGLEBUTTONCONTROL_H_
 #define SRC_CONTROLS_TOGGLEBUTTONCONTROL_H_
 
+#include <iostream>
 #include "ControlItem.h"
 #include "../Components/DoubleSolenoidItem.h"
 #include "../Components/VictorSPItem.h"
