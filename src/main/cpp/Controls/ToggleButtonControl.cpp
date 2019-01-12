@@ -83,7 +83,7 @@ void ToggleButtonControl::SetSolenoidDefalt()
 {
 	for(int i=0; i<(int)components.size();i++)
 	{
-		(*components[i]).DefaultSet();
+		((DoubleSolenoidItem*)(components[i]))->DefaultSet();
 	}
 }
 

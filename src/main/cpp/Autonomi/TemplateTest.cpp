@@ -3,6 +3,7 @@
 using namespace std;
 using namespace Autonomi;
 using namespace Util;
+using namespace Configuration;
 
 TemplateTest::TemplateTest(ActiveCollection *_activeCollection)
 {
@@ -12,5 +13,6 @@ TemplateTest::TemplateTest(ActiveCollection *_activeCollection)
 void TemplateTest::Start()
 {
 	cout << "template test" << endl;
-	activeCollection->Get<VictorSPItem*>("left_0");
+	VictorSPItem *victor = (VictorSPItem*)(activeCollection->Get("left_0"));
+//	VictorSPItem *vic = &victor;
 }
