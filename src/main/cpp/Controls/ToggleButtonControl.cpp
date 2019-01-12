@@ -12,6 +12,7 @@ Email:	dylantrwatson@gmail.com, irobot983@gmail.com
 
 #include "ToggleButtonControl.h"
 
+using namespace std;
 using namespace Controls;
 
 ToggleButtonControl::ToggleButtonControl() { }
