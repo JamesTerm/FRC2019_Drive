@@ -55,10 +55,17 @@ void DoubleSolenoidItem::Set(DoubleSolenoid::Value value){
 	}
 }
 
-double DoubleSolenoidItem::Get(){return 0;}
+double DoubleSolenoidItem::Get(){
+	DoubleSolenoid::Value curState = GetState();
+	switch(curState){
+		case DoubleSolenoid::Value::kOff : return 0;
+		case DoubleSolenoid::Value::kForward : return 1;
+		case DoubleSolenoid::Value::kReverse : return 2;
+	}	
+}
 
 DoubleSolenoid::Value DoubleSolenoidItem::GetState(){
- return DoubleSolenoid::Value::kOff;
+	return solenoid->Get();
 }
 
 void DoubleSolenoidItem::Set(double value){
