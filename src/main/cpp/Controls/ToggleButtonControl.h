@@ -15,6 +15,7 @@ Email:	dylantrwatson@gmail.com, irobbot983@gmail.com
 
 #include "ControlItem.h"
 #include "../Components/DoubleSolenoidItem.h"
+#include "../Components/VictorSPItem.h"
 
 using namespace frc;
 
@@ -31,12 +32,14 @@ namespace Controls
 			bool LastState;
 			double current;
 			bool IsSolenoid;
+			bool IsReversed;
 
 		public:
 			ToggleButtonControl();
 			ToggleButtonControl(Joystick *_joy, string _name, int _button, bool _IsSwitchOnPress, bool _IsReversed, double _powerMultiplier, bool _IsSolenoid);
 			void SetSolenoids(DoubleSolenoid::Value value);
 			void SetSolenoidDefalt();
+			DoubleSolenoid::Value GetSolenoidValue();
 			virtual ~ToggleButtonControl();
 			virtual double Update() override;
 	};
