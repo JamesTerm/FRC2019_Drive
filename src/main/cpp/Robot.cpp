@@ -47,7 +47,20 @@ void Robot::Autonomous()
 	cout << "Autonomous Started." << endl;
 	string autoSelected = SmartDashboard::GetString("Auto Selector", m_driveStraight);
 	cout << autoSelected << endl;
-	
+	//TODO create selector for auton/goal
+
+	//this is to run goals
+	double const loopDuration = 0.010;
+	double deltaTime = 0;
+
+	Goal* autonGoal = new GoalDoNothing(15.0);
+	autonGoal->activate();
+	while(IsAutonomous() && !IsDisabled())
+	{
+		autonGoal->Process(deltaTime);
+		Wait(loopDuration);
+		deltaTime += loopDuration;
+	}
 }
 
 /**
