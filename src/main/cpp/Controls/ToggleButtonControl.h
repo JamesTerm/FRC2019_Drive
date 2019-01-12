@@ -39,7 +39,7 @@ namespace Controls
 			ToggleButtonControl(Joystick *_joy, string _name, int _button, bool _IsSwitchOnPress, bool _IsReversed, double _powerMultiplier, bool _IsSolenoid);
 			void SetSolenoids(DoubleSolenoid::Value value);
 			void SetSolenoidDefalt();
-			void GetSolenoidValue();
+			DoubleSolenoid::Value GetSolenoidValue();
 			virtual ~ToggleButtonControl();
 			virtual double Update() override;
 	};

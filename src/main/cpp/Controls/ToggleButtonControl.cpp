@@ -112,10 +112,10 @@ void ToggleButtonControl::SetSolenoidDefalt()
 	}
 }
 
-void ToggleButtonControl::GetSolenoidValue(){
+DoubleSolenoid::Value ToggleButtonControl::GetSolenoidValue(){
 	for(int i=0; i<(int)components.size();i++)
 	{
-		(*components[i]).GetState();
+		((DoubleSolenoidItem)*components[i]).Get();
 	}
 }
 
