@@ -74,7 +74,7 @@ double ToggleButtonControl::Update()
 		}
 	}
 	else{
-		if(components.size > 0){
+		if(components.size() > 0){
 			if(IsReversed){
 				if(Val){
 					SetToComponents(-current);
@@ -116,7 +116,9 @@ void ToggleButtonControl::SetSolenoidDefalt()
 DoubleSolenoid::Value ToggleButtonControl::GetSolenoidValue(){
 	for(int i=0; i<(int)components.size();i++)
 	{
-		((DoubleSolenoidItem)*components[i]).Get();
+		//TODO: Fix for MultiComponent Use
+		return ((DoubleSolenoidItem*)(components[i]))->GetState();
+		
 	}
 }
 
