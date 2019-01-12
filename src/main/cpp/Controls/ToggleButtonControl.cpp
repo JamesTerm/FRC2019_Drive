@@ -23,6 +23,7 @@ ToggleButtonControl::ToggleButtonControl(Joystick *_joy, string _name, int _butt
 	button = _button;
 	IsSwitchOnPress = _IsSwitchOnPress;
 	IsSolenoid = _IsSolenoid;
+	IsReversed = _IsReversed;
 	if(IsSwitchOnPress)
 	{
 		State = false;
@@ -35,10 +36,6 @@ ToggleButtonControl::ToggleButtonControl(Joystick *_joy, string _name, int _butt
 	}
 }
 
-//Ian notes:
-//SetToComponents()-motor
-//SetSolenoids() - direction
-//SolenDefalt
 double ToggleButtonControl::Update()
 {
 
@@ -61,10 +58,35 @@ double ToggleButtonControl::Update()
 	if(IsSolenoid)
 	{
 		if(State){
-			
+			if(GetSolenoidValue() == DoubleSolenoid::Value::kForward){
+				SetSolenoids(DoubleSolenoid::Value::kReverse);
+			}
+			else if (GetSolenoidValue() == DoubleSolenoid::Value::kReverse){
+				SetSolenoids(DoubleSolenoid::Value::kForward);
+			}
+			else{
+				cout << "The defalt of the solenoid is off" << endl;
+			}
 		}
 		else{
 			SetSolenoidDefalt();
+		}
+	}
+	else{
+		if(components.size > 0){
+			if(IsReversed){
+				if(Val){
+					SetToComponents(-current);
+				}
+			}
+			else{
+				if(Val){
+					SetToComponents(current);
+				}
+			}
+		}
+		else{
+			cout << "No Components found" << endl;
 		}
 	}
 
@@ -84,6 +106,13 @@ void ToggleButtonControl::SetSolenoidDefalt()
 	for(int i=0; i<(int)components.size();i++)
 	{
 		(*components[i]).DefaultSet();
+	}
+}
+
+void ToggleButtonControl::GetSolenoidValue(){
+	for(int i=0; i<(int)components.size();i++)
+	{
+		(*components[i]).GetState();
 	}
 }
 
