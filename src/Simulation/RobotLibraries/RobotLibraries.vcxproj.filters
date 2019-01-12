@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Base">
+      <UniqueIdentifier>{f1150f32-d035-42f8-bfc0-60a094129330}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\HeaderFiles">
+      <UniqueIdentifier>{42a0d4da-ecf9-41f4-9f1c-5896b0078bf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\SourceFiles">
+      <UniqueIdentifier>{33bd3455-a2d5-4899-a1e3-9141dc2553f5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\main\cpp\Base\EventMap.cpp">
+      <Filter>Base\SourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Base\JoystickBinder.cpp">
+      <Filter>Base\SourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Base\LUA.cpp">
+      <Filter>Base\SourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Base\Misc.cpp">
+      <Filter>Base\SourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Base\Script.cpp">
+      <Filter>Base\SourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Base\Time_Type.cpp">
+      <Filter>Base\SourceFiles</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\main\cpp\Base\Base_Includes.h">
+      <Filter>Base\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Base\Event.h">
+      <Filter>Base\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Base\EventMap.h">
+      <Filter>Base\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Base\Joystick.h">
+      <Filter>Base\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Base\JoystickBinder.h">
+      <Filter>Base\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Base\LUA.h">
+      <Filter>Base\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Base\Misc.h">
+      <Filter>Base\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Base\Script.h">
+      <Filter>Base\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Base\Time_Type.h">
+      <Filter>Base\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Base\Vec2d.h">
+      <Filter>Base\HeaderFiles</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

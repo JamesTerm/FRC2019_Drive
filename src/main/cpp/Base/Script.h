@@ -1,7 +1,7 @@
 
 #pragma once
 
-class lua_State;
+struct lua_State;
 
 namespace Framework
 {

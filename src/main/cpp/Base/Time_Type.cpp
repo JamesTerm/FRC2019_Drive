@@ -1,5 +1,5 @@
-#if 0
-#include "Timer.h"
+#ifdef _Win32
+#include <windows.h>
 #else
 #include "frc/Timer.h"
 using namespace frc;
@@ -115,8 +115,32 @@ bool time_type::operator<= (const time_type &Value) const
 	return (__int64)m_Time<=(__int64)Value;
 }
 
+#ifdef _Win32
+time_type time_type::get_current_time()
+{
+	LARGE_INTEGER freq, current;
+	QueryPerformanceFrequency(&freq);
+	QueryPerformanceCounter(&current);
+
+	//Using const helps the compiler pull the remainder from the same IDIV instruction (for 64 bit)
+	const __int64 TimeStamp_Divisor = (__int64)current.QuadPart;
+	const __int64 TimeBase_Dividend = (__int64)freq.QuadPart;
+
+	__int64 Quotient = (TimeStamp_Divisor / TimeBase_Dividend);
+	const __int64 Remainder = (TimeStamp_Divisor%TimeBase_Dividend);
+
+	//Now to scale the integer and remainder to 10 microsecond units
+	const __int64 TimeTypeUnitBase = 10000000;
+	Quotient *= TimeTypeUnitBase;
+	__int64 RemainderScaled = (Remainder*TimeTypeUnitBase) / TimeBase_Dividend;
+	Quotient += RemainderScaled;
+	return Quotient;
+}
+
+#else
 time_type time_type::get_current_time()
 {
 	const double CurrentTime=GetTime();
 	return CurrentTime;
 }
+#endif
