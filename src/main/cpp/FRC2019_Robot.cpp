@@ -1165,7 +1165,7 @@ class FRC_2019_Goals_Impl : public AtomicGoal
 			try
 			{
 				const double fGoalSelection=SmartDashboard::GetNumber("Auton GoalSelection");
-				int GoalSelection=(size_t)fGoalSelection;
+				int GoalSelection=(int)fGoalSelection;
 				if ((GoalSelection<0)||(GoalSelection>eNoAutonTypes))
 					GoalSelection=eDoNothing;
 				m_AutonType=(AutonType)GoalSelection;
@@ -1179,7 +1179,7 @@ class FRC_2019_Goals_Impl : public AtomicGoal
 			try
 			{
 				const double fPosition=SmartDashboard::GetNumber("Auton Position");
-				int Position=(size_t)fPosition;
+				int Position=(int)fPosition;
 				if ((Position<0)||(Position>eNoAutonTypes))
 					Position=eDoNothing;
 				m_RobotPosition=(Robot_Position)Position;

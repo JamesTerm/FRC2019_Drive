@@ -62,7 +62,7 @@ class FRC2019_Robot_Properties : public Tank_Robot_Properties
 //TODO enable controls
 //		const Control_Assignment_Properties &Get_ControlAssignmentProps() const {return m_ControlAssignmentProps;}
 	private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef Tank_Robot_Properties __super;
 		#endif
 		Rotary_Properties m_TurretProps,m_PitchRampProps,m_KickerWheelProps;
@@ -208,7 +208,7 @@ class FRC2019_Robot : public Tank_Robot
 
 				void Kicker_Wheel_SetRequestedVelocity(double Velocity) {m_Velocity+=Velocity;}
 			private:
-				#ifndef Robot_TesterCode
+				#ifndef _Win32
 				typedef Rotary_Velocity_Control __super;
 				#endif
 				FRC2019_Robot * const m_pParent;
@@ -246,7 +246,7 @@ class FRC2019_Robot : public Tank_Robot
 				virtual bool DidHitMinLimit() const;
 				virtual bool DidHitMaxLimit() const;
 			private:
-				#ifndef Robot_TesterCode
+				#ifndef _Win32
 				typedef Rotary_Position_Control __super;
 				#endif
 				void SetPosRest();
@@ -271,7 +271,7 @@ class FRC2019_Robot : public Tank_Robot
 		//used to blend turret and pitch controls into the drive itself
 		virtual void UpdateController(double &AuxVelocity,Vec2D &LinearAcceleration,double &AngularAcceleration,bool &LockShipHeadingToOrientation,double dTime_s);
 	private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef  Tank_Robot __super;
 		#endif
 		FRC_2019_Control_Interface * const m_RobotControl;

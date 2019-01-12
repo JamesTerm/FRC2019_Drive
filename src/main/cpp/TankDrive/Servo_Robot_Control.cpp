@@ -1,5 +1,6 @@
-
+#ifndef _Win32
 #include <frc/WPILib.h>
+#endif
 
 #include "../Base/Base_Includes.h"
 #include <math.h>

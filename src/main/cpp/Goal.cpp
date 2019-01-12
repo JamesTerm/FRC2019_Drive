@@ -22,3 +22,7 @@ Goal::Goal_Status GoalDoNothing::Process()
     }
     return eFailed; //if somehow it gets past your code, fail
 }
+
+void GoalDoNothing::Terminate()
+{
+}

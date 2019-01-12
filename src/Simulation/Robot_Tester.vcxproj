@@ -103,7 +103,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_Win32;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -151,10 +151,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\main\cpp\FRC2019_Robot.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Robot_Tester.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\main\cpp\FRC2019_Goals.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\main\cpp\FRC2019_Robot.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -163,6 +170,14 @@
     </ClCompile>
     <ClCompile Include="RobotTester_Internal.cpp" />
     <ClCompile Include="Robot_Tester.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="RobotLibraries\RobotLibraries.vcxproj">
+      <Project>{e56d8c47-da69-46f8-92ca-8f68b3e553b3}</Project>
+    </ProjectReference>
+    <ProjectReference Include="SmartDashboard\SmartDashboard.vcxproj">
+      <Project>{556fc434-d0c3-4b96-bf29-e9cf5cd24f02}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

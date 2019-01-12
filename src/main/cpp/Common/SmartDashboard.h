@@ -24,7 +24,7 @@ public:
 class ITable;
 class Sendable;
 
-class __declspec(dllimport) SmartDashboard //: public SensorBase
+class SmartDashboard //: public SensorBase
 {
 public:
 	static void init();
