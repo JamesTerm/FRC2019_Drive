@@ -62,7 +62,7 @@ void cls(HANDLE hConsole = NULL)
 	//PERR(bSuccess, "SetConsoleCursorPosition");   return; 
 }
 
-int CommandLineInterface()
+void CommandLineInterface()
 {
 	RobotTester _robot_tester;
 	_robot_tester.RobotTester_init();
