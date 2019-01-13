@@ -10,6 +10,8 @@ Note:
 Currently in this build the Encoders are not yet hooked up, as I changed stuff around... so when testing the actual motion profiling may not be quite correct, and currently all the systems are in open loop so it should work fine for now.
 
 Now run the console app.
+Run VS 2017 load the FRC2019/src/Simulation/Robot_Tester.sln build it in Debug x64... run from this (e.g. f5).
+Currently, it only builds in x64 as I need to transfer some project setting over to release, but I am not really needing to do this yet as I prefer to always run this in debug given the nature of its use-case.  Also the code runs with the working directory set to FRC2019/src/Simulation/ so if you wish to run the .exe by itself it will need to be placed there as it uses a relative path to load the lua file.  Alternatively, you can hard code an absolute path to the .lua file, or set an environment variable and run it from anywhere. 
 It currently doesn't really have any commands, but type test
 The Test_Auton box should be checked and AutonTest defaults to zero (doesn't do anything except to update a countdown time starting with 1800 seconds.
 
