@@ -159,11 +159,36 @@ void task_proc(RobotTester_Internal *instance)
 
 void RobotTester_Internal::StartStreaming()
 {
+	//Here is an example where lambda is useful, this avoids the need to pass an instance and call both the operator() and task_proc
+	//I've left them it to compare
+	#if 0
 	if (!m_IsStreaming)
 	{
 		m_IsStreaming = true;
 		m_TaskState = reallyAsync(task_proc, this);
 	}
+	#else
+	if (!m_IsStreaming)
+	{
+		m_IsStreaming = true;
+		//TODO make a reallyAsync that doesn't require an instance
+		m_TaskState = reallyAsync(
+			[&](void *dummy)
+		{
+			printf("starting task_proc()\n");
+			void *dummy_ptr = nullptr;
+			while (m_IsStreaming)
+			{
+				const double synthetic_delta = 0.01;
+				if (m_pRobot)
+					m_pRobot->TimeChange(synthetic_delta);
+				MySleep(synthetic_delta);
+			}
+			printf("ending task_proc()\n");
+		}
+		, this);
+	}
+	#endif
 }
 
 
