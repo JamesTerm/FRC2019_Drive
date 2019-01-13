@@ -1,0 +1,59 @@
+The simulation is a console app that loads up the robot and gives it time slices.  In it's first iteration type test to start loading the robot and running auton (the auton it does depends on the number that is currnetly set, or 0 by default).
+
+First make sure to run SmartDashboard set to local like so:
+java -jar C:\Users\JamesK\wpilib\tools\SmartDashboard.jar ip localhost
+
+Next load 
+.\FRC2019\src\Simulation\FRC2019_MainLayout.xml within SmartDashboard this is only a one-time load and newer controls may be populated when trying some of the later goals.  Some of the controls shown may be depreciated, but the most important ones are Test_Auton checkbox, and AutonTest control... unfortunately its a float number but treat it like an integer.  1.0 2.0 3.0 etc to pick which auton to do.
+
+Note:
+Currently in this build the Encoders are not yet hooked up, as I changed stuff around... so when testing the actual motion profiling may not be quite correct, and currently all the systems are in open loop so it should work fine for now.
+
+Now run the console app.
+It currently doesn't really have any commands, but type test
+The Test_Auton box should be checked and AutonTest defaults to zero (doesn't do anything except to update a countdown time starting with 1800 seconds.
+
+Click the Test_Auton to turn off the auton.
+Next try setting AutonTest to 1.0
+Click the Test_Auton button
+
+This drives forward up 1 foot by default the TestMove with show 1.0 and when the run is down the y_ft will show something like 0.98 (as there is some tolerance).
+
+Notice how the auton auto stops when the goal is complete
+
+now Try 2.0 for AutonTest, un-check and recheck Test_Auton
+When it turns 45 degrees you can see the little heading indicator (between the left and right voltage) that shows it turning.  Change the TestRotate to a different angle to see how it behaves.
+
+Here is a list of all the goals... some are disabled or partially working because they were for the curivator:
+
+enum AutonType
+{
+	eDoNothing,
+	eJustMoveForward,
+	eJustRotate,
+	eSimpleMoveRotateSequence,
+	eTestBoxWayPoints,
+	eTestArm,
+	eArmGrabSequence,
+	eTestTurret,
+	eArmAndTurretTest,
+	eArmClawGrab,
+	eTurretTracking,
+	eDriveTracking,
+	eNoAutonTypes
+};
+
+Feel free to look through the code at these goals... I haven't tested them all yet for this robot, but I will leave you with this:
+
+eTurretTracking
+https://www.dropbox.com/s/gg0t3xfn4qk00qe/20180303_163552.mp4?dl=0
+
+eDriveTracking
+https://www.dropbox.com/s/wxyt0x038hindar/20180306_191130.mp4?dl=0
+
+I don't have a video yet... but the drive tracking also did forward and backward on distance as well... I may work on these goals a bit more off season.
+
+
+
+
+
