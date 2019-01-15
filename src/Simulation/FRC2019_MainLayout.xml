@@ -1,80 +1,30 @@
 <xml version="1.0">
 <dashboard>
 	<widget field="TestRotate" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="499" y="539"/>
+		<location x="738" y="326"/>
+		<width>96</width>
 	</widget>
 	<widget field="TestMove" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="503" y="509"/>
-	</widget>
-	<widget field="Test_Auton" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.CheckBox">
-		<location x="501" y="454"/>
-	</widget>
-	<widget field="AutonTest" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="500" y="482"/>
-	</widget>
-	<widget field="side_move_rad" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="47" y="538"/>
-	</widget>
-	<widget field="arm_height_in" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="53" y="512"/>
-	</widget>
-	<widget field="LimitDartLower" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
-		<location x="496" y="420"/>
-	</widget>
-	<widget field="LimitDartUpper" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
-		<location x="498" y="395"/>
-	</widget>
-	<widget field="Auton GoalSelection" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="34" y="450"/>
-	</widget>
-	<widget field="Timer" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="43" y="381"/>
-		<property name="Font Size" value="20"/>
-	</widget>
-	<widget field="Auton Position" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="39" y="423"/>
-	</widget>
-	<widget field="ForkLeft" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
-		<location x="59" y="330"/>
-	</widget>
-	<widget field="ForkRight" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
-		<location x="127" y="327"/>
-	</widget>
-	<widget field="support_hotspot" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
-		<location x="755" y="405"/>
-	</widget>
-	<widget field="Edit Position Main" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
-		<location x="756" y="361"/>
-	</widget>
-	<widget field="height_indicator_y" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="740" y="229"/>
-	</widget>
-	<widget field="first_move_ft" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="56" y="485"/>
-	</widget>
-	<widget field="Camera_z" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="748" y="256"/>
-	</widget>
-	<widget field="Camera_y" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="747" y="280"/>
-	</widget>
-	<widget field="Camera_x" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="749" y="303"/>
-	</widget>
-	<widget field="Camera_rot_y" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="751" y="329"/>
+		<location x="738" y="295"/>
+		<width>96</width>
 	</widget>
 	<widget field="FieldCentricDrive_Mode" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
-		<location x="500" y="371"/>
+		<location x="302" y="174"/>
 	</widget>
-	<widget field="UseHighGear" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
-		<location x="497" y="349"/>
+	<widget field="Timer" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="734" y="181"/>
+		<width>131</width>
+		<property name="Font Size" value="20"/>
+	</widget>
+	<widget field="Test_Auton" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.CheckBox">
+		<location x="740" y="233"/>
 	</widget>
 	<widget field="AutoPilot" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
-		<location x="598" y="170"/>
+		<location x="610" y="169"/>
 	</widget>
-	<widget field="Main_Is_Targeting" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
-		<location x="754" y="384"/>
+	<widget field="AutonTest" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="739" y="266"/>
+		<width>93</width>
 	</widget>
 	<widget field="Sequence" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
 		<location x="694" y="112"/>
@@ -93,7 +43,16 @@
 		<property name="Minimum" value="-1.0"/>
 	</widget>
 	<widget field="Edit Position" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.CheckBox">
-		<location x="802" y="134"/>
+		<location x="800" y="111"/>
+	</widget>
+	<widget field="Deployment" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="170" y="309"/>
+	</widget>
+	<widget field="Claw" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="48" y="309"/>
+	</widget>
+	<widget field="Wrist" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="118" y="310"/>
 	</widget>
 	<widget field="RollerVoltage" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
 		<location x="53" y="259"/>
@@ -124,6 +83,7 @@
 		<location x="281" y="265"/>
 		<width>107</width>
 		<height>30</height>
+		<property name="Foreground" value="51.153.255.255"/>
 		<property name="Background" value="0.0.102.255"/>
 		<property name="Maximum" value="3.844"/>
 		<property name="Minimum" value="-3.844"/>
@@ -131,6 +91,7 @@
 	<widget field="RightEncoder" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
 		<location x="512" y="260"/>
 		<width>115</width>
+		<property name="Foreground" value="51.153.255.255"/>
 		<property name="Background" value="0.0.102.255"/>
 		<property name="Maximum" value="3.844"/>
 		<property name="Minimum" value="-3.844"/>
@@ -184,38 +145,68 @@
 		<property name="Lower Limit" value="-14.0"/>
 		<property name="Tick Interval" value="2.8"/>
 	</widget>
-	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
-		<location x="803" y="114"/>
-		<property name="Text" value="Edit Position"/>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Image">
+		<location x="-114" y="-118"/>
+		<property name="Image File" value="D:\Stuff\BroncBotz\Code\Temp\BackgroundTexture.jpg"/>
 	</static-widget>
 	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
 		<location x="803" y="114"/>
 		<property name="Text" value="Edit Position"/>
 	</static-widget>
-	<widget field="axis5" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="337" y="528"/>
-	</widget>
-	<widget field="axis4" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="322" y="503"/>
-	</widget>
-	<widget field="axis3" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="316" y="479"/>
-	</widget>
-	<widget field="axis2" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="310" y="453"/>
-	</widget>
-	<widget field="axis1" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="303" y="428"/>
-	</widget>
-	<widget field="axis0" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="297" y="400"/>
-	</widget>
-	<widget field="armRaw" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="736" y="441"/>
-	</widget>
 	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
-		<location x="803" y="114"/>
-		<property name="Text" value="Edit Position"/>
+		<location x="45" y="340"/>
+		<property name="Text" value="PID up Only"/>
+	</static-widget>
+	<widget field="Use Up PID Only" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.CheckBox">
+		<location x="18" y="339"/>
+	</widget>
+	<widget field="Lag Predict Down" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="490" y="462"/>
+		<width>120</width>
+	</widget>
+	<widget field="Lag Predict Up" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="504" y="435"/>
+		<width>107</width>
+	</widget>
+	<widget field="Tolerance Count" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="493" y="399"/>
+		<width>122</width>
+	</widget>
+	<widget field="Up P" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="20" y="361"/>
+		<width>77</width>
+		<height>20</height>
+	</widget>
+	<widget field="Up I" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="25" y="393"/>
+		<width>70</width>
+	</widget>
+	<widget field="Up D" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="21" y="422"/>
+		<width>71</width>
+	</widget>
+	<widget field="Tolerance" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="496" y="370"/>
+	</widget>
+	<widget field="Down P" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="114" y="366"/>
+		<width>90</width>
+	</widget>
+	<widget field="Down I" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="117" y="397"/>
+		<width>81</width>
+	</widget>
+	<widget field="Down D" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="117" y="427"/>
+		<width>80</width>
+	</widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Image">
+		<location x="-114" y="-118"/>
+		<property name="Image File" value="D:\Stuff\BroncBotz\Code\Temp\BackgroundTexture.jpg"/>
+	</static-widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Image">
+		<location x="-114" y="-118"/>
+		<property name="Image File" value="D:\Stuff\BroncBotz\Code\Temp\BackgroundTexture.jpg"/>
 	</static-widget>
 </dashboard>
 <live-window>

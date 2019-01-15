@@ -1,33 +1,36 @@
+
 Pi=3.14159265358979323846
 Pi2=Pi*2
 Inches2Meters=0.0254
 Feet2Meters=0.3048
 Meters2Feet=3.2808399
 Meters2Inches=39.3700787
+Inches2Meters=0.0254
 OunceInchToNewton=0.00706155183333
 Pounds2Kilograms=0.453592
 Deg2Rad=(1/180) * Pi
 
-ArmLength_m=48 * Inches2Meters  --4 feet
+ArmLength_m=1.8288  --6 feet
 ArmToGearRatio=72.0/28.0
 GearToArmRatio=1.0/ArmToGearRatio
 PotentiometerToArmRatio=36.0/54.0
 PotentiometerToGearRatio=PotentiometerToArmRatio * ArmToGearRatio
 PotentiometerMaxRotation_r=270.0 * Deg2Rad
-GearHeightOffset_m=38.43 * Inches2Meters
+GearHeightOffset_m=55 * Inches2Meters
 MotorToWheelGearRatio=12.0/36.0
 
 
 g_wheel_diameter_in=6   --This will determine the correct distance try to make accurate too
-WheelBase_Width_In=24.52198975	  --The wheel base will determine the turn rate, must be as accurate as possible!
-WheelBase_Length_In=28.7422  
+WheelBase_Width_In=22.3125	  --The wheel base will determine the turn rate, must be as accurate as possible!
+WheelBase_Length_In=9.625
 WheelTurningDiameter_In= ( (WheelBase_Width_In * WheelBase_Width_In) + (WheelBase_Length_In * WheelBase_Length_In) ) ^ 0.5
 HighGearSpeed = (749.3472 / 60.0) * Pi * g_wheel_diameter_in * Inches2Meters  * 0.9  --RPMs from BHS2015 Chassis.SLDASM
 LowGearSpeed  = (346.6368 / 60.0) * Pi * g_wheel_diameter_in * Inches2Meters  * 0.9
-Drive_MaxAccel=5
---Omni wheels means no skid
---skid=math.cos(math.atan2(WheelBase_Length_In,WheelBase_Width_In))
-skid=1
+GearSpeedRPM = 600  --this had 372.63 but this seemed too slow according to the encoder readings
+GearSpeed = (GearSpeedRPM / 60.0) * Pi * g_wheel_diameter_in * Inches2Meters
+
+Drive_MaxAccel=4
+skid=math.cos(math.atan2(WheelBase_Length_In,WheelBase_Width_In))
 gMaxTorqueYaw = (2 * Drive_MaxAccel * Meters2Inches / WheelTurningDiameter_In) * skid
 
 MainRobot = {
@@ -94,7 +97,7 @@ MainRobot = {
 
 	MAX_SPEED = HighGearSpeed,
 	ACCEL = 10,    -- Thruster Acceleration m/s2 (1g = 9.8)
-	BRAKE = ACCEL,
+	BRAKE = ACCEL,     -- Brake Deceleration m/s2 (1g = 9.8)
 	-- Turn Rates (radians/sec) This is always correct do not change
 	heading_rad = (2 * HighGearSpeed * Meters2Inches / WheelTurningDiameter_In) * skid,
 	
@@ -119,7 +122,7 @@ MainRobot = {
 		{p=200, i=0, d=50},					--These should always match, but able to be made different
 		latency=0.0,
 		heading_latency=0.0,
-		drive_to_scale=0.50,				--For 4 to 10 50% gives a 5 inch tolerance
+		drive_to_scale=0.50,
 		left_max_offset=0.0 , right_max_offset=0.0,   --Ensure both tread top speeds are aligned
 		--This is obtainer from encoder RPM's of 1069.2 and Wheel RPM's 427.68 (both high and low have same ratio)
 		encoder_to_wheel_ratio=0.5,			--example if encoder spins at 1069.2 multiply by this to get 427.68 (for the wheel rpm)
@@ -132,7 +135,7 @@ MainRobot = {
 		reverse_steering='no',
 		 left_encoder_reversed='no',
 		right_encoder_reversed='no',
-		inv_max_accel = 1/15.0,  --solved empiracally
+		inv_max_accel = 1.0/15.0,  --solved empiracally
 		forward_deadzone_left  = 0.02,
 		forward_deadzone_right = 0.02,
 		reverse_deadzone_left  = 0.02,
@@ -151,36 +154,23 @@ MainRobot = {
 			stall_current_amp=133,
 			free_current_amp=2.7
 		}
+
 	},
-	
 	robot_settings =
 	{
-		ds_display_row=-1,					--This will display the coordinates and heading (may want to leave on)
-
-		height_presets =
-		--Heights are in inches
-		{rest=0.0, tote_3=11.75*2 + 2 },
-		auton =
-		{
-			first_move_ft=20,
-			arm_height_in=12,
-			support_hotspot='n',
-			show_auton_variables='y'
-		},
-
 		arm =
 		{
 			is_closed=0,
 			show_pid_dump='n',
 			ds_display_row=-1,
-			use_pid_up_only='y',
+			use_pid_up_only='n',
 			pid_up=
-			{p=100, i=0, d=25},
+			{p=100, i=0, d=0},
 			pid_down=
-			{p=100, i=0, d=25},
+			{p=100, i=0, d=0},
 			tolerance=0.15,
 			tolerance_count=20,
-			voltage_multiply=5.0,			--May be reversed
+			voltage_multiply=1.0,			--May be reversed
 			encoder_to_wheel_ratio=1.0,
 			Arm_SetPotentiometerSafety=true,	
 			--max_speed=(19300/64/60) * Pi2,	--This is about 5 rps (a little slower than hiking viking drive)
@@ -224,163 +214,97 @@ MainRobot = {
 				free_current_amp=1.8
 			}
 		},
-
-		kicker =
+		claw =
 		{
-			is_closed=0,
-			show_pid_dump='no',
-			ds_display_row=-1,				--Use this display to determine max speed (try to get a good match)
-			pid=
-			{p=100, i=0, d=50 },
-			latency=0.0,
-			voltage_multiply=1.0,
-
-			length_in=4,					--6 inch diameter (we shouldn't worry about tweaking this just measure it and be done)
-			max_speed=42,					--with 13.2 gear reduction in radians (default is 42)					
-			accel=10.0,						--These are only needed if we bind keys for power in meters per second
-			brake=10.0,
-			--These are low because of traction
-			max_accel_forward=85,
-			max_accel_reverse=85,
-			--inv_max_accel = 1/23,  --solved empiracally
-		},
-
-		low_gear = 
-		{
-			--While it is true we have more torque for low gear, we have to be careful that we do not make this too powerful as it could
-			--cause slipping if driver "high sticks" to start or stop quickly.
-			--for this year... there is no high gear... so we'll inherit these from high gear
-			--MaxAccelLeft = 10, MaxAccelRight = 10, MaxAccelForward = 10 * 2, MaxAccelReverse = 10 * 2, 
-			--MaxTorqueYaw = 25 * 2,
-			--MaxTorqueYaw_High = 25 * 2,
-
-			MAX_SPEED = LowGearSpeed,
-			ACCEL = 10*2,    -- Thruster Acceleration m/s2 (1g = 9.8)
-			BRAKE = ACCEL, 
-			-- Turn Rates (deg/sec) This is always correct do not change
-			heading_rad = (2 * LowGearSpeed * Meters2Inches / WheelTurningDiameter_In) * skid,
+			--Note: there are no encoders here so is_closed is ignored
+			tolerance=0.01,					--we need good precision
+			voltage_multiply=1.0,			--May be reversed
 			
-			tank_drive =
-			{
-				is_closed=0,
-				show_pid_dump='n',
-				ds_display_row=-1,
-				--We must NOT use I or D for low gear, we must keep it very responsive
-				--We are always going to use the encoders in low gear to help assist to fight quickly changing gravity shifts
-				left_pid=
-				{p=25, i=0, d=5},
-				right_pid=
-				{p=25, i=0, d=5},					--These should always match, but able to be made different
-				--latency=0.300,
-				--I'm explicitly keeping this here to show that we have the same ratio (it is conceivable that this would not always be true)
-				--This is obtainer from encoder RPM's of 1069.2 and Wheel RPM's 427.68 (both high and low have same ratio)
-				encoder_to_wheel_ratio=0.5,			--example if encoder spins at 1069.2 multiply by this to get 427.68 (for the wheel rpm)
-				voltage_multiply=1.0,				--May be reversed using -1.0
-				--Note: this is only used in simulation as 884 victors were phased out, but encoder simulators still use it
-				curve_voltage=
-				{t4=3.1199, t3=-4.4664, t2=2.2378, t1=0.1222, c=0},
-				reverse_steering='no',
-				 left_encoder_reversed='no',
-				right_encoder_reversed='no',
-				inv_max_accel = 1/15,  --solved empiracally
-				motor_specs =
-				{
-					wheel_mass=1.5,
-					cof_efficiency=1.0,
-					gear_reduction=5310.0/346.6368,
-					torque_on_wheel_radius=Inches2Meters * 1,
-					drive_wheel_radius=Inches2Meters * 2,
-					number_of_motors=2,
-					
-					free_speed_rpm=5310.0,
-					stall_torque=2.43,
-					stall_current_amp=133,
-					free_current_amp=2.7
-				}
-			}
+			max_speed=28,
+			accel=112,						--These are needed and should be high enough to grip without slip
+			brake=112,
+			max_accel_forward=112,
+			max_accel_reverse=112
 		}
 	},
-
 	controls =
 	{
-		--Competition Settings--
-		slotlist = {slot_1="controller (xbox 360 for windows)", slot_2="gamepad f310 (controller)"},
-
-		
-		--Testing settings--
-		--slotlist = {slot_1="controller (xbox 360 for windows)", slot_2="gamepad f310 (controller)", slot_3="ch throttle quadrant", slot_4="logitech attack 3"},
-			
-		--field_centric_x_axis_threshold=0.40,
-		--tank_steering_tolerance=0.05,
-
 		Joystick_1 =
 		{
-			--Driver
-			control = "controller (xbox 360 for windows)",
-			Joystick_SetLeftVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
-			--Joystick_SetLeft_XAxis = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.1, curve_intensity=1.0},
-			Joystick_SetRightVelocity = {type="joystick_analog", key=5, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
-			--Joystick_SetRight_XAxis = {type="joystick_analog", key=5, is_flipped=false, multiplier=1.0, filter=0.1, curve_intensity=1.0},			             		--Analog_Turn = {type="joystick_culver", key_x=5, key_y=2, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
+			control = "logitech dual action",
+			--Joystick_SetLeftVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
+			--Joystick_SetRightVelocity = {type="joystick_analog", key=5, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
+			Analog_Turn = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
+			Joystick_SetCurrentSpeed_2 = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			--scaled down to 0.5 to allow fine tuning and a good top acceleration speed (may change with the lua script tweaks)
+			POV_Turn =  {type="joystick_analog", key=8, is_flipped=false, multiplier=1.0, filter=0.0, curve_intensity=0.0},
+			Turn_180 = {type="joystick_button", key=7, on_off=false},
 			
-			--Analog_Turn = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
-			KickerWheel_SetCurrentVelocity = {type="joystick_analog", key=4, is_flipped=true, multiplier=1.0, filter=0.3, curve_intensity=1.0},
-			--Joystick_SetCurrentSpeed_2 = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			Arm_SetPos0feet = {type="joystick_button", key=2, on_off=false},
+			Arm_SetPos3feet = {type="joystick_button", key=1, on_off=false},
+			Arm_SetPos6feet = {type="joystick_button", key=3, on_off=false},
+			Arm_SetPos9feet = {type="joystick_button", key=4, on_off=false},
+			Arm_SetCurrentVelocity = {type="joystick_analog", key=5, is_flipped=true, multiplier=0.6, filter=0.1, curve_intensity=3.0},
+			Arm_Rist={type="joystick_button", key=5, on_off=true},
 			
-			--Robot_SetLowGearOff = {type="joystick_button", key=8, keyboard=';', on_off=false},
-			--Robot_SetLowGearOn = {type="joystick_button", key=6, keyboard='l', on_off=false},
-			
-			--Previously assigned to 8
-			--POV_Turn =  {type="joystick_analog", key=8, is_flipped=false, multiplier=1.0, filter=0.0, curve_intensity=0.0},		
-		
+			--Claw_SetCurrentVelocity  --not used
+			Claw_Close =	 {type="joystick_button", key=6, on_off=true},
+			Claw_Grip =		 {type="joystick_button", key=8, on_off=true},
+			--Claw_Squirt =	 {type="joystick_button", key=7, on_off=true},
+			Robot_CloseDoor= {type="joystick_button", key=9, on_off=true}
 		},
-
+		
 		Joystick_2 =
 		{
-			--Operator
-			control = "gamepad f310 (controller)",
+			control = "airflo",
+			--Joystick_SetLeftVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
+			--Joystick_SetRightVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
+			Analog_Turn = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
+			Joystick_SetCurrentSpeed_2 = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			--scaled down to 0.5 to allow fine tuning and a good top acceleration speed (may change with the lua script tweaks)
+			POV_Turn =  {type="joystick_analog", key=8, is_flipped=false, multiplier=1.0, filter=0.0, curve_intensity=0.0},
+			--Turn_180 = {type="joystick_button", key=7, on_off=false},
 			
-			Arm_SetCurrentVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=0.6, filter=0.05, curve_intensity=3.0},
-	         	Arm_SetCurrentVelocity = {type="joystick_button", key=7, is_flipped=true, multiplier=0.6, filter=0.05, curve_intensity=3.0},
-
-			--Arm_ForkBoth = {type="joystick_button", key=4, on_off=true},
-			--Arm_ForkRight = {type="joystick_button", key=2, on_off=true},
-			--Arm_ForkLeft = {type="joystick_button", key=3, on_off=true},
+			Arm_SetPos0feet = {type="joystick_button", key=1, keyboard='y', on_off=false},
+			Arm_SetPos3feet = {type="joystick_button", key=3, keyboard='u', on_off=false},
+			Arm_SetPos6feet = {type="joystick_button", key=2, keyboard='l', on_off=false},
+			Arm_SetPos9feet = {type="joystick_button", key=4, keyboard=';', on_off=false},
+			Arm_SetCurrentVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=0.6, filter=0.1, curve_intensity=3.0},
+			Arm_Rist={type="joystick_button", key=5, keyboard='r', on_off=true},
+			Arm_Advance={type="keyboard", key='k', on_off=true},
+			Arm_Retract={type="keyboard", key='j', on_off=true},
 			
-			
-			--Claw_Close =	 {type="joystick_button", key=7, on_off=true},
+			--Claw_SetCurrentVelocity  --not used
+			Claw_Close =	 {type="joystick_button", key=6, keyboard='c', on_off=true},
+			Claw_Grip =		 {type="joystick_button", key=8, keyboard='i', on_off=true},
+			Claw_Squirt =	 {type="joystick_button", key=7, keyboard='h', on_off=true},
+			Robot_CloseDoor= {type="joystick_button", key=9, keyboard='o', on_off=true}
 		},
-	
 
 		Joystick_3 =
 		{
-			--Operator
-			control = "ch throttle quadrant",
-						
-			Arm_SetCurrentVelocity = {type="joystick_analog", key=0, is_flipped=true, multiplier=0.6, filter=0.1, curve_intensity=3.0},
-
-			--Arm_SetPosRest     = {type="joystick_button", key='0', on_off=false},
-			--Arm_SetTote2Height = {type="joystick_button", key='2', on_off=false},
-			--Arm_SetTote3Height = {type="joystick_button", key='4', on_off=false},
-			--Arm_SetTote4Height = {type="joystick_button", key='6', on_off=false},
-			--Arm_SetTote5Height = {type="joystick_button", key='8', on_off=false},
-			--Arm_SetTote6Height = {type="joystick_button", key='10', on_off=false},
-						
-		},
-
-		Joystick_4 =
-		{
-			--Ryan's Joystick
-			control = "logitech attack 3",
+			control = "gamepad f310 (controller)",
 			Analog_Turn = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
-			Joystick_SetCurrentSpeed_2 = {type="joystick_analog", key=1, is_flipped=false, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			Joystick_SetCurrentSpeed_2 = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			--scaled down to 0.5 to allow fine tuning and a good top acceleration speed (may change with the lua script tweaks)
+			POV_Turn =  {type="joystick_analog", key=8, is_flipped=false, multiplier=1.0, filter=0.0, curve_intensity=0.0},
+			--Turn_180 = {type="joystick_button", key=7, on_off=false},
 			
-			--Arm_SetCurrentVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=0.6, filter=0.1, curve_intensity=3.0},						
-		}
-
+			Arm_SetPos0feet = {type="joystick_button", key=1, on_off=false},
+			Arm_SetPos3feet = {type="joystick_button", key=3, on_off=false},
+			Arm_SetPos6feet = {type="joystick_button", key=2, on_off=false},
+			Arm_SetPos9feet = {type="joystick_button", key=4, on_off=false},
+			Arm_SetCurrentVelocity = {type="joystick_analog", key=4, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
+			Arm_Rist={type="joystick_button", key=5, on_off=true},
 			
+			Claw_SetCurrentVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			Claw_Close =	 {type="joystick_button", key=6, on_off=true},
+			Claw_Grip =		 {type="joystick_button", key=9, on_off=true},
+			Claw_Squirt =	 {type="joystick_button", key=7, on_off=true},
+			Robot_CloseDoor= {type="joystick_button", key=8, on_off=true}
+		},
 	},
-	
-	--This is only used in the AI tester, can be ignored
+		
 	UI =
 	{
 		Length=5, Width=5,
