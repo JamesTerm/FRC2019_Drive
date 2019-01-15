@@ -43,7 +43,7 @@
 		<property name="Minimum" value="-1.0"/>
 	</widget>
 	<widget field="Edit Position" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.CheckBox">
-		<location x="800" y="111"/>
+		<location x="803" y="134"/>
 	</widget>
 	<widget field="Deployment" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
 		<location x="170" y="309"/>
@@ -83,7 +83,6 @@
 		<location x="281" y="265"/>
 		<width>107</width>
 		<height>30</height>
-		<property name="Foreground" value="51.153.255.255"/>
 		<property name="Background" value="0.0.102.255"/>
 		<property name="Maximum" value="3.844"/>
 		<property name="Minimum" value="-3.844"/>
@@ -91,7 +90,6 @@
 	<widget field="RightEncoder" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
 		<location x="512" y="260"/>
 		<width>115</width>
-		<property name="Foreground" value="51.153.255.255"/>
 		<property name="Background" value="0.0.102.255"/>
 		<property name="Maximum" value="3.844"/>
 		<property name="Minimum" value="-3.844"/>
@@ -144,57 +142,6 @@
 		<property name="Upper Limit" value="14.0"/>
 		<property name="Lower Limit" value="-14.0"/>
 		<property name="Tick Interval" value="2.8"/>
-	</widget>
-	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
-		<location x="803" y="114"/>
-		<property name="Text" value="Edit Position"/>
-	</static-widget>
-	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
-		<location x="45" y="340"/>
-		<property name="Text" value="PID up Only"/>
-	</static-widget>
-	<widget field="Use Up PID Only" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.CheckBox">
-		<location x="18" y="339"/>
-	</widget>
-	<widget field="Lag Predict Down" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="490" y="462"/>
-		<width>120</width>
-	</widget>
-	<widget field="Lag Predict Up" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="504" y="435"/>
-		<width>107</width>
-	</widget>
-	<widget field="Tolerance Count" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="493" y="399"/>
-		<width>122</width>
-	</widget>
-	<widget field="Up P" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="20" y="361"/>
-		<width>77</width>
-		<height>20</height>
-	</widget>
-	<widget field="Up I" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="25" y="393"/>
-		<width>70</width>
-	</widget>
-	<widget field="Up D" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="21" y="422"/>
-		<width>71</width>
-	</widget>
-	<widget field="Tolerance" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="496" y="370"/>
-	</widget>
-	<widget field="Down P" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="114" y="366"/>
-		<width>90</width>
-	</widget>
-	<widget field="Down I" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="117" y="397"/>
-		<width>81</width>
-	</widget>
-	<widget field="Down D" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="117" y="427"/>
-		<width>80</width>
 	</widget>
 </dashboard>
 <live-window>
