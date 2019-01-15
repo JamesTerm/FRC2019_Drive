@@ -2,7 +2,7 @@
 #include "Robot_Tester.h"
 
 //Stubbed out for now
-class FRC_2019_Control : public FRC_2019_Control_Interface
+class FRC_2019_Control : public FRC2019_Control_Interface
 {
 public:
 	//from Tank_Drive_Control_Interface,
