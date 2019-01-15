@@ -145,10 +145,6 @@
 		<property name="Lower Limit" value="-14.0"/>
 		<property name="Tick Interval" value="2.8"/>
 	</widget>
-	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Image">
-		<location x="-114" y="-118"/>
-		<property name="Image File" value="D:\Stuff\BroncBotz\Code\Temp\BackgroundTexture.jpg"/>
-	</static-widget>
 	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
 		<location x="803" y="114"/>
 		<property name="Text" value="Edit Position"/>
@@ -200,14 +196,6 @@
 		<location x="117" y="427"/>
 		<width>80</width>
 	</widget>
-	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Image">
-		<location x="-114" y="-118"/>
-		<property name="Image File" value="D:\Stuff\BroncBotz\Code\Temp\BackgroundTexture.jpg"/>
-	</static-widget>
-	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Image">
-		<location x="-114" y="-118"/>
-		<property name="Image File" value="D:\Stuff\BroncBotz\Code\Temp\BackgroundTexture.jpg"/>
-	</static-widget>
 </dashboard>
 <live-window>
 </live-window>
