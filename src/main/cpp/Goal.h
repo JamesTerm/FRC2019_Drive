@@ -50,6 +50,7 @@ protected:
   SubgoalStack m_subgoals;
 };
 
+
 ////////////////Implemented Atomic Goals////////////////
 
 //the purpose of this goal is to be the template for other implemented goals.
@@ -73,7 +74,7 @@ class GoalDriveWithTimer : public GoalDoNothing
 {
 public:
   GoalDriveWithTimer(double seconds, double leftPower, double rightPower, ActiveCollection* activeCollection) : GoalDoNothing(seconds) 
-  {
+  { //m_status is set inactive by parent constructor (i think)
     m_left = leftPower;
     m_right = rightPower;
   }
@@ -84,7 +85,16 @@ protected:
   ActiveCollection* m_activeCollection;
 };
 
-class GoalWaitThenDrive : public CompositeGoal
+class GoalWaitThenDrive : public CompositeGoal 
 {
-  
+  public:
+    GoalWaitThenDrive(double waitSec, double driveSec, ActiveCollection* activeCollection)
+    {
+      m_waitSec = waitSec;
+      m_driveSec = driveSec;
+      m_activeCollection = activeCollection;
+    }
+  private:
+    double m_waitSec, m_driveSec;
+    ActiveCollection* m_activeCollection;
 };
