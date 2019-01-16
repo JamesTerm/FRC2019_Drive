@@ -166,4 +166,6 @@ bin/
 *.ipch
 *.db
 *.idb
+*.opendb
+*.db-*
 
