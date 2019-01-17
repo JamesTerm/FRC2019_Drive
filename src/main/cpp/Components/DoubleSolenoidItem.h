@@ -39,6 +39,7 @@ public:
 	virtual void Set(double value) override;
 	virtual double Get() override;
 	DoubleSolenoid::Value GetState();
+	DoubleSolenoid::Value GetDefaultValue();
 	virtual ~DoubleSolenoidItem();
 };
 }

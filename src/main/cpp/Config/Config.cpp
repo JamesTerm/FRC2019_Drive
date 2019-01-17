@@ -101,6 +101,12 @@ void Config::AllocateComponents(){
 	rightDrive->AddComponent(right_0);
 	rightDrive->AddComponent(right_1);
 	rightDrive->AddComponent(right_2);
+
+	//Toggle motor:
+	//ToggleTest->AddComponent(left_0);
+	//ToggleTest->AddComponent(left_1);
+	//ToggleTest->AddComponent(left_2);
+	
 /********************* OPERATE CONTROL DEFINITIONS ******************/
 
 	AxisControl *intakeDropControl = new AxisControl(m_operatorJoy, "IntakeDropControl", 5, 0.3, true, 0.50);

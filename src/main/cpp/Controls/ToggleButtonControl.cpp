@@ -25,16 +25,9 @@ ToggleButtonControl::ToggleButtonControl(Joystick *_joy, string _name, int _butt
 	IsSwitchOnPress = _IsSwitchOnPress;
 	IsSolenoid = _IsSolenoid;
 	IsReversed = _IsReversed;
-	if(IsSwitchOnPress)
-	{
-		State = false;
-		LastState = false;
-	}
-	else
-	{
-		State = false;
-		LastState = true;
-	}
+	State = false;
+	out = false;
+	LastState = false;
 }
 
 double ToggleButtonControl::Update()
@@ -42,55 +35,55 @@ double ToggleButtonControl::Update()
 
 	bool Val = joy->GetRawButton(button);
 
-	current = ((double)Val) * powerMultiplier;
-	//Switching
-	if(Val && IsSwitchOnPress && !State && (LastState != Val))
-	{
-		State = true;
-		LastState = true;
-	}
-	else if(!Val && IsSwitchOnPress && State && (LastState != Val))
-	{
-		State = false;
-		LastState = false;
-	}
-	//What the button will do now
+	current = ((double)State) * powerMultiplier;
 
+	//Switching for state to be used
+	if(IsSwitchOnPress){
+		State = ButtonDown(Val);
+	}
+	else{
+		State = ButtonUp(Val);
+	}
+	
 	if(IsSolenoid)
 	{
 		if(State){
-			if(GetSolenoidValue() == DoubleSolenoid::Value::kForward){
+			//gets default value for solenoid to be used to move the other direction
+			DoubleSolenoid::Value def = GetSolenoidDefaultValue();
+			if(def == DoubleSolenoid::Value::kForward){
 				SetSolenoids(DoubleSolenoid::Value::kReverse);
 			}
-			else if (GetSolenoidValue() == DoubleSolenoid::Value::kReverse){
+			else if (def == DoubleSolenoid::Value::kReverse){
 				SetSolenoids(DoubleSolenoid::Value::kForward);
 			}
 			else{
 				cout << "The defalt of the solenoid is off" << endl;
 			}
+
 		}
 		else{
 			SetSolenoidDefalt();
 		}
 	}
-	else{
-		if(components.size() > 0){
-			if(IsReversed){
-				if(Val){
+	else if(!IsSolenoid)
+	{
+		if(State)
+		{
+			//sets the motor current
+			if(components.size() > 0){
+				if(IsReversed){
 					SetToComponents(-current);
 				}
-			}
-			else if(!IsReversed){
-				if(Val){
+				else if(!IsReversed){
 					SetToComponents(current);
 				}
 			}
 			else{
-				SetToComponents(0);
+				cout << "No Components found" << endl;
 			}
 		}
 		else{
-			cout << "No Components found" << endl;
+			SetToComponents(0);
 		}
 	}
 
@@ -113,11 +106,58 @@ void ToggleButtonControl::SetSolenoidDefalt()
 	}
 }
 
-DoubleSolenoid::Value ToggleButtonControl::GetSolenoidValue(){
+bool ToggleButtonControl::ButtonDown(bool input)
+{
+	//switches state when the button is pressed
+	if(input){
+		if(!LastState){
+			out = !out;
+			LastState = true;
+
+			cout << "Flip state" << endl;
+		}
+	}
+	if(!input){
+		LastState = false;
+	}
+
+	return out;
+}
+
+bool ToggleButtonControl::ButtonUp(bool input)
+{
+	//switches state when the button is released
+	if(!input){
+		if(LastState){
+			out = !out;
+			LastState = false;
+
+			cout << "Flip state" << endl;
+		}
+	}
+	if(input){
+		LastState = true;
+	}
+
+	return out;
+}
+
+DoubleSolenoid::Value ToggleButtonControl::GetSolenoidValue()
+{
 	for(int i=0; i<(int)components.size();i++)
 	{
 		//TODO: Fix for MultiComponent Use
 		return ((DoubleSolenoidItem*)(components[i]))->GetState();
+		
+	}
+}
+
+DoubleSolenoid::Value ToggleButtonControl::GetSolenoidDefaultValue()
+{
+	for(int i=0; i<(int)components.size();i++)
+	{
+		//TODO: Fix for MultiComponent Use
+		return ((DoubleSolenoidItem*)(components[i]))->GetDefaultValue();
 		
 	}
 }
