@@ -32,7 +32,7 @@ ToggleButtonControl::ToggleButtonControl(Joystick *_joy, string _name, int _butt
 	}
 	else
 	{
-		State = true;
+		State = false;
 		LastState = true;
 	}
 }

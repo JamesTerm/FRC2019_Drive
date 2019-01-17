@@ -57,6 +57,8 @@ void Config::AllocateComponents(){
 
 	VictorSPItem *intakeDrop = new VictorSPItem("IntakeDrop", 8, false);
 
+	DoubleSolenoidItem *SolenoidTest = new DoubleSolenoidItem("SolenoidToggle", 1, 0, DoubleSolenoid::Value::kReverse, false);
+
 //	DigitalInputItem *liftSwitch = new DigitalInputItem(4, "InputTest");
 
 /***********************  SOLENOID DEFINITIONS  *******************/
@@ -76,15 +78,22 @@ void Config::AllocateComponents(){
 	m_activeCollection->Add(rightIntake);
 	m_activeCollection->Add(intakeDrop);
 
+	m_activeCollection->Add(SolenoidTest);
+
 //	m_activeCollection->Add(liftSwitch);
 /*********************** DRIVE CONTROL DEFINITIONS ******************/
 
 	AxisControl *leftDrive = new AxisControl(m_driveJoy, "LeftDrive", 1, 0.07, true, 0.70);
 	AxisControl *rightDrive = new AxisControl(m_driveJoy, "RightDrive", 5, 0.07, true, 0.70);
+	ToggleButtonControl *ToggleTest = new ToggleButtonControl(m_driveJoy, "ToggleTest", 3, true, false, 0.3, true);
+
 /*********************** DRIVE ADDITIONS ***************************/
 
 	m_drive->AddControlDrive(leftDrive);
 	m_drive->AddControlDrive(rightDrive);
+
+	m_drive->AddControlDrive(ToggleTest);
+
 /*********************** DRIVE BINDINGS ****************************/
 	leftDrive->AddComponent(left_0);
 	leftDrive->AddComponent(left_1);
@@ -132,6 +141,8 @@ void Config::AllocateComponents(){
 
 	intakeInControlRight->SetRamp(0.1);
 	intakeInControlLeft->SetRamp(0.1);
+
+	ToggleTest->AddComponent(SolenoidTest);
 
 //	liftControl->SetLift(liftSwitch, 3.0);
 }
