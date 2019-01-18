@@ -10,15 +10,6 @@ OunceInchToNewton=0.00706155183333
 Pounds2Kilograms=0.453592
 Deg2Rad=(1/180) * Pi
 
-ArmLength_m=1.8288  --6 feet
-ArmToGearRatio=72.0/28.0
-GearToArmRatio=1.0/ArmToGearRatio
-PotentiometerToArmRatio=36.0/54.0
-PotentiometerToGearRatio=PotentiometerToArmRatio * ArmToGearRatio
-PotentiometerMaxRotation_r=270.0 * Deg2Rad
-GearHeightOffset_m=55 * Inches2Meters
-MotorToWheelGearRatio=12.0/36.0
-
 
 g_wheel_diameter_in=6   --This will determine the correct distance try to make accurate too
 WheelBase_Width_In=22.3125	  --The wheel base will determine the turn rate, must be as accurate as possible!
@@ -42,31 +33,30 @@ MainRobot = {
 		{
 			id_1 = { name= "right_drive_1", channel=1, module=1}, 
 			id_2 = { name= "right_drive_2", channel=2}, 
-			id_3 = { name="left_drive_1", channel=3},
-			id_4 = { name="left_drive_2", channel=4},
-			id_5= { name="kicker_wheel", channel=5},
-			id_6= { name="arm", channel=6}
+			id_3 = { name= "right_drive_3", channel=3}, 
+			id_4 = { name="left_drive_1", channel=4},
+			id_5 = { name="left_drive_2", channel=5},
+			id_6 = { name="left_drive_3", channel=6},
+			id_7= { name="arm", channel=7}
 			--If we decide we need more power we can assign these
-			--id_3 = { name= "right_drive_3", channel=3}, 
-			--id_6 = { name="left_drive_3", channel=6},
 		},
-		relay =
-		{
-			id_1 = { name= "CameraLED", channel=1}
-		},
-		double_solenoid =
-		{
-			id_1 = { name="use_low_gear",    forward_channel=2, reverse_channel=1},
-			id_2 = { name="fork_left",    forward_channel=3, reverse_channel=4},
-			id_3 = { name="fork_right",    forward_channel=5, reverse_channel=6},
-		},
-		digital_input =
-		{
-			--These channels must be unique to digital input encoder channels as well
-			--Also ensure you do not use the slot for the compressor ;)
-			id_1 = { name="dart_upper_limit",  channel=5},
-			id_2 = { name="dart_lower_limit",  channel=6}
-		},
+		-- relay =
+		-- {
+		-- 	id_1 = { name= "CameraLED", channel=1}
+		-- },
+		-- double_solenoid =
+		-- {
+		-- 	id_1 = { name="use_low_gear",    forward_channel=2, reverse_channel=1},
+		-- 	id_2 = { name="fork_left",    forward_channel=3, reverse_channel=4},
+		-- 	id_3 = { name="fork_right",    forward_channel=5, reverse_channel=6},
+		-- },
+		-- digital_input =
+		-- {
+		-- 	--These channels must be unique to digital input encoder channels as well
+		-- 	--Also ensure you do not use the slot for the compressor ;)
+		-- 	id_1 = { name="dart_upper_limit",  channel=5},
+		-- 	id_2 = { name="dart_lower_limit",  channel=6}
+		-- },
 		analog_input =
 		{
 			id_1 = { name="arm_potentiometer",  channel=2},
@@ -163,42 +153,29 @@ MainRobot = {
 			is_closed=0,
 			show_pid_dump='n',
 			ds_display_row=-1,
-			use_pid_up_only='n',
+			use_pid_up_only='y',  --for now make the same, but this may change
 			pid_up=
 			{p=100, i=0, d=0},
 			pid_down=
 			{p=100, i=0, d=0},
-			tolerance=0.15,
-			tolerance_count=20,
+			tolerance=0.5,  --in inches
+			tolerance_count=1,
 			voltage_multiply=1.0,			--May be reversed
 			encoder_to_wheel_ratio=1.0,
 			Arm_SetPotentiometerSafety=true,	
-			--max_speed=(19300/64/60) * Pi2,	--This is about 5 rps (a little slower than hiking viking drive)
 			max_speed=8.8,	--loaded max speed (see sheet) which is 2.69 rps
 			accel=1.0,						--We may indeed have a two button solution (match with max accel)
 			brake=1.0,
-			max_accel_forward=10,			--These are in radians, just go with what feels right
+			max_accel_forward=10,			--just go with what feels right (up may need more)
 			max_accel_reverse=10,
 			using_range=0,					--Warning Only use range if we have a potentiometer!
-			--These min/max are arm converted to gear ratio (TODO reseach this more)
-			max_range_deg= 52.36 * ArmToGearRatio,
+			--These min/max in inch units
+			max_range= 36,
 			--Note the sketch used -43.33, but tests on actual assembly show -46.12
-			min_range_deg=(-46.12) * ArmToGearRatio,
-			starting_position_deg=-46.12,
+			min_range= 0,
+			pot_offset=0,
+			starting_position=6,
 			use_aggressive_stop = 'yes',
-			--inv_max_accel_up = 0.05,
-			--inv_max_decel_up = 0.0,
-			--inv_max_accel_down = 0.05,
-			--inv_max_decel_down = 0.01,
-			--slow_velocity_voltage = 4.0,
-			--slow_velocity = 2.0,
-			--predict_up=.400,
-			--predict_down=.400,
-			--pulse_burst_time=0.06,
-			--pulse_burst_range=0.5,
-			--reverse_deadzone=0.10,
-			--slow_angle_scalar = GearToArmRatio,
-			--distance_scale = 0.5,
 			motor_specs =
 			{
 				wheel_mass=Pounds2Kilograms * 16.27,
