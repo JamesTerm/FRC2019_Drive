@@ -80,7 +80,6 @@ enum AutonType
 	eTurretTracking,
 	eDriveTracking,
 	//autons for 2019
-	//TODO implement these
 	eOnePieceAuto, 
 	eTwoPieceAuto, 
 	//end autons
@@ -906,18 +905,115 @@ class FRC2019_Goals_Impl : public AtomicGoal
 			bool m_SAS_FloodControl;  //Limit writes to the properties
 		};
 		//2019 utility goals
-
-		//2019 auton goals
-		class OneHatchAuto : public Generic_CompositeGoal, public SetUpProps
+		class IntakeHatch : public AtomicGoal, public SetUpProps
 		{
-			OneHatchAuto(FRC2019_Goals_Impl* parent) : SetUpProps(parent)
+			public:
+			IntakeHatch(FRC2019_Goals_Impl* parent) : SetUpProps(parent)
 			{
 				m_Status = eInactive;
-				
+			}
+			virtual void Activate()
+			{
+				m_Status = eActive;
+
+				//TODO Implement however hatch is intaken
+			}
+		};
+		class IntakeCargo : public AtomicGoal, public SetUpProps
+		{
+			public:
+			IntakeCargo(FRC2019_Goals_Impl* parent) : SetUpProps(parent)
+			{
+				m_Status = eInactive;
+			}
+			virtual void Activate()
+			{
+				m_Status = eActive;
+
+				//TODO Implement however cargo is intaken
 			}
 		};
 
-	public:
+		class OuttakeHatch : public AtomicGoal, public SetUpProps
+		{
+			public:
+			OuttakeHatch(FRC2019_Goals_Impl* parent) : SetUpProps(parent)
+			{
+				m_Status = eInactive;
+			}
+			virtual void Activate()
+			{
+				m_Status = eActive;
+
+				//TODO Implement however hatch is outtaken
+			}
+		};
+		class OuttakeCargo : public AtomicGoal, public SetUpProps
+		{
+			public:
+			OuttakeCargo(FRC2019_Goals_Impl* parent) : SetUpProps(parent)
+			{
+				m_Status = eInactive;
+			}
+			virtual void Activate()
+			{
+				m_Status = eActive;
+
+				//TODO Implement however cargo is outtaken
+			}
+		};
+
+		//2019 auton goals
+
+		enum Game_Piece
+		{
+			eHatch,
+			eCargo
+		};
+		class OnePieceAuto : public Generic_CompositeGoal, public SetUpProps
+		{
+		  public:
+			OnePieceAuto(FRC2019_Goals_Impl *parent, Game_Piece gamePiece) : SetUpProps(parent)
+			{
+				m_Status = eInactive;
+				m_gamePiece = gamePiece;
+			}
+			virtual void Activate()
+			{
+				m_Status = eActive;
+
+				//TODO goals to get to location
+				if(m_gamePiece == eHatch) AddSubgoal(new OuttakeHatch(m_Parent));
+				else if(m_gamePiece == eCargo) AddSubgoal(new OuttakeCargo(m_Parent));
+			}
+		  protected:
+		  	Game_Piece m_gamePiece;
+		};
+
+		class TwoPieceAuto : public Generic_CompositeGoal, public SetUpProps
+		{
+		  public:
+			TwoPieceAuto(FRC2019_Goals_Impl *parent, Game_Piece gamePiece, Game_Piece gamePiece2) : SetUpProps(parent)
+			{
+				m_Status = eInactive;
+				m_gamePiece = gamePiece;
+				m_gamePiece2 = gamePiece2;
+			}
+			virtual void Activate()
+			{
+				m_Status = eActive;
+
+				AddSubgoal(new OnePieceAuto(m_Parent, m_gamePiece));
+				//TODO add remaining subgoals to get to next game piece
+				if(m_gamePiece2 == eHatch) AddSubgoal(new IntakeHatch(m_Parent));
+				else if(m_gamePiece2 == eCargo) AddSubgoal(new IntakeCargo(m_Parent));
+				AddSubgoal(new OnePieceAuto(m_Parent, m_gamePiece2));
+			}
+		  protected:
+		  Game_Piece m_gamePiece, m_gamePiece2;
+		};
+
+	  public:
 		FRC2019_Goals_Impl(FRC2019_Robot &robot) : m_Robot(robot), m_Timer(0.0), 
 			m_Primer(false)  //who ever is done first on this will complete the goals (i.e. if time runs out)
 		{
@@ -962,6 +1058,10 @@ class FRC2019_Goals_Impl : public AtomicGoal
 			#endif
 
 			printf("Testing=%d \n",AutonTest);
+			
+			//TODO get piece type from SmartDashboard. for now, just assigned manually
+			Game_Piece gamePiece = eHatch;
+			Game_Piece gamePiece2 = eCargo;
 			switch(AutonTest)
 			{
 			case eJustMoveForward:
@@ -983,9 +1083,12 @@ class FRC2019_Goals_Impl : public AtomicGoal
 				m_Primer.AddGoal(new DriveTracking(this));
 				break;
 			case eOnePieceAuto:
-				//TODO implement this
+				
+				m_Primer.AddGoal(new OnePieceAuto(this, gamePiece));
+				break;
 			case eTwoPieceAuto:
-				//TODO implement this
+				m_Primer.AddGoal(new TwoPieceAuto(this, gamePiece, gamePiece2));
+				break;
 			case eDoNothing:
 			case eNoAutonTypes: //grrr windriver and warning 1250
 				break;
