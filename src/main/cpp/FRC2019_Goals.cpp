@@ -79,8 +79,35 @@ enum AutonType
 	eTestBoxWayPoints,
 	eTurretTracking,
 	eDriveTracking,
+	//autons for 2019
+	//TODO implement these
+	eOnePieceAuto, 
+	eTwoPieceAuto, 
+	//end autons
 	eNoAutonTypes
 };
+
+/* GOALS FOR 2019
+ * DriveForward  //super basic, no fluff, just needs to get past line no matter what
+ * 	- Drive past hab line
+ * 		+ JustMoveForward vovers this
+ * OnePieceAuto //goal can be told whether to do hatch or cargo
+ * 	- Drive to location
+ * 		+ I think James has this implemented already, not sure.
+ *  - Place Hatch -OR-
+ * 		+ line up with cargo bay
+ * 		+ release (??? idk how robot works yet)
+ * 	- Place Cargo
+ * 		+ move arm down
+ * 		+ (possibly) lift elevator
+ * 		+ outtake cargo (motors)
+ * TwoPieceAuto //Dream lol
+ * 	- OnePieceAuto
+ * 	- Drive to location
+ * 	- Intake Hatch -OR-
+ * 	- Intake Cargo
+ * 	- OnePieceAuto (if waypoint stuff is accurate enough for this, we can call OnePieceAuto again)
+ */
 
 
 //TODO Move into Misc
@@ -878,6 +905,17 @@ class FRC2019_Goals_Impl : public AtomicGoal
 			bool m_IsTargeting;  //Have a valve for targeting
 			bool m_SAS_FloodControl;  //Limit writes to the properties
 		};
+		//2019 utility goals
+
+		//2019 auton goals
+		class OneHatchAuto : public Generic_CompositeGoal, public SetUpProps
+		{
+			OneHatchAuto(FRC2019_Goals_Impl* parent) : SetUpProps(parent)
+			{
+				m_Status = eInactive;
+				
+			}
+		};
 
 	public:
 		FRC2019_Goals_Impl(FRC2019_Robot &robot) : m_Robot(robot), m_Timer(0.0), 
@@ -944,6 +982,10 @@ class FRC2019_Goals_Impl : public AtomicGoal
 			case eDriveTracking:
 				m_Primer.AddGoal(new DriveTracking(this));
 				break;
+			case eOnePieceAuto:
+				//TODO implement this
+			case eTwoPieceAuto:
+				//TODO implement this
 			case eDoNothing:
 			case eNoAutonTypes: //grrr windriver and warning 1250
 				break;
