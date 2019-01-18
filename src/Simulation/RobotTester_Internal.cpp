@@ -134,7 +134,8 @@ __inline void MySleep(double Seconds)
 	std::this_thread::sleep_for(std::chrono::milliseconds(time_ms));
 }
 
-
+//Keeping this around to demonstraight the benefit of using a lambda
+#if 0
 void RobotTester_Internal::operator() (const void*)
 {
 	//static int test = 0;
@@ -156,6 +157,7 @@ void task_proc(RobotTester_Internal *instance)
 	}
 	printf("ending task_proc()\n");
 }
+#endif
 
 void RobotTester_Internal::StartStreaming()
 {

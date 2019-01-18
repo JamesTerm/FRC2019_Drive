@@ -322,7 +322,12 @@ void FRC2019_Robot::TestAutonomous()
 
 	{
 		Goal *goal = NULL;
+		//Note: we may change how this gets implemented
+		#if 1
 		goal = FRC2019_Goals::Get_FRC2019_Autonomous(this);
+		#else
+		goal = FRC2019_Goals::Get_Sample_Goal(this);
+		#endif
 		if (goal)
 			goal->Activate(); //now with the goal(s) loaded activate it
 		SetGoal(goal);

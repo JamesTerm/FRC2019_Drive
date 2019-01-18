@@ -50,5 +50,8 @@
     <ClCompile Include="..\main\cpp\FRC2019_Robot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\cpp\SampleGoals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
