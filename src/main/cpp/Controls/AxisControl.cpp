@@ -40,7 +40,6 @@ double AxisControl::Update()
 	if(reversed)
 		val = -val;
 
-	cout << "VAL: " << val << endl;
 	SetToComponents(val);
 	isIdle = false;
 	currentPow = val;

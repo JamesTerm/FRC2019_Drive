@@ -20,6 +20,7 @@ Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 #include "../Systems/Drive.h"
 #include "../Controls/ButtonControl.h"
 #include "../Controls/AxisControl.h"
+#include "../Controls/ToggleButtonControl.h"
 
 using namespace System;
 namespace Configuration{
