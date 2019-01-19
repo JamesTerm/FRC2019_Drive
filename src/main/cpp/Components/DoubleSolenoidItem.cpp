@@ -68,6 +68,10 @@ DoubleSolenoid::Value DoubleSolenoidItem::GetState(){
 	return solenoid->Get();
 }
 
+DoubleSolenoid::Value DoubleSolenoidItem::GetDefaultValue(){
+	return _default;
+}
+
 void DoubleSolenoidItem::Set(double value){
 	if(!inUse){
 		inUse = true;
