@@ -245,6 +245,13 @@ __inline void Auton_Smart_GetMultiValue(size_t NoItems,const char * const SmartN
 }
 
 
+//No need to compute these every clock cycle
+const double c_TestTimeLimit = 30.0*60.0; //level 1 30 minutes <--arbitrary
+const double c_AutonomousTimeLimit = 15.0; //15 seconds
+const double c_TeleOpTimeLimit = (2.0 * 60.0) + 15.0;   //2:15
+const double c_TimerTable[3] = { c_TestTimeLimit,c_AutonomousTimeLimit,c_TeleOpTimeLimit };
+const char *const csz_TimerTable[3] = { "Test","Autonomous","Tele" };
+
 //Use this class as an example template, and create your own... at the very bottom MainGoal->AddSubgoal() put your goal there
 //Collapse this to elimate most of the clutter.  Some goals and calls to parts not on this robot have been disabled, but
 //can be traced to determine how to integrate them 1/11/19 -James
@@ -252,7 +259,14 @@ class Sample_Goals_Impl : public AtomicGoal
 {
 	private:
 		FRC2019_Robot &m_Robot;
-		double m_Timer;
+		double m_Timer=0.0;
+		bool m_GameClock = true;
+		enum ClockMode
+		{
+			eTest,    //Like Tele but a good long time for testing goals for a long period of time
+			eAuton,  //test auton short time
+			eTele,  //Tele cycle of game
+		} m_ClockMode = eAuton,m_PrevClockMode= eAuton;
 
 		class SetUpProps
 		{
@@ -273,18 +287,62 @@ class Sample_Goals_Impl : public AtomicGoal
 			Sample_Goals_Impl *m_Parent;
 		public:
 			goal_clock(Sample_Goals_Impl *Parent)	: m_Parent(Parent) {	m_Status=eInactive;	}
-			void Activate()  {	m_Status=eActive;	}
+			void Activate()  
+			{
+				ClockMode &_ClockMode = m_Parent->m_ClockMode;
+				//Keep logic simple... if we are not doing the game we are in dev mode
+				bool DevMode = !m_Parent->m_GameClock;
+				DevMode= Auton_Smart_GetSingleValue_Bool("DevMode", false); 
+				m_Parent->m_GameClock = !DevMode;
+				//While in dev mode we can pick which kind of clock to use
+				if (DevMode)
+				{
+					const double dClockMode = Auton_Smart_GetSingleValue("ClockMode", 0.0);
+					const int ReallyAreYouKiddingme = (int)dClockMode;		//Gah
+					_ClockMode = (ClockMode)ReallyAreYouKiddingme;
+				}
+				else
+					_ClockMode = eAuton;   //Game mode: Set it explicitly for multisession use-case
+
+				//setup default mode
+				SmartDashboard::PutString("GameMode", csz_TimerTable[_ClockMode]);
+				m_Status=eActive;	
+			}
 			Goal_Status Process(double dTime_s)
 			{
-				const double AutonomousTimeLimit=30.0*60.0; //level 1 30 minutes
+				//reference parent member vars for easier reading
 				double &Timer=m_Parent->m_Timer;
+				ClockMode &_ClockMode = m_Parent->m_ClockMode;
+				ClockMode &_PrevClockMode = m_Parent->m_PrevClockMode;
+
+				const double CurrentTimeLimit =c_TimerTable[_ClockMode];
 				if (m_Status==eActive)
 				{
-					SmartDashboard::PutNumber("Timer",AutonomousTimeLimit-Timer);
+					SmartDashboard::PutNumber("Timer", CurrentTimeLimit-Timer);
+					//Increment the timer... should be the only write to it!!
 					Timer+=dTime_s;
-					if (Timer>=AutonomousTimeLimit)
-						m_Status=eCompleted;
+					if (Timer >= CurrentTimeLimit)
+					{
+						if (!m_Parent->m_GameClock)
+							m_Status = eCompleted;
+						else
+						{
+							assert(_ClockMode != eTest);  //duh
+							if (_ClockMode == eAuton)
+							{
+								Timer = 0.0;  //reset the clock
+								_ClockMode = eTele;  //and switch to teleop
+							}
+							else
+								m_Status = eCompleted;
+						}
+					}
 				}
+				//All clockmode writes are final... see if they changed... for flood control
+				if (_PrevClockMode != _ClockMode)
+					SmartDashboard::PutString("GameMode", csz_TimerTable[_ClockMode]);
+				//updated previous for next cycle
+				_PrevClockMode = _ClockMode;
 				return m_Status;
 			}
 			void Terminate() {	m_Status=eFailed;	}
