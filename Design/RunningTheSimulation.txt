@@ -2,6 +2,7 @@ The simulation is a console app that loads up the robot and gives it time slices
 
 First make sure to run SmartDashboard set to local like so:
 java -jar C:\Users\JamesK\wpilib\tools\SmartDashboard.jar ip localhost
+java -jar C:\Users\weeks\wpilib\tools\SmartDashboard.jar ip localhost
 
 Next load 
 .\FRC2019\src\Simulation\FRC2019_MainLayout.xml within SmartDashboard this is only a one-time load and newer controls may be populated when trying some of the later goals.  Some of the controls shown may be depreciated, but the most important ones are Test_Auton checkbox, and AutonTest control... unfortunately its a float number but treat it like an integer.  1.0 2.0 3.0 etc to pick which auton to do.
