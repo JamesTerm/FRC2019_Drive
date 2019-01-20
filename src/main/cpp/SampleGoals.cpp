@@ -549,61 +549,142 @@ class Sample_Goals_Impl : public AtomicGoal
 		//Arm Tests----------------------------------------------------------------------
 
 		//2019 utility goals
-		class IntakeHatch : public AtomicGoal, public SetUpProps
+	//TODO: implement all "_util" goals
+		class IntakeHatch_util : public AtomicGoal, public SetUpProps
 		{
-			public:
-			IntakeHatch(Sample_Goals_Impl* parent) : SetUpProps(parent)
+		public:
+			IntakeHatch_util(Sample_Goals_Impl *parent) : SetUpProps(parent)
 			{
 				m_Status = eInactive;
 			}
 			virtual void Activate()
 			{
+				SmartDashboard::PutString("GoalMessage", "Intake Hatch util");
 				m_Status = eActive;
-
-				//TODO Implement however hatch is intaken
+			}
+			virtual Goal_Status Process()
+			{
+				SmartDashboard::PutString("GoalMessage", "Intake Hatch util");
 			}
 		};
-		class IntakeCargo : public AtomicGoal, public SetUpProps
+		class IntakeCargo_util : public AtomicGoal, public SetUpProps
 		{
-			public:
-			IntakeCargo(Sample_Goals_Impl* parent) : SetUpProps(parent)
+		public:
+			IntakeCargo_util(Sample_Goals_Impl *parent) : SetUpProps(parent)
 			{
 				m_Status = eInactive;
 			}
 			virtual void Activate()
 			{
 				m_Status = eActive;
+				SmartDashboard::PutString("GoalMessage", "Intake Cargo util");
+			}
+			virtual Goal_Status Process()
+			{
+				SmartDashboard::PutString("GoalMessage", "Intake Cargo util");
+			}
+		};
+		class OuttakeHatch_util : public AtomicGoal, public SetUpProps
+		{
+		public:
+			OuttakeHatch_util(Sample_Goals_Impl *parent) : SetUpProps(parent)
+			{
+				m_Status = eInactive;
+			}
+			virtual void Activate()
+			{
+				m_Status = eActive;
+			}
+			virtual Goal_Status Process()
+			{
+				SmartDashboard::PutString("GoalMessage", "Outtake Hatch util");
+			}
+		};
+		class OuttakeCargo_util : public AtomicGoal, public SetUpProps
+		{
+		public:
+			OuttakeCargo_util(Sample_Goals_Impl *parent) : SetUpProps(parent)
+			{
+				m_Status = eInactive;
+			}
+			virtual void Activate()
+			{
+				m_Status = eActive;
+				SmartDashboard::PutString("GoalMessage", "Outtake Cargo util");
+			}
+			virtual Goal_Status Process()
+			{
 
-				//TODO Implement however cargo is intaken
 			}
 		};
 
-		class OuttakeHatch : public AtomicGoal, public SetUpProps
+		class IntakeHatch : public Generic_CompositeGoal, public SetUpProps
 		{
-			public:
-			OuttakeHatch(Sample_Goals_Impl* parent) : SetUpProps(parent)
+		public:
+			IntakeHatch(Sample_Goals_Impl *parent) : SetUpProps(parent)
 			{
 				m_Status = eInactive;
 			}
 			virtual void Activate()
 			{
 				m_Status = eActive;
-
-				//TODO Implement however hatch is outtaken
+				SmartDashboard::PutString("GoalMessage", "Intake Hatch");
+				AddSubgoal(new Goal_Wait(.5));
+				//AddSubgoal(new IntakeHatch_util(m_Parent));
+				AddSubgoal(new Goal_Wait(3.0)); //replace with correct goal once implemented
+				AddSubgoal(new Goal_Wait(.5));
 			}
 		};
-		class OuttakeCargo : public AtomicGoal, public SetUpProps
+		class IntakeCargo : public Generic_CompositeGoal, public SetUpProps
 		{
-			public:
-			OuttakeCargo(Sample_Goals_Impl* parent) : SetUpProps(parent)
+		public:
+			IntakeCargo(Sample_Goals_Impl *parent) : SetUpProps(parent)
 			{
 				m_Status = eInactive;
 			}
 			virtual void Activate()
 			{
 				m_Status = eActive;
+				SmartDashboard::PutString("GoalMessage", "Intake Cargo");
+				AddSubgoal(new Goal_Wait(.5));
+				//AddSubgoal(new IntakeCargo_util(m_Parent));
+				AddSubgoal(new Goal_Wait(3.0)); //replace with correct goal once implemented
+				AddSubgoal(new Goal_Wait(.5));
+			}
+		};
 
-				//TODO Implement however cargo is outtaken
+		class OuttakeHatch : public Generic_CompositeGoal, public SetUpProps
+		{
+		public:
+			OuttakeHatch(Sample_Goals_Impl *parent) : SetUpProps(parent)
+			{
+				m_Status = eInactive;
+			}
+			virtual void Activate()
+			{
+				m_Status = eActive;
+				SmartDashboard::PutString("GoalMessage", "Outtake Hatch");
+				AddSubgoal(new Goal_Wait(.5));
+				//AddSubgoal(new OuttakeHatch_util(m_Parent));
+				AddSubgoal(new Goal_Wait(1.0)); //replace with correct goal once implemented
+				AddSubgoal(new Goal_Wait(.5));
+			}
+		};
+		class OuttakeCargo : public Generic_CompositeGoal, public SetUpProps
+		{
+		public:
+			OuttakeCargo(Sample_Goals_Impl *parent) : SetUpProps(parent)
+			{
+				m_Status = eInactive;
+				SmartDashboard::PutString("GoalMessage", "Outtake Cargo");
+			}
+			virtual void Activate()
+			{
+				m_Status = eActive;
+				AddSubgoal(new Goal_Wait(.5));
+				//AddSubgoal(new OuttakeCargo_util(m_Parent));
+				AddSubgoal(new Goal_Wait(1.0)); //replace with correct goal once implemented
+				AddSubgoal(new Goal_Wait(.5));
 			}
 		};
 
@@ -616,8 +697,8 @@ class Sample_Goals_Impl : public AtomicGoal
 		};
 		class OnePieceAuto : public Generic_CompositeGoal, public SetUpProps
 		{
-		  public:
-			OnePieceAuto(Sample_Goals_Impl *parent, Game_Piece gamePiece) : SetUpProps(parent)
+		public:
+			OnePieceAuto(Sample_Goals_Impl *parent, Game_Piece gamePiece) : SetUpProps(parent),Generic_CompositeGoal(true)
 			{
 				m_Status = eInactive;
 				m_gamePiece = gamePiece;
@@ -625,18 +706,23 @@ class Sample_Goals_Impl : public AtomicGoal
 			virtual void Activate()
 			{
 				m_Status = eActive;
-
+				Goal *g = nullptr;
 				//TODO goals to get to location
-				if(m_gamePiece == eHatch) AddSubgoal(new OuttakeHatch(m_Parent));
-				else if(m_gamePiece == eCargo) AddSubgoal(new OuttakeCargo(m_Parent));
+				if (m_gamePiece == eHatch)
+					AddSubgoal(g=new OuttakeHatch(m_Parent));
+				else if (m_gamePiece == eCargo)
+					AddSubgoal(g=new OuttakeCargo(m_Parent));
+				if (g)
+					g->Activate();   //once goals are all set... might as well activate them
 			}
-		  protected:
-		  	Game_Piece m_gamePiece;
+
+		protected:
+			Game_Piece m_gamePiece;
 		};
 
 		class TwoPieceAuto : public Generic_CompositeGoal, public SetUpProps
 		{
-		  public:
+		public:
 			TwoPieceAuto(Sample_Goals_Impl *parent, Game_Piece gamePiece, Game_Piece gamePiece2) : SetUpProps(parent)
 			{
 				m_Status = eInactive;
@@ -649,12 +735,15 @@ class Sample_Goals_Impl : public AtomicGoal
 
 				AddSubgoal(new OnePieceAuto(m_Parent, m_gamePiece));
 				//TODO add remaining subgoals to get to next game piece
-				if(m_gamePiece2 == eHatch) AddSubgoal(new IntakeHatch(m_Parent));
-				else if(m_gamePiece2 == eCargo) AddSubgoal(new IntakeCargo(m_Parent));
+				if (m_gamePiece2 == eHatch)
+					AddSubgoal(new IntakeHatch(m_Parent));
+				else if (m_gamePiece2 == eCargo)
+					AddSubgoal(new IntakeCargo(m_Parent));
 				AddSubgoal(new OnePieceAuto(m_Parent, m_gamePiece2));
 			}
-		  protected:
-		  Game_Piece m_gamePiece, m_gamePiece2;
+
+		protected:
+			Game_Piece m_gamePiece, m_gamePiece2;
 		};
 
 	  public:
