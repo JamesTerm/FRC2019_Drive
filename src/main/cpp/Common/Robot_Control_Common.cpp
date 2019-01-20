@@ -1,5 +1,8 @@
-#if 0
-#include "WPILib.h"
+#if 1
+
+#ifndef _Win32
+#include <frc/WPILib.h>
+#endif
 
 #include "../Base/Base_Includes.h"
 #include <math.h>
@@ -26,13 +29,16 @@
 
 #include "../Base/Joystick.h"
 #include "../Base/JoystickBinder.h"
+//TODO see if I should move Encoder2
+#ifndef _Win32
 #include "InOut_Interface.h"
+#endif
 #include "Debug.h"
 
 #include "Robot_Control_Common.h"
-#include "SmartDashboard/SmartDashboard.h"
+#include "SmartDashboard.h"
 
-
+using namespace frc;
   /***********************************************************************************************************************************/
  /*													Control_Assignment_Properties													*/
 /***********************************************************************************************************************************/
@@ -56,23 +62,14 @@ static void LoadControlElement_1C_Internal(Scripting::Script& script,Control_Ass
 				err = script.GetField("channel",NULL,NULL,&fTest);
 				assert(!err);
 
-				#ifdef __USE_LEGACY_WPI_LIBRARIES__
-				newElement.Channel=(size_t)fTest;
-				#else
 				newElement.Channel=(size_t)fTest-1;  //make ordinal
-				#endif
 
 				err = script.GetField("name",&newElement.name,NULL,NULL);
 				assert(!err);
 				err = script.GetField("module",NULL,NULL,&fTest);
 
-				#ifdef __USE_LEGACY_WPI_LIBRARIES__
-				newElement.Module=(err)?1:(size_t)fTest;
-				assert(newElement.Module!=0);  //sanity check... this is cardinal
-				#else
 				newElement.Module=(err)?0:(size_t)fTest;
 				//assert(newElement.Module!=0);  //note: All module parameters are all ordinal for roboRIO
-				#endif
 			}
 			Output.push_back(newElement);
 			script.Pop();
@@ -103,33 +100,20 @@ static void LoadControlElement_2C_Internal(Scripting::Script& script,Control_Ass
 					err=script.GetField("a_channel",NULL,NULL,&fTest);
 				assert(!err);
 
-				#ifdef __USE_LEGACY_WPI_LIBRARIES__
-				newElement.ForwardChannel=(size_t)fTest;
-				#else
 				newElement.ForwardChannel=(size_t)fTest-1;  //make ordinal
-				#endif
 
 				err = script.GetField("reverse_channel",NULL,NULL,&fTest);
 				if (err)
 					err=script.GetField("b_channel",NULL,NULL,&fTest);
 				assert(!err);
 
-				#ifdef __USE_LEGACY_WPI_LIBRARIES__
-				newElement.ReverseChannel=(size_t)fTest;
-				#else
 				newElement.ReverseChannel=(size_t)fTest-1;  //make ordinal
-				#endif
 				err = script.GetField("name",&newElement.name,NULL,NULL);
 				assert(!err);
 				err = script.GetField("module",NULL,NULL,&fTest);
 
-				#ifdef __USE_LEGACY_WPI_LIBRARIES__
-				newElement.Module=(err)?1:(size_t)fTest;
-				assert(newElement.Module!=0);  //sanity check... this is cardinal
-				#else
 				newElement.Module=(err)?0:(size_t)fTest;
 				//assert(newElement.Module!=0);  //note: All module parameters are all ordinal for roboRIO
-				#endif
 			}
 			Output.push_back(newElement);
 			script.Pop();
@@ -218,7 +202,7 @@ RobotControlCommon::~RobotControlCommon()
 }
 
 template <class T>
-__inline void Initialize_1C_LUT(const Control_Assignment_Properties::Controls_1C &control_props,std::vector<T *> &constrols,
+__inline void Initialize_1C_LUT(const Control_Assignment_Properties::Controls_1C &control_props,std::vector<T *> &controls,
 								RobotControlCommon::Controls_LUT &control_LUT,RobotControlCommon *instance,size_t (RobotControlCommon::*delegate)(const char *name) const)
 {
 	//typedef Control_Assignment_Properties::Controls_1C Controls_1C;
@@ -232,20 +216,16 @@ __inline void Initialize_1C_LUT(const Control_Assignment_Properties::Controls_1C
 		if (enumIndex==(size_t)-1)
 			continue;
 		//create the new Control
-		#ifdef Robot_TesterCode
-		T *NewElement=new T(element.Module,element.Channel,element.name.c_str());  //adding name for UI
+		#ifdef _Win32
+		T *NewElement=new T((uint8_t)element.Module,(uint32_t)element.Channel,element.name.c_str());  //adding name for UI
 		#else
 		//quick debug when things are not working
 		printf("new %s as %d\n",element.name.c_str(),element.Channel);
-		#ifdef __USE_LEGACY_WPI_LIBRARIES__
-		T *NewElement=new T(element.Module,element.Channel);
-		#else
 		T *NewElement=new T(element.Channel);
 		#endif
-		#endif
-		const size_t LUT_index=constrols.size(); //get size before we add it in
-		//const size_t PopulationIndex=constrols.size();  //get the ordinal value before we add it
-		constrols.push_back(NewElement);  //add it to our list of victors
+		const size_t LUT_index=controls.size(); //get size before we add it in
+		//const size_t PopulationIndex=controls.size();  //get the ordinal value before we add it
+		controls.push_back(NewElement);  //add it to our list of victors
 		//Now to work out the new LUT
 		//our LUT is the EnumIndex position set to the value of i... make sure we have the slots created
 		//Note: with the more board we can have more victors, so I've increased this to 20... also this index does not represent pin count, but is a separate index
@@ -258,7 +238,7 @@ __inline void Initialize_1C_LUT(const Control_Assignment_Properties::Controls_1C
 }
 
 template <class T>
-__inline void Initialize_2C_LUT(const Control_Assignment_Properties::Controls_2C &control_props,std::vector<T *> &constrols,
+__inline void Initialize_2C_LUT(const Control_Assignment_Properties::Controls_2C &control_props,std::vector<T *> &controls,
 								RobotControlCommon::Controls_LUT &control_LUT,RobotControlCommon *instance,size_t (RobotControlCommon::*delegate)(const char *name) const)
 {
 	//typedef Control_Assignment_Properties::Controls_2C Controls_2C;
@@ -272,16 +252,16 @@ __inline void Initialize_2C_LUT(const Control_Assignment_Properties::Controls_2C
 		if (enumIndex==(size_t)-1)
 			continue;
 		//create the new Control
-		#ifdef Robot_TesterCode
-		T *NewElement=new T(element.Module,element.ForwardChannel,element.ReverseChannel,element.name.c_str());
+		#ifdef _Win32
+		T *NewElement=new T((uint8_t)element.Module,(uint32_t)element.ForwardChannel,(uint32_t)element.ReverseChannel,element.name.c_str());
 		#else
 		//quick debug when things are not working
 		printf("new %s as %d, %d\n",element.name.c_str(),element.ForwardChannel,element.ReverseChannel);
 		T *NewElement=new T(element.Module,element.ForwardChannel,element.ReverseChannel);
 		#endif
-		const size_t LUT_index=constrols.size(); //get size before we add it in
-		//const size_t PopulationIndex=constrols.size();  //get the ordinal value before we add it
-		constrols.push_back(NewElement);  //add it to our list of victors
+		const size_t LUT_index=controls.size(); //get size before we add it in
+		//const size_t PopulationIndex=controls.size();  //get the ordinal value before we add it
+		controls.push_back(NewElement);  //add it to our list of victors
 		//Now to work out the new LUT
 		//our LUT is the EnumIndex position set to the value of i... make sure we have the slots created
 		assert(enumIndex<20);  //sanity check we have a limit to how many victors we have
@@ -295,7 +275,7 @@ __inline void Initialize_2C_LUT(const Control_Assignment_Properties::Controls_2C
 void RobotControlCommon::RobotControlCommon_Initialize(const Control_Assignment_Properties &props)
 {
 	m_Props=props;
-	#ifdef Robot_TesterCode
+	#ifdef _Win32
 	typedef Control_Assignment_Properties::Controls_1C Controls_1C;
 	typedef Control_Assignment_Properties::Control_Element_1C Control_Element_1C;
 	typedef Control_Assignment_Properties::Controls_2C Controls_2C;
@@ -336,7 +316,7 @@ void RobotControlCommon::TranslateToRelay(size_t index,double Voltage)
 	}
 }
 
-#ifdef Robot_TesterCode
+#ifdef _Win32
   /***********************************************************************************************************************************/
  /*																Encoder2															*/
 /***********************************************************************************************************************************/
@@ -459,12 +439,12 @@ void RobotDrive::SetLeftRightMotorOutputs(float leftOutput, float rightOutput)
 	uint8_t syncGroup = 0x80;
 
 	if (m_frontLeftMotor != NULL)
-		m_frontLeftMotor->Set(Limit(leftOutput) * m_invertedMotors[kFrontLeftMotor] * m_maxOutput, syncGroup);
-	m_rearLeftMotor->Set(Limit(leftOutput) * m_invertedMotors[kRearLeftMotor] * m_maxOutput, syncGroup);
+		m_frontLeftMotor->Set((float)(Limit(leftOutput) * m_invertedMotors[kFrontLeftMotor] * m_maxOutput, syncGroup));
+	m_rearLeftMotor->Set((float)(Limit(leftOutput) * m_invertedMotors[kRearLeftMotor] * m_maxOutput, syncGroup));
 
 	if (m_frontRightMotor != NULL)
-		m_frontRightMotor->Set(-Limit(rightOutput) * m_invertedMotors[kFrontRightMotor] * m_maxOutput, syncGroup);
-	m_rearRightMotor->Set(-Limit(rightOutput) * m_invertedMotors[kRearRightMotor] * m_maxOutput, syncGroup);
+		m_frontRightMotor->Set((float)(-Limit(rightOutput) * m_invertedMotors[kFrontRightMotor] * m_maxOutput, syncGroup));
+	m_rearRightMotor->Set((float)(-Limit(rightOutput) * m_invertedMotors[kRearRightMotor] * m_maxOutput, syncGroup));
 
 	//CANJaguar::UpdateSyncGroup(syncGroup);  ah ha... sync group only works with CAN / Jaguar
 }
@@ -728,5 +708,5 @@ double Control_2C_Element_UI::get_number() const
 #endif  //__SHOW_SMARTDASHBOARD__
 
 
-#endif  //Robot_TesterCode
+#endif  //_Win32
 #endif

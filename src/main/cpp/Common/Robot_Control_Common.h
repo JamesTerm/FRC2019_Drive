@@ -1,9 +1,6 @@
 #pragma once
-
-//It is still not yet certain how the cRIO support will unfold in regards to updated WPI libraries, so until that is settled... enable this to build with cRIO
-//  [1/24/2015 JamesK]
-//#define __USE_LEGACY_WPI_LIBRARIES__
-
+namespace frc
+{
 //This parses out the LUA into two table for each control element... its population properties and LUT
 class COMMON_API Control_Assignment_Properties
 {
@@ -43,7 +40,7 @@ class COMMON_API Control_Assignment_Properties
 
 
 //Add simulated WPILib control elements here... these are to reflect the latest compatible interface with the WPI libraries
-#ifdef Robot_TesterCode
+#ifdef _Win32
 typedef unsigned     int uint32_t;
 typedef unsigned    char uint8_t;
 typedef unsigned	 int UINT32;
@@ -120,7 +117,7 @@ class DigitalInput : public Control_1C_Element_UI
 public:
 	DigitalInput(uint8_t moduleNumber, uint32_t channel,const char *name) : Control_1C_Element_UI(moduleNumber,channel,name,1.0),
 		m_ModuleNumber(moduleNumber), m_Channel(channel) {}
-	uint32_t Get() {return get_number();}
+	uint32_t Get() {return (uint32_t)get_number();}
 	uint32_t GetChannel() {return m_Channel;}
 private:
 	uint8_t m_ModuleNumber;
@@ -323,7 +320,7 @@ private:
 #define LUT_VALID(x) ((index<x.size()) && (x[index]!=(size_t)-1))
 #define IF_LUT(x) if ((index<x.size()) && (x[index]!=(size_t)-1))
 
-#ifdef __USE_LEGACY_WPI_LIBRARIES__
+#ifdef _Win32
 typedef AnalogChannel AnalogInput;
 #endif
 
@@ -335,13 +332,13 @@ class COMMON_API RobotControlCommon
 
 		//victor methods
 		__inline double Victor_GetCurrentPorV(size_t index) {return LUT_VALID(m_VictorLUT)?m_Victors[m_VictorLUT[index]]->Get() : 0.0;}
-		__inline void Victor_UpdateVoltage(size_t index,double Voltage) {IF_LUT(m_VictorLUT) m_Victors[m_VictorLUT[index]]->Set(Voltage);}
+		__inline void Victor_UpdateVoltage(size_t index,double Voltage) {IF_LUT(m_VictorLUT) m_Victors[m_VictorLUT[index]]->Set((float)Voltage);}
 		__inline Victor *Victor_GetInstance(size_t index) {return LUT_VALID(m_VictorLUT)?m_Victors[m_VictorLUT[index]] : NULL;}
 
 		//servo methods
 		__inline double Servo_GetCurrentPorV(size_t index) {return LUT_VALID(m_ServoLUT)?m_Servos[m_ServoLUT[index]]->Get() : 0.0;}
 		//Note: we convert the voltage to the -1 - 1 range by adding 1 and dividing by 2
-		__inline void Servo_UpdateVoltage(size_t index,double Voltage) {IF_LUT(m_ServoLUT) m_Servos[m_ServoLUT[index]]->Set((Voltage + 1.0) / 2.0);}
+		__inline void Servo_UpdateVoltage(size_t index,double Voltage) {IF_LUT(m_ServoLUT) m_Servos[m_ServoLUT[index]]->Set((float)((Voltage + 1.0) / 2.0));}
 		__inline Servo *Servo_GetInstance(size_t index) {return LUT_VALID(m_ServoLUT)?m_Servos[m_ServoLUT[index]] : NULL;}
 
 		//solenoid methods
@@ -367,47 +364,37 @@ class COMMON_API RobotControlCommon
 		__inline double Encoder_GetRate(size_t index) {return LUT_VALID(m_EncoderLUT)?m_Encoders[m_EncoderLUT[index]]->GetRate():0.0;}
 		__inline double Encoder_GetDistance(size_t index) {return LUT_VALID(m_EncoderLUT)?m_Encoders[m_EncoderLUT[index]]->GetDistance():0.0;}
 
-		#ifdef __USE_LEGACY_WPI_LIBRARIES__
-		__inline void Encoder_Start(size_t index) { IF_LUT(m_EncoderLUT) m_Encoders[m_EncoderLUT[index]]->Start();}
-		__inline void Encoder_Stop(size_t index)  { IF_LUT(m_EncoderLUT) m_Encoders[m_EncoderLUT[index]]->Stop();}
-		#else
 		__inline void Encoder_Start(size_t index) { }
 		__inline void Encoder_Stop(size_t index)  { }
-		#endif
 
 		__inline void Encoder_Reset(size_t index) {	IF_LUT(m_EncoderLUT) m_Encoders[m_EncoderLUT[index]]->Reset();}
 		__inline void Encoder_SetDistancePerPulse(size_t index,double distancePerPulse) {IF_LUT(m_EncoderLUT) m_Encoders[m_EncoderLUT[index]]->SetDistancePerPulse(distancePerPulse);}
 		__inline void Encoder_SetReverseDirection(size_t index,bool reverseDirection)   {IF_LUT(m_EncoderLUT) m_Encoders[m_EncoderLUT[index]]->SetReverseDirection(reverseDirection);}
-		#ifdef Robot_TesterCode
+		#ifdef _Win32
 		__inline void Encoder_TimeChange(size_t index,double dTime_s,double adjustment_delta) {m_Encoders[m_EncoderLUT[index]]->TimeChange(dTime_s,adjustment_delta);}
 		#endif
 		__inline Encoder2 *Encoder_GetInstance(size_t index) {return LUT_VALID(m_EncoderLUT)?m_Encoders[m_EncoderLUT[index]] : NULL;}
 
 		//analog channel inputs
-		__inline int Analog_GetValue(size_t index) {return LUT_VALID(m_AnalogInputLUT)?m_AnalogInputs[m_AnalogInputLUT[index]]->GetValue():0.0;}
-		__inline int Analog_GetAverageValue(size_t index) {return LUT_VALID(m_AnalogInputLUT)?m_AnalogInputs[m_AnalogInputLUT[index]]->GetAverageValue():0.0;}
+		__inline int Analog_GetValue(size_t index) {return LUT_VALID(m_AnalogInputLUT)?(int)m_AnalogInputs[m_AnalogInputLUT[index]]->GetValue():0;}
+		__inline int Analog_GetAverageValue(size_t index) {return LUT_VALID(m_AnalogInputLUT)?(int)m_AnalogInputs[m_AnalogInputLUT[index]]->GetAverageValue():0;}
 
 		void TranslateToRelay(size_t index,double Voltage);
 		__inline Compressor *CreateCompressor()
 		{
-			#ifdef __USE_LEGACY_WPI_LIBRARIES__
-			return new Compressor(m_Props.GetCompressorLimit(),m_Props.GetCompressorRelay());
+			#ifdef _Win32
+			return new Compressor((uint32_t)m_Props.GetCompressorLimit(), (uint32_t)m_Props.GetCompressorRelay());
 			#else
 			return new Compressor(0);  //This is now the PCM node ID
 			#endif
 		}
 		__inline void DestroyCompressor(Compressor *instance) {delete instance;}
 
-		#ifndef __USE_LEGACY_WPI_LIBRARIES__
 		__inline Accelerometer *CreateBuiltInAccelerometer()
 		{
 			return new BuiltInAccelerometer();
 		}
 		__inline void DestroyBuiltInAccelerometer(Accelerometer *instance) {delete instance;}
-		#else
-		__inline Accelerometer *CreateBuiltInAccelerometer() {return NULL;}
-		__inline void DestroyBuiltInAccelerometer(void *instance) {}
-		#endif
 	protected:
 		virtual void RobotControlCommon_Initialize(const Control_Assignment_Properties &props);
 		//Override by derived class
@@ -427,3 +414,4 @@ class COMMON_API RobotControlCommon
 
 		Controls_LUT m_VictorLUT,m_ServoLUT,m_RelayLUT,m_DigitalInputLUT,m_AnalogInputLUT,m_DoubleSolenoidLUT,m_EncoderLUT;
 };
+}

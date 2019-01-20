@@ -1,5 +1,5 @@
-#if 0
-#include "WPILib.h"
+#ifndef _Win32
+#include <frc/WPILib.h>
 
 #include "../Base/Base_Includes.h"
 #include <math.h>
@@ -33,6 +33,7 @@
 #include "Robot_Control_Common.h"
 
 using namespace Framework::Base;
+using namespace frc;
 #undef __DisableTankDrive__
 
   /***********************************************************************************************************************************/
