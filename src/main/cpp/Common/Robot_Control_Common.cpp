@@ -364,15 +364,15 @@ void Encoder2::SetReverseDirection(bool reverseDirection)
 {
 	m_ValueScalar?1.0:-1.0;
 }
-
+#endif //_Win32
 
   /***********************************************************************************************************************************/
- /*																RobotDrive															*/
+ /*																RobotDrive2															*/
 /***********************************************************************************************************************************/
 
 const int32_t kMaxNumberOfMotors=4;
 
-void RobotDrive::InitRobotDrive() {
+void RobotDrive2::InitRobotDrive() {
 	m_frontLeftMotor = NULL;
 	m_frontRightMotor = NULL;
 	m_rearRightMotor = NULL;
@@ -382,7 +382,7 @@ void RobotDrive::InitRobotDrive() {
 	m_LeftOutput=0.0,m_RightOutput=0.0;
 }
 
-RobotDrive::RobotDrive(Victor *frontLeftMotor, Victor *rearLeftMotor,
+RobotDrive2::RobotDrive2(Victor *frontLeftMotor, Victor *rearLeftMotor,
 						Victor *frontRightMotor, Victor *rearRightMotor)
 {
 	InitRobotDrive();
@@ -403,7 +403,7 @@ RobotDrive::RobotDrive(Victor *frontLeftMotor, Victor *rearLeftMotor,
 	m_deleteSpeedControllers = false;
 }
 
-RobotDrive::RobotDrive(Victor &frontLeftMotor, Victor &rearLeftMotor,
+RobotDrive2::RobotDrive2(Victor &frontLeftMotor, Victor &rearLeftMotor,
 						Victor &frontRightMotor, Victor &rearRightMotor)
 {
 	InitRobotDrive();
@@ -418,7 +418,7 @@ RobotDrive::RobotDrive(Victor &frontLeftMotor, Victor &rearLeftMotor,
 	m_deleteSpeedControllers = false;
 }
 
-RobotDrive::~RobotDrive()
+RobotDrive2::~RobotDrive2()
 {
 	if (m_deleteSpeedControllers)
 	{
@@ -429,7 +429,7 @@ RobotDrive::~RobotDrive()
 	}
 }
 
-void RobotDrive::SetLeftRightMotorOutputs(float leftOutput, float rightOutput)
+void RobotDrive2::SetLeftRightMotorOutputs(float leftOutput, float rightOutput)
 {
 	//this is added for convenience in simulation
 	m_LeftOutput=leftOutput,m_RightOutput=rightOutput;
@@ -449,7 +449,7 @@ void RobotDrive::SetLeftRightMotorOutputs(float leftOutput, float rightOutput)
 	//CANJaguar::UpdateSyncGroup(syncGroup);  ah ha... sync group only works with CAN / Jaguar
 }
 
-float RobotDrive::Limit(float num)
+float RobotDrive2::Limit(float num)
 {
 	if (num > 1.0)
 	{
@@ -462,7 +462,7 @@ float RobotDrive::Limit(float num)
 	return num;
 }
 
-void RobotDrive::Normalize(double *wheelSpeeds)
+void RobotDrive2::Normalize(double *wheelSpeeds)
 {
 	double maxMagnitude = fabs(wheelSpeeds[0]);
 	int32_t i;
@@ -480,7 +480,7 @@ void RobotDrive::Normalize(double *wheelSpeeds)
 	}
 }
 
-void RobotDrive::RotateVector(double &x, double &y, double angle)
+void RobotDrive2::RotateVector(double &x, double &y, double angle)
 {
 	double cosA = cos(angle * (3.14159 / 180.0));
 	double sinA = sin(angle * (3.14159 / 180.0));
@@ -490,7 +490,7 @@ void RobotDrive::RotateVector(double &x, double &y, double angle)
 	y = yOut;
 }
 
-void RobotDrive::SetInvertedMotor(MotorType motor, bool isInverted)
+void RobotDrive2::SetInvertedMotor(MotorType motor, bool isInverted)
 {
 	if (motor < 0 || motor > 3)
 	{
@@ -501,31 +501,31 @@ void RobotDrive::SetInvertedMotor(MotorType motor, bool isInverted)
 	m_invertedMotors[motor] = isInverted ? -1 : 1;
 }
 
-void RobotDrive::SetExpiration(float timeout){}
+void RobotDrive2::SetExpiration(float timeout){}
 
-float RobotDrive::GetExpiration()
+float RobotDrive2::GetExpiration()
 {
 	return 0.0;
 }
 
-bool RobotDrive::IsAlive()
+bool RobotDrive2::IsAlive()
 {
 	return true;
 }
 
-bool RobotDrive::IsSafetyEnabled()
+bool RobotDrive2::IsSafetyEnabled()
 {
 	return true;
 }
 
-void RobotDrive::SetSafetyEnabled(bool enabled) {}
+void RobotDrive2::SetSafetyEnabled(bool enabled) {}
 
-void RobotDrive::GetDescription(char *desc)
+void RobotDrive2::GetDescription(char *desc)
 {
-	sprintf(desc, "RobotDrive");
+	sprintf(desc, "RobotDrive2");
 }
 
-void RobotDrive::StopMotor()
+void RobotDrive2::StopMotor()
 {
 	if (m_frontLeftMotor != NULL) m_frontLeftMotor->Disable();
 	if (m_frontRightMotor != NULL) m_frontRightMotor->Disable();
@@ -533,6 +533,8 @@ void RobotDrive::StopMotor()
 	if (m_rearRightMotor != NULL) m_rearRightMotor->Disable();
 }
 
+
+#ifdef _Win32
 //Ideally we have only one robot control for both the tester and the main app... we can use this macro in tester to control if we want to see that the calls
 //are correctly working.  Typically we shouldn't need to enable this unless there is a problem, or alternatively to verify the actual controls are being sent out
 //#define __SHOW_SMARTDASHBOARD__

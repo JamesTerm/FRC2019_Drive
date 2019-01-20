@@ -255,8 +255,9 @@ public:
 	virtual double GetY() {return 0.0;}
 	virtual double GetZ() {return 0.0;}
 };
+#endif
 
-class COMMON_API RobotDrive
+class COMMON_API RobotDrive2
 {
 public:
 	enum MotorType
@@ -267,9 +268,9 @@ public:
 		kRearRightMotor = 3
 	};
 
-	RobotDrive(Victor *frontLeftMotor, Victor *rearLeftMotor,Victor *frontRightMotor, Victor *rearRightMotor);
-	RobotDrive(Victor &frontLeftMotor, Victor &rearLeftMotor,Victor &frontRightMotor, Victor &rearRightMotor);
-	virtual ~RobotDrive();
+	RobotDrive2(Victor *frontLeftMotor, Victor *rearLeftMotor,Victor *frontRightMotor, Victor *rearRightMotor);
+	RobotDrive2(Victor &frontLeftMotor, Victor &rearLeftMotor,Victor &frontRightMotor, Victor &rearRightMotor);
+	virtual ~RobotDrive2();
 
 	virtual void SetLeftRightMotorOutputs(float leftOutput, float rightOutput);
 	virtual void GetLeftRightMotorOutputs(float &leftOutput, float &rightOutput) //I added this one for convenience
@@ -315,7 +316,6 @@ private:
 };
 
 
-#endif
 
 #define LUT_VALID(x) ((index<x.size()) && (x[index]!=(size_t)-1))
 #define IF_LUT(x) if ((index<x.size()) && (x[index]!=(size_t)-1))

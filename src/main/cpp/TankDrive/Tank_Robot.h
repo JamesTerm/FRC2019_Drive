@@ -263,7 +263,7 @@ class DRIVE_API Tank_Robot_Control :  public frc::RobotControlCommon, public Tan
 		__inline double RPS_To_LinearVelocity(double RPS);
 		__inline double LinearVelocity_To_RPS(double Velocity);
 	protected:
-		frc::RobotDrive *m_RobotDrive;
+		frc::RobotDrive2 *m_RobotDrive;
 
 		double m_RobotMaxSpeed;  //cache this to covert velocity to motor setting
 		double m_ArmMaxSpeed;
