@@ -20,3 +20,22 @@ The robot control is the interface where all the voltage is applied, as well as 
 FRC2019_Goals.cpp
 We should have one file for all the goals.  I've done this in 2014 and for Curivator, so I can demonstrate how it interfaces with the robot, and explain how all the base tools are easily accessible, as we start a goal library... it can all be in one class, the trick is that the IDE can collapse well to work.  It's conceivable to develope them in VS2017, fortunately VS Code has ctrl k-'0' to collapse.  Essentially all the code is declared and implemented in the same place so its easy to quickly change the goals as needed.
 
+-----------------------------------------------------------------------------------------------------------------------------------
+Iteration 2:
+
+So far everything written above has been successful, and now I need to layout some goals for the next iteration.  I'll put these in order of importance.
+
+RobotControl integration is the most important.  There are 2 ways to achieve this, 1 is to rewrite the interface and point them to the existing convention.  The other is a hybrid solution where some will use the existing convention.  To save time, I'm going to go with the other.  The way it works is that RobotControlCommon currently is Lua driven to assign the interface to a control.  If a control isn't shown in the LUA then no resources are allocated.  This makes it possible to co-exist for long term its hard to say which convention we end up using, and its possible that some resources are shared... for this I may make robot control common able to link over providing callback overrides.  Once robot control builds we'll be able to start testing the goals on either robot, and its possible to do so because each robot has its own lua, so the code can be identical for both.
+
+On the low end of things... We'll see where vision and gyro are, as we can make goals for them and run real tests to see how well they work.  For gyro, the goal is already written, but some work will need to be done to integrate the gyro (I can explain or fix this when we get there).  The same is true for vision an example code for that has been written as well and we can start testing its ability to track the target.  Also, check on the status of encoders on the drive.
+
+Provide an arm example, much like drive forward, will have a height and the elevator goes to that height.
+
+Get controls to work on the simulation as I'll need them to start teleop goals
+
+Make example of a teleop goal (e.g. 180 and 90 buttons for drive)
+a)  Make it easy to implement for client code
+b)  Make it easy to specify which goals are mutually exclusive with each other, and with other teleop operations
+c)  Evaluate use case on end game
+
+Make a new robot viewer or investigate other simulators
