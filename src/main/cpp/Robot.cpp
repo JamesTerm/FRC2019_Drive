@@ -64,18 +64,30 @@ using namespace std;
     * Called when teleop starts
     **/
 	void Robot::OperatorControl()
-	{
+	{auto inst = nt::NetworkTableInstance::GetDefault();
+		auto table = inst.GetTable("VISION_2019");
+		bool var = false;
 		cout << "Teleoperation Started." << endl;
 		while (IsOperatorControl() && !IsDisabled())
 		{
 			m_drive->Update();
-			Wait(0.010);
+			Wait(0.010);table->PutBoolean("yeet",var);
+			cout << "yeet test" << endl;
+			var = !var;
 		}
 	}
 
 	/**
 	 * Called when the Test period starts
 	**/
-	void Robot::Test() {}
+	void Robot::Test() 
+	{
+		
+		while(true)
+		{
+			
+		}
+		
+	}
 
 START_ROBOT_CLASS(Robot) //!< This identifies Robot as the main Robot starting class

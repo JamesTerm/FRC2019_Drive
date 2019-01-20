@@ -16,6 +16,9 @@
 #include "Systems/Drive.h"
 #include "Controls/AxisControl.h"
 #include "Autonomi/Autons.h"
+#include "networktables/NetworkTable.h"
+#include "networktables/NetworkTableEntry.h"
+#include "networktables/NetworkTableInstance.h"
 
 using namespace frc;
 using namespace System;

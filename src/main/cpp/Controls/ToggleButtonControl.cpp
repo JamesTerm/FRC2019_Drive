@@ -9,7 +9,7 @@ All rights reserved.
 Author(s):	Dylan Watson, Ian Poll
 Email:	dylantrwatson@gmail.com, irobot983@gmail.com
 \*********************************************************************/
-/*
+
 #include "ToggleButtonControl.h"
 
 using namespace std;
@@ -164,4 +164,3 @@ DoubleSolenoid::Value ToggleButtonControl::GetSolenoidDefaultValue()
 
 ToggleButtonControl::~ToggleButtonControl() { }
 
-*/

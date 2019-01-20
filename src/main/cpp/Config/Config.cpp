@@ -36,12 +36,6 @@ void Config::AllocateComponents(){
 	m_activeCollection->Add(left_1);
 	m_activeCollection->Add(right_0);
 	m_activeCollection->Add(right_1);
-
-	AxisControl *leftDrive = new AxisControl(m_driveJoy, "LeftDrive", 1, 0.07, true, 0.70);
-	AxisControl *rightDrive = new AxisControl(m_driveJoy, "RightDrive", 5, 0.07, true, 0.70);
-
-	m_drive->AddControlDrive(leftDrive);
-	m_drive->AddControlDrive(rightDrive);
 	m_activeCollection->Add(SolenoidTest);
 
 	AxisControl *leftDrive = new AxisControl(m_driveJoy, "LeftDrive", 1, 0.07, true, 0.70);
