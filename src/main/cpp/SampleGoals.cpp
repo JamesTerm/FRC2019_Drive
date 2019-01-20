@@ -595,9 +595,15 @@ class Sample_Goals_Impl : public AtomicGoal
 			{
 				m_Status = eActive;
 			}
-			virtual Goal_Status Process()
+			//Note: you must put parameter in to properly override
+			virtual Goal_Status Process(double dTime_s)
 			{
+				ActivateIfInactive();
 				SmartDashboard::PutString("GoalMessage", "Outtake Hatch util");
+				//we'll probably fire an event here (if it's just this then use RobotQuickNotify)
+				//m_EventMap.EventOnOff_Map[m_EventName.c_str()].Fire(m_IsOn);
+				m_Status = eCompleted;
+				return m_Status;
 			}
 		};
 		class OuttakeCargo_util : public AtomicGoal, public SetUpProps
@@ -656,16 +662,16 @@ class Sample_Goals_Impl : public AtomicGoal
 		class OuttakeHatch : public Generic_CompositeGoal, public SetUpProps
 		{
 		public:
-			OuttakeHatch(Sample_Goals_Impl *parent) : SetUpProps(parent)
+			OuttakeHatch(Sample_Goals_Impl *parent) : SetUpProps(parent), Generic_CompositeGoal(true)
 			{
 				m_Status = eInactive;
 			}
 			virtual void Activate()
 			{
-				m_Status = eActive;
 				SmartDashboard::PutString("GoalMessage", "Outtake Hatch");
+				m_Status = eActive;
 				AddSubgoal(new Goal_Wait(.5));
-				//AddSubgoal(new OuttakeHatch_util(m_Parent));
+				AddSubgoal(new OuttakeHatch_util(m_Parent));
 				AddSubgoal(new Goal_Wait(1.0)); //replace with correct goal once implemented
 				AddSubgoal(new Goal_Wait(.5));
 			}
@@ -706,14 +712,11 @@ class Sample_Goals_Impl : public AtomicGoal
 			virtual void Activate()
 			{
 				m_Status = eActive;
-				Goal *g = nullptr;
 				//TODO goals to get to location
 				if (m_gamePiece == eHatch)
-					AddSubgoal(g=new OuttakeHatch(m_Parent));
+					AddSubgoal(new OuttakeHatch(m_Parent));
 				else if (m_gamePiece == eCargo)
-					AddSubgoal(g=new OuttakeCargo(m_Parent));
-				if (g)
-					g->Activate();   //once goals are all set... might as well activate them
+					AddSubgoal(new OuttakeCargo(m_Parent));
 			}
 
 		protected:
