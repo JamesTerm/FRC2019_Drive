@@ -74,7 +74,7 @@
 //#include "Common/InOut_Interface.h"
 #include "../main/cpp/Common/Debug.h"
 //TODO enable robot control
-//#include "Common/Robot_Control_Common.h"
+#include "../main/cpp/Common/Robot_Control_Common.h"
 #include "../main/cpp/TankDrive/Tank_Robot.h"
 //This was depreciated and integrated ... stubbed out
 // #include "TankDrive/src/Tank_Robot_Control.h"

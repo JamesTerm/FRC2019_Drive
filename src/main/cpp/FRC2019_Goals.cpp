@@ -28,13 +28,15 @@
 #include "Base/JoystickBinder.h"
 #include "Common/UI_Controller.h"
 #include "Common/PIDController.h"
-//#include "frc/WPILib.h"
 #include "Base/Joystick.h"
 #include "Base/JoystickBinder.h"
-//#include "Common/InOut_Interface.h"
+#ifndef _Win32
+#include <frc/WPILib.h>
+#include "Common/InOut_Interface.h"
+#endif
 #include "Common/Debug.h"
 //TODO enable robot control
-//#include "Common/Robot_Control_Common.h"
+#include "Common/Robot_Control_Common.h"
 #include "TankDrive/Tank_Robot.h"
 
 //#define __UsingTankDrive__

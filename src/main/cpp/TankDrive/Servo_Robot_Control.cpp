@@ -29,9 +29,12 @@
 #include "../Common/Robot_Control_Interface.h"
 #include "../Common/UI_Controller.h"
 #include "../Common/PIDController.h"
-//#include "../Common/InOut_Interface.h"
+#ifndef _Win32
+#include <frc/WPILib.h>
+#include "../Common/InOut_Interface.h"
+#endif
 #include "../Common/Debug.h"
-//#include "../Common/Robot_Control_Common.h"
+#include "../Common/Robot_Control_Common.h"
 #include "Tank_Robot.h"
 #include "Servo_Robot_Control.h"
 
