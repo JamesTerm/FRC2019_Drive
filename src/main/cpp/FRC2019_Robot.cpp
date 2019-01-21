@@ -54,7 +54,7 @@ using namespace std;
 /***********************************************************************************************************************************/
 
 FRC2019_Robot::Robot_Claw::Robot_Claw(FRC2019_Robot *parent,Rotary_Control_Interface *robot_control) :
-	Rotary_Velocity_Control("Claw",robot_control,eRollers),m_pParent(parent),m_Grip(false),m_Squirt(false)
+	Rotary_Velocity_Control("Claw",robot_control,eRoller),m_pParent(parent),m_Grip(false),m_Squirt(false)
 {
 }
 
