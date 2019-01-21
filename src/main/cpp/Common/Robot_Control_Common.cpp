@@ -405,9 +405,12 @@ RobotDrive2::RobotDrive2(Victor *frontLeftMotor, Victor *rearLeftMotor,
 	if (frontLeftMotor == NULL || rearLeftMotor == NULL || frontRightMotor == NULL || rearRightMotor == NULL)
 	{
 		//wpi_setWPIError(NullParameter);
-		assert(false);
+		//assert(false);
+		m_IsEnabled = false;
 		return;
 	}
+	else
+		m_IsEnabled = true;
 	m_frontLeftMotor = frontLeftMotor;
 	m_rearLeftMotor = rearLeftMotor;
 	m_frontRightMotor = frontRightMotor;
@@ -447,21 +450,28 @@ RobotDrive2::~RobotDrive2()
 
 void RobotDrive2::SetLeftRightMotorOutputs(float leftOutput, float rightOutput)
 {
+	if (!m_IsEnabled) return;
 	//this is added for convenience in simulation
 	m_LeftOutput=leftOutput,m_RightOutput=rightOutput;
 
 	assert(m_rearLeftMotor != NULL && m_rearRightMotor != NULL);
 
-	uint8_t syncGroup = 0x80;
+	//syncGroup no longer used
+	//uint8_t syncGroup = 0x80;
 
-	if (m_frontLeftMotor != NULL)
-		m_frontLeftMotor->Set((float)(Limit(leftOutput) * m_invertedMotors[kFrontLeftMotor] * m_maxOutput, syncGroup));
-	m_rearLeftMotor->Set((float)(Limit(leftOutput) * m_invertedMotors[kRearLeftMotor] * m_maxOutput, syncGroup));
+	m_frontLeftMotor->Set((float)(Limit(leftOutput) * m_invertedMotors[kFrontLeftMotor] * m_maxOutput));
+	m_rearLeftMotor->Set((float)(Limit(leftOutput) * m_invertedMotors[kRearLeftMotor] * m_maxOutput));
 
-	if (m_frontRightMotor != NULL)
-		m_frontRightMotor->Set((float)(-Limit(rightOutput) * m_invertedMotors[kFrontRightMotor] * m_maxOutput, syncGroup));
-	m_rearRightMotor->Set((float)(-Limit(rightOutput) * m_invertedMotors[kRearRightMotor] * m_maxOutput, syncGroup));
+	m_frontRightMotor->Set((float)(-Limit(rightOutput) * m_invertedMotors[kFrontRightMotor] * m_maxOutput));
+	m_rearRightMotor->Set((float)(-Limit(rightOutput) * m_invertedMotors[kRearRightMotor] * m_maxOutput));
 
+	//TODO should eventually update to reflect this, but this shouldn't affect the functionality
+	#if 0
+	m_frontLeftMotor->Set(Limit(leftOutput) * m_maxOutput);
+	m_rearLeftMotor->Set(Limit(leftOutput) * m_maxOutput);
+	m_frontRightMotor->Set(-Limit(rightOutput) * m_maxOutput);
+	m_rearRightMotor->Set(-Limit(rightOutput) * m_maxOutput);
+	#endif
 	//CANJaguar::UpdateSyncGroup(syncGroup);  ah ha... sync group only works with CAN / Jaguar
 }
 

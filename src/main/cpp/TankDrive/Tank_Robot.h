@@ -197,7 +197,7 @@ class DRIVE_API Tank_Robot_Properties : public UI_Ship_Properties
 		#endif
 };
 
-#undef __Tank_TestControlAssignments__
+//#define __Tank_TestControlAssignments__
 #if defined _Win32 && !defined __Tank_TestControlAssignments__
 
 class DRIVE_API Tank_Robot_Control : public Tank_Drive_Control_Interface

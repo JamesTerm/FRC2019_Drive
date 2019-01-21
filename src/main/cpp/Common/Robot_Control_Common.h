@@ -313,6 +313,7 @@ private:
 		return motors;
 	}
 	float m_LeftOutput,m_RightOutput;
+	bool m_IsEnabled = false;  //Use to determine if its been enabled for quick disable access
 };
 
 
@@ -371,7 +372,7 @@ class COMMON_API RobotControlCommon
 		__inline void Encoder_SetDistancePerPulse(size_t index,double distancePerPulse) {IF_LUT(m_EncoderLUT) m_Encoders[m_EncoderLUT[index]]->SetDistancePerPulse(distancePerPulse);}
 		__inline void Encoder_SetReverseDirection(size_t index,bool reverseDirection)   {IF_LUT(m_EncoderLUT) m_Encoders[m_EncoderLUT[index]]->SetReverseDirection(reverseDirection);}
 		#ifdef _Win32
-		__inline void Encoder_TimeChange(size_t index,double dTime_s,double adjustment_delta) {m_Encoders[m_EncoderLUT[index]]->TimeChange(dTime_s,adjustment_delta);}
+		__inline void Encoder_TimeChange(size_t index,double dTime_s,double adjustment_delta) { IF_LUT(m_EncoderLUT) m_Encoders[m_EncoderLUT[index]]->TimeChange(dTime_s,adjustment_delta);}
 		#endif
 		__inline Encoder2 *Encoder_GetInstance(size_t index) {return LUT_VALID(m_EncoderLUT)?m_Encoders[m_EncoderLUT[index]] : NULL;}
 
