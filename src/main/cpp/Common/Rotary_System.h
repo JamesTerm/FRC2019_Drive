@@ -1,5 +1,10 @@
 #pragma once
 
+//TODO should have a common include to replace this
+#ifdef _Win32
+#include "Calibration_Testing.h"
+#endif
+
 struct Rotary_Props
 {
 	double VoltageScalar;		//Used to handle reversed voltage wiring
@@ -246,13 +251,13 @@ class COMMON_API Rotary_Properties : public Ship_1D_Properties
 		const Rotary_Props &GetRotaryProps() const {return m_RotaryProps;}
 		//Get and Set the properties
 		Rotary_Props &RotaryProps() {return m_RotaryProps;}
-		#ifdef Robot_TesterCode
+		#ifdef _Win32
 		const EncoderSimulation_Props &GetEncoderSimulationProps() const {return m_EncoderSimulation.GetEncoderSimulationProps();}
 		EncoderSimulation_Props &EncoderSimulationProps() {return m_EncoderSimulation.EncoderSimulationProps();}
 		#endif
 	protected:
 		Rotary_Props m_RotaryProps;
-		#ifdef Robot_TesterCode
+		#ifdef _Win32
 		EncoderSimulation_Properties m_EncoderSimulation;
 		#endif
 	private:

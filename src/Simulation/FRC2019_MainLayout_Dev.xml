@@ -1,5 +1,16 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="armPot_Raw" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
+		<location x="45" y="66"/>
+		<width>251</width>
+		<height>63</height>
+		<property name="Foreground" value="255.102.51.255"/>
+		<property name="Maximum" value="1.0"/>
+	</widget>
+	<widget field="arm_Raw" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="-42" y="215"/>
+		<width>86</width>
+	</widget>
 	<widget field="GameMode" type="String" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
 		<location x="226" y="351"/>
 		<property name="Font Size" value="20"/>
@@ -84,12 +95,6 @@
 		<location x="182" y="185"/>
 		<width>79</width>
 	</widget>
-	<widget field="ArmAngle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.SimpleDial">
-		<location x="21" y="23"/>
-		<property name="Upper Limit" value="220.0"/>
-		<property name="Lower Limit" value="-50.0"/>
-		<property name="Tick Interval" value="45.0"/>
-	</widget>
 	<widget field="LeftEncoder" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
 		<location x="281" y="265"/>
 		<width>107</width>
@@ -155,6 +160,9 @@
 		<property name="Upper Limit" value="14.0"/>
 		<property name="Lower Limit" value="-14.0"/>
 		<property name="Tick Interval" value="2.8"/>
+	</widget>
+	<widget field="SafetyLock_Arm" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.CheckBox">
+		<location x="120" y="215"/>
 	</widget>
 </dashboard>
 <live-window>

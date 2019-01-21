@@ -1,5 +1,5 @@
 //Note: This is only for simulation only, as the robot will have real sensors
-#ifdef Robot_TesterCode
+#ifdef _Win32
 
 #include "../Base/Base_Includes.h"
 #include <math.h>
@@ -22,6 +22,7 @@
 #include "Poly.h"
 #include "Robot_Control_Interface.h"
 #include "Rotary_System.h"
+#include "SmartDashboard.h"
 
 
 using namespace std;
@@ -85,7 +86,7 @@ double GetTweakedVoltage(double Voltage)
 	{
 		if (VoltMag<c_DeadZone)
 		{
-			DebugOutput("Buzz %f\n",Voltage);   //simulate no movement but hearing the motor
+			//DebugOutput("Buzz %f\n",Voltage);   //simulate no movement but hearing the motor
 			VoltMag=0.0;
 		}
 		else if (VoltMag<c_MidRangeZone)
@@ -448,7 +449,7 @@ EncoderSimulation_Properties::EncoderSimulation_Properties()
 	m_EncoderSimulation_Props=props;
 }
 
-void EncoderSimulation_Properties::LoadFromScript(GG_Framework::Logic::Scripting::Script& script)
+void EncoderSimulation_Properties::LoadFromScript(Framework::Scripting::Script& script)
 {
 	EncoderSimulation_Props &props=m_EncoderSimulation_Props;
 	double test;
@@ -528,6 +529,12 @@ __inline double Drive_Train_Characteristics::GetWheelTorque(double Torque) const
 {
 	return Torque / m_Props.GearReduction * m_Props.DriveTrainEfficiency;
 }
+
+__inline double Drive_Train_Characteristics::INV_GetWheelTorque(double Torque) const
+{
+	return Torque * m_Props.GearReduction * m_Props.COF_Efficiency;
+}
+
 __inline double Drive_Train_Characteristics::GetTorqueAtWheel(double Torque) const
 {
 	return (GetWheelTorque(Torque) / m_Props.DriveWheelRadius);
@@ -566,6 +573,10 @@ __inline double Drive_Train_Characteristics::GetMotorRPS_Angular(double wheel_An
 {
 	return GetWheelRPS_Angular(wheel_AngularVelocity) /  m_Props.GearReduction;
 }
+__inline double Drive_Train_Characteristics::INV_GetMotorRPS_Angular(double wheel_AngularVelocity) const
+{
+	return GetWheelRPS_Angular(wheel_AngularVelocity) *  m_Props.GearReduction;
+}
 
 __inline double Drive_Train_Characteristics::GetTorqueFromLinearVelocity(double LinearVelocity) const
 {
@@ -582,6 +593,15 @@ __inline double Drive_Train_Characteristics::GetWheelTorqueFromVoltage(double Vo
 	return (Voltage>0)? WheelTorque : -WheelTorque;  //restore sign
 }
 
+__inline double Drive_Train_Characteristics::GetTorqueFromVoltage_V1(double Voltage) const
+{
+	const EncoderSimulation_Props::Motor_Specs &motor=m_Props.motor;
+	const double Amps=fabs(Voltage*motor.Stall_Current_Amp);
+	const double MotorTorque=GetAmp_To_Torque_nm(Amps);
+	const double WheelTorque=INV_GetWheelTorque(MotorTorque * m_Props.NoMotors);
+	return (Voltage>0)? WheelTorque : -WheelTorque;  //restore sign
+}
+
 __inline double Drive_Train_Characteristics::GetTorqueFromVoltage(double Voltage) const
 {
 	const EncoderSimulation_Props::Motor_Specs &motor=m_Props.motor;
@@ -591,10 +611,10 @@ __inline double Drive_Train_Characteristics::GetTorqueFromVoltage(double Voltage
 	return (Voltage>0)? WheelTorque : -WheelTorque;  //restore sign
 }
 
-__inline double Drive_Train_Characteristics::INV_GetTorqueFromVelocity(double AngularVelocity) const
+__inline double Drive_Train_Characteristics::INV_GetTorqueFromVelocity(double wheel_AngularVelocity) const
 {
-	const double MotorTorque=INV_GetVel_To_Torque_nm(GetMotorRPS_Angular(AngularVelocity));
-	return GetWheelTorque(MotorTorque * m_Props.NoMotors);
+	const double MotorTorque_nm=INV_GetVel_To_Torque_nm(INV_GetMotorRPS_Angular(wheel_AngularVelocity));
+	return INV_GetWheelTorque(MotorTorque_nm * m_Props.NoMotors);
 }
 
 __inline double Drive_Train_Characteristics::GetTorqueFromVelocity(double wheel_AngularVelocity) const
@@ -602,8 +622,10 @@ __inline double Drive_Train_Characteristics::GetTorqueFromVelocity(double wheel_
 	const double MotorTorque_nm=GetVel_To_Torque_nm(GetMotorRPS_Angular(wheel_AngularVelocity));
 	return GetWheelTorque(MotorTorque_nm * m_Props.NoMotors);
 }
-
-
+__inline double Drive_Train_Characteristics::GetMaxPushingForce() const
+{	
+	return std::min(GetMaxTraction()*9.80665, GetMaxDriveForce()); 
+}
   /***************************************************************************************************************/
  /*												Encoder_Simulator2												*/
 /***************************************************************************************************************/
@@ -658,7 +680,7 @@ void Encoder_Simulator2::UpdateEncoderVoltage(double Voltage)
 	ForceToApply-=ForceAbsorbed;
 	m_Physics.ApplyFractionalForce(ForceToApply,m_Time_s);
 	#else
-	double TorqueToApply=m_DriveTrain.GetTorqueFromVoltage(Voltage);
+	double TorqueToApply=m_DriveTrain.GetTorqueFromVoltage_V1(Voltage);
 	const double TorqueAbsorbed=m_DriveTrain.INV_GetTorqueFromVelocity(m_Physics.GetVelocity());
 	TorqueToApply-=TorqueAbsorbed;
 	m_Physics.ApplyFractionalTorque(TorqueToApply,m_Time_s,m_DriveTrain.GetDriveTrainProps().TorqueAccelerationDampener);

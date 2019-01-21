@@ -1,22 +1,3 @@
-#ifdef Robot_TesterCode
-#include "stdafx.h"
-#include "Robot_Tester.h"
-namespace Robot_Tester
-{
-	#include "Tank_Robot_UI.h"
-	#include "CommonUI.h"
-	#include "FRC2019_Robot.h"
-}
-
-using namespace Robot_Tester;
-using namespace GG_Framework::Base;
-using namespace osg;
-using namespace std;
-
-const double Pi=M_PI;
-const double Pi2=M_PI*2.0;
-
-#else
 
 #include "Base/Base_Includes.h"
 #include <math.h>
@@ -49,6 +30,8 @@ const double Pi2=M_PI*2.0;
 #ifndef _Win32
 #include <frc/WPILib.h>
 #include "Common/InOut_Interface.h"
+#else
+#include "Common/Calibration_Testing.h"
 #endif
 #include "Common/Debug.h"
 #include "Common/Robot_Control_Common.h"
@@ -62,7 +45,9 @@ const double Pi2=M_PI*2.0;
 #include "Common/SmartDashboard.h"
 using namespace Framework::Base;
 using namespace std;
-#endif
+
+//#define __EnableRobotArmDisable__
+
 
   /***********************************************************************************************************************************/
  /*													FRC2019_Robot::Robot_Claw														*/
@@ -443,28 +428,72 @@ void FRC2019_Robot_Properties::LoadFromScript(Scripting::Script& script)
 
 
 //TODO implement once tank is enabled
-#if 0
+#if 1
   /***********************************************************************************************************************************/
  /*													FRC2019_Robot_Control															*/
 /***********************************************************************************************************************************/
 
-void FRC2019_Robot_Control::UpdateRotaryVoltage(size_t index,double Voltage)
+void FRC2019_Robot_Control::ResetPos()
 {
-	switch (index)
+	if (m_Compressor)
 	{
-		case FRC2019_Robot::eArm:
-			{
-				m_ArmVoltage=Voltage * m_RobotProps.GetArmProps().GetRotaryProps().VoltageScalar;
-				m_Potentiometer.UpdatePotentiometerVoltage(m_ArmVoltage);
-				m_Potentiometer.TimeChange();  //have this velocity immediately take effect
-			}
-			break;
-		case FRC2019_Robot::eRollers:
-			m_RollerVoltage=Voltage;
-			//DOUT3("Arm Voltage=%f",Voltage);
-			break;
+		//Enable this code if we have a compressor 
+		m_Compressor->Stop();
+		printf("RobotControl::ResetPos Compressor->Stop()\n");
+		{
+			printf("RobotControl::ResetPos Compressor->Start()\n");
+			m_Compressor->Start();
+		}
 	}
 }
+
+__inline void CheckDisableSafety_FRC2019(size_t index, bool &SafetyLock)
+{
+	//return;
+	std::string SmartLabel = csz_FRC2019_Robot_SpeedControllerDevices_Enum[index];
+	SmartLabel[0] -= 32; //Make first letter uppercase
+	//This section is extra control of each system while 3D positioning is operational... enable for diagnostics
+	std::string VoltageArmSafety = SmartLabel + "Disable";
+	const bool bVoltageArmDisable = SmartDashboard::GetBoolean(VoltageArmSafety.c_str());
+	if (bVoltageArmDisable)
+		SafetyLock = true;
+}
+
+void FRC2019_Robot_Control::UpdateVoltage(size_t index,double Voltage)
+{
+	bool SafetyLock=SmartDashboard::GetBoolean("SafetyLock_Arm");
+	double VoltageScalar=1.0;
+
+	switch (index)
+	{
+	case FRC2019_Robot::eArm:
+		{
+			#ifdef __EnableRobotArmDisable__
+			CheckDisableSafety_FRC2019(index,SafetyLock);
+			#endif
+			#ifdef _Win32
+			//Note: put index back in here if we have multiple pots
+			m_Potentiometer.UpdatePotentiometerVoltage(SafetyLock?0.0:Voltage);
+			m_Potentiometer.TimeChange();  //have this velocity immediately take effect
+			#endif
+		}
+		break;
+	}
+	//Note this check will be needed if we follow the swerve drive model
+	//if (index<FRC2019_Robot::eDriveOffset)
+	{
+		VoltageScalar=m_RobotProps.GetArmProps().GetRotaryProps().VoltageScalar;
+		Voltage*=VoltageScalar;
+		std::string SmartLabel=csz_FRC2019_Robot_SpeedControllerDevices_Enum[index];
+		SmartLabel[0]-=32; //Make first letter uppercase
+		SmartLabel+="Voltage";
+		SmartDashboard::PutNumber(SmartLabel.c_str(),Voltage);
+		if (SafetyLock)
+			Voltage=0.0;
+		Victor_UpdateVoltage(index,Voltage);
+	}
+}
+
 void FRC2019_Robot_Control::CloseSolenoid(size_t index,bool Close)
 {
 	switch (index)
@@ -490,10 +519,24 @@ void FRC2019_Robot_Control::CloseSolenoid(size_t index,bool Close)
 }
 
 
-FRC2019_Robot_Control::FRC2019_Robot_Control() : m_pTankRobotControl(&m_TankRobotControl),m_ArmVoltage(0.0),m_RollerVoltage(0.0),
+FRC2019_Robot_Control::FRC2019_Robot_Control(bool UseSafety) : m_pTankRobotControl(&m_TankRobotControl),
 	m_Deployment(false),m_Claw(false),m_Rist(false)
 {
-	m_TankRobotControl.SetDisplayVoltage(false); //disable display there so we can do it here
+	//depreciated once we had smart dashboard
+	//m_TankRobotControl.SetDisplayVoltage(false); //disable display there so we can do it here
+}
+
+FRC2019_Robot_Control::~FRC2019_Robot_Control()
+{
+	//Encoder_Stop(Curivator_Robot::eWinch);
+	if (m_Compressor)
+	{
+		DestroyCompressor(m_Compressor);
+		m_Compressor = nullptr;
+	}
+	m_FirstRun = false;
+	//DestroyBuiltInAccelerometer(m_RoboRIO_Accelerometer);
+	//m_RoboRIO_Accelerometer = NULL;
 }
 
 void FRC2019_Robot_Control::Reset_Rotary(size_t index)
@@ -502,18 +545,24 @@ void FRC2019_Robot_Control::Reset_Rotary(size_t index)
 	{
 		case FRC2019_Robot::eArm:
 			m_KalFilter_Arm.Reset();
+			#ifdef _Win32
 			m_Potentiometer.ResetPos();
+			#endif
 			break;
 	}
 }
 
 void FRC2019_Robot_Control::Initialize(const Entity_Properties *props)
 {
+	Tank_Drive_Control_Interface *tank_interface = m_pTankRobotControl;
+	tank_interface->Initialize(props);
+
 	const FRC2019_Robot_Properties *robot_props=dynamic_cast<const FRC2019_Robot_Properties *>(props);
 
 	//For now robot_props can be NULL since the swerve robot is borrowing it
 	if (robot_props)
 	{
+		#ifdef _Win32
 		m_RobotProps=*robot_props;  //save a copy
 		assert(robot_props);
 		Rotary_Properties writeable_arm_props=robot_props->GetArmProps();
@@ -521,25 +570,57 @@ void FRC2019_Robot_Control::Initialize(const Entity_Properties *props)
 		//This is not perfect but will work for our simulation purposes
 		writeable_arm_props.RotaryProps().EncoderToRS_Ratio=robot_props->GetFRC2019RobotProps().ArmToGearRatio;
 		m_Potentiometer.Initialize(&writeable_arm_props);
+		#endif
 	}
-	Tank_Drive_Control_Interface *tank_interface=m_pTankRobotControl;
-	tank_interface->Initialize(props);
+	//Note: Initialize may be called multiple times so we'll only set this stuff up on first run
+	if (!m_FirstRun)
+	{
+		m_FirstRun = true;
+		//For now don't manage this here
+		//SmartDashboard::PutBoolean("Test_Auton", false);
+		//Ensure we have this
+		SmartDashboard::PutBoolean("SafetyLock_Arm",false);
+
+		//This one one must also be called for the lists that are specific to the robot
+		RobotControlCommon_Initialize(robot_props->Get_ControlAssignmentProps());
+		//This may return NULL for systems that do not support it
+		//m_RoboRIO_Accelerometer = CreateBuiltInAccelerometer();
+		m_Compressor = CreateCompressor();
+		ResetPos(); //must be called after compressor is created
+		#ifdef __EnableRobotArmDisable__
+		//TODO change to reflect all pots that need safety
+		for (size_t i=0;i<1;i++)
+		{
+			const char * const Prefix=csz_FRC2019_Robot_SpeedControllerDevices_Enum[i];
+			string ContructedName;
+			ContructedName=Prefix;
+			ContructedName[0]-=32; //Make first letter uppercase
+			ContructedName+="Disable";
+			#ifdef Robot_TesterCode
+			const bool DisableDefault=false;
+			#else
+			const bool DisableDefault=true;
+			#endif
+			SmartDashboard::PutBoolean(ContructedName.c_str(),DisableDefault);
+		}
+		#endif
+	}
 }
 
 void FRC2019_Robot_Control::Robot_Control_TimeChange(double dTime_s)
 {
+	#ifdef _Win32
 	m_Potentiometer.SetTimeDelta(dTime_s);
+	#endif
+	//depreciated once we had smart dashboard
 	//display voltages
-	DOUT2("l=%f r=%f a=%f r=%f D%dC%dR%d\n",m_TankRobotControl.GetLeftVoltage(),m_TankRobotControl.GetRightVoltage(),m_ArmVoltage,m_RollerVoltage,
-		m_Deployment,m_Claw,m_Rist
-		);
-	SmartDashboard::PutNumber("ArmVoltage",m_ArmVoltage);
-	SmartDashboard::PutNumber("RollerVoltage",m_RollerVoltage);
+	//DOUT2("l=%f r=%f a=%f r=%f D%dC%dR%d\n",m_TankRobotControl.GetLeftVoltage(),m_TankRobotControl.GetRightVoltage(),m_ArmVoltage,m_RollerVoltage,
+	//	m_Deployment,m_Claw,m_Rist
+	//	);
+	//These are no longer placed here
+	//SmartDashboard::PutNumber("ArmVoltage",m_ArmVoltage);
+	//SmartDashboard::PutNumber("RollerVoltage",m_RollerVoltage);
 }
-
-//const double c_Arm_DeadZone=0.150;  //was 0.085 for out off
-const double c_Arm_DeadZone=0.085;   //This has better results
-const double c_Arm_Range=1.0-c_Arm_DeadZone;
 
 //void Robot_Control::UpdateVoltage(size_t index,double Voltage)
 //{
@@ -553,16 +634,21 @@ double FRC2019_Robot_Control::GetRotaryCurrentPorV(size_t index)
 	{
 		case FRC2019_Robot::eArm:
 		{
-			const FRC2019_Robot_Props &props=m_RobotProps.GetFRC2019RobotProps();
-			const double c_GearToArmRatio=1.0/props.ArmToGearRatio;
-			//result=(m_Potentiometer.GetDistance() * m_RobotProps.GetArmProps().GetRotaryProps().EncoderToRS_Ratio) + 0.0;
-			//no conversion needed in simulation
+			#ifndef _Win32
+			result = 0.0;
+			//TODO port from curivator
+			#else
 			result=(m_Potentiometer.GetPotentiometerCurrentPosition()) + 0.0;
-
-			//result = m_KalFilter_Arm(result);  //apply the Kalman filter
-			SmartDashboard::PutNumber("ArmAngle",RAD_2_DEG(result*c_GearToArmRatio));
-			const double height= (sin(result*c_GearToArmRatio)*props.ArmLength)+props.GearHeightOffset;
-			SmartDashboard::PutNumber("Height",height*3.2808399);
+			//Now to normalize it
+			const Ship_1D_Props &shipprops = m_RobotProps.GetArmProps().GetShip_1D_Props();
+			const double NormalizedResult = (result - shipprops.MinRange) / (shipprops.MaxRange - shipprops.MinRange);
+			const char * const Prefix = csz_FRC2019_Robot_SpeedControllerDevices_Enum[index];
+			std::string ContructedName;
+			ContructedName = Prefix, ContructedName += "_Raw";
+			SmartDashboard::PutNumber(ContructedName.c_str(), result);  //this one is a bit different as it is the selected units we use
+			ContructedName = Prefix, ContructedName += "Pot_Raw";
+			SmartDashboard::PutNumber(ContructedName.c_str(), NormalizedResult);
+			#endif
 		}
 		break;
 	}

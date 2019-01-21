@@ -35,7 +35,7 @@ class COMMON_API Control_Assignment_Properties
 	private:
 		Controls_1C m_Victors,m_Servos,m_Relays,m_Digital_Inputs,m_Analog_Inputs;
 		Controls_2C m_Double_Solenoids,m_Encoders;
-		size_t m_Compressor_Relay,m_Compressor_Limit;
+		size_t m_Compressor_Relay=-1,m_Compressor_Limit=-1;
 };
 
 
@@ -380,14 +380,7 @@ class COMMON_API RobotControlCommon
 		__inline int Analog_GetAverageValue(size_t index) {return LUT_VALID(m_AnalogInputLUT)?(int)m_AnalogInputs[m_AnalogInputLUT[index]]->GetAverageValue():0;}
 
 		void TranslateToRelay(size_t index,double Voltage);
-		__inline Compressor *CreateCompressor()
-		{
-			#ifdef _Win32
-			return new Compressor((uint32_t)m_Props.GetCompressorLimit(), (uint32_t)m_Props.GetCompressorRelay());
-			#else
-			return new Compressor(0);  //This is now the PCM node ID
-			#endif
-		}
+		Compressor *CreateCompressor();
 		__inline void DestroyCompressor(Compressor *instance) {delete instance;}
 
 		__inline Accelerometer *CreateBuiltInAccelerometer()

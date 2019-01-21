@@ -24,6 +24,16 @@
 #ifndef _Win32
 #include <frc/WPILib.h>
 #include "../Common/InOut_Interface.h"
+#else
+#include "../Common/Ship_1D.h"
+#include "../Common/Ship.h"
+#include "../Common/AI_Base_Controller.h"
+#include "../Common/Vehicle_Drive.h"
+#include "../Common/PIDController.h"
+#include "../Common/Poly.h"
+#include "../Common/Robot_Control_Interface.h"
+#include "../Common/Rotary_System.h"
+#include "../Common/Calibration_Testing.h"
 #endif
 #include "../Common/Debug.h"
 #include "../Common/Robot_Control_Common.h"
@@ -856,7 +866,7 @@ void Tank_Robot_Properties::LoadFromScript(Scripting::Script& script)
  /*														Tank_Robot_Control															*/
 /***********************************************************************************************************************************/
 
-#if defined Robot_TesterCode && !defined __Tank_TestControlAssignments__
+#if defined _Win32 && !defined __Tank_TestControlAssignments__
 Tank_Robot_Control::Tank_Robot_Control(bool UseSafety) : m_LeftVoltage(0.0),m_RightVoltage(0.0),m_DisplayVoltage(true)
 {
 }
@@ -903,7 +913,7 @@ void Tank_Robot_Control::Tank_Drive_Control_TimeChange(double dTime_s)
 	if (m_DisplayVoltage)
 	{
 		//display voltages
-		DOUT2("l=%f r=%f\n",m_LeftVoltage,m_RightVoltage);
+		//DOUT2("l=%f r=%f\n",m_LeftVoltage,m_RightVoltage);
 	}
 	m_dTime_s=dTime_s;
 }
@@ -1043,7 +1053,7 @@ void Tank_Robot_Control::Initialize(const Entity_Properties *props)
 	m_RobotMaxSpeed=robot_props->GetEngagedMaxSpeed();
 	//This will copy all the props
 	m_TankRobotProps=robot_props->GetTankRobotProps();
-	#ifdef Robot_TesterCode
+	#ifdef _Win32
 	m_ShipProps=robot_props->GetShipProps();
 	#endif
 	//Note: These reversed encoder properties require reboot of cRIO
@@ -1174,7 +1184,7 @@ void Tank_Robot_Control::UpdateLeftRightVoltage(double LeftVoltage,double RightV
 void Tank_Robot_Control::Tank_Drive_Control_TimeChange(double dTime_s)
 {
 	m_dTime_s=dTime_s;
-	#ifdef Robot_TesterCode
+	#ifdef _Win32
 	float LeftVoltage,RightVoltage;
 	m_RobotDrive->GetLeftRightMotorOutputs(LeftVoltage,RightVoltage);
 	double velocity= LeftVoltage * m_ShipProps.MAX_SPEED;

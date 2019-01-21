@@ -316,6 +316,22 @@ void RobotControlCommon::TranslateToRelay(size_t index,double Voltage)
 	}
 }
 
+Compressor *RobotControlCommon::CreateCompressor()
+{
+	Compressor *ret = nullptr;
+	//Don't create the compressor until we ask for it in the lua
+	if (m_Props.GetCompressorLimit() != -1)
+	{
+		#ifdef _Win32
+		ret=new Compressor((uint32_t)m_Props.GetCompressorLimit(), (uint32_t)m_Props.GetCompressorRelay());
+		#else
+		ret=new Compressor(0);  //This is now the PCM node ID
+		#endif
+	}
+	return ret;
+}
+
+
 #ifdef _Win32
   /***********************************************************************************************************************************/
  /*																Encoder2															*/

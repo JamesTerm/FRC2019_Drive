@@ -14,7 +14,7 @@ class COMMON_API Potentiometer_Tester : public Ship_1D
 	private:
 		double m_Time_s;
 		Ship_1D_Properties m_PotentiometerProps;
-		GG_Framework::Base::EventMap m_DummyMap;
+		Framework::Base::EventMap m_DummyMap;
 		bool m_Bypass;  //used for stress test
 };
 
@@ -35,9 +35,9 @@ class COMMON_API Potentiometer_Tester2 : public Ship_1D
 		void SimulateOpposingForce(double Voltage);
 		double m_Time_s;
 		Ship_1D_Properties m_PotentiometerProps;
-		GG_Framework::Base::EventMap m_DummyMap;
+		Framework::Base::EventMap m_DummyMap;
 		bool m_SimulateOpposingForce;  //used for stress test
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef Ship_1D __super;
 		#endif
 
@@ -61,11 +61,11 @@ class COMMON_API Encoder_Simulator : public Ship_1D
 	private:
 		double m_Time_s;
 		Ship_1D_Properties m_EncoderProps;
-		GG_Framework::Base::EventMap m_DummyMap;
+		Framework::Base::EventMap m_DummyMap;
 		LatencyFilter m_Latency;
 		double m_EncoderScalar; //used to implement reverse
 		bool m_GetEncoderFirstCall;  //allows GetEncoderVelocity to know when a new set of calls occur within a time slice
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef Ship_1D __super;
 		#endif
 };
@@ -99,7 +99,7 @@ class COMMON_API EncoderSimulation_Properties
 {
 	public:
 		EncoderSimulation_Properties();
-		virtual void LoadFromScript(GG_Framework::Logic::Scripting::Script& script);
+		virtual void LoadFromScript(Framework::Scripting::Script& script);
 		const EncoderSimulation_Props &GetEncoderSimulationProps() const {return m_EncoderSimulation_Props;}
 		//Get and Set the properties
 		EncoderSimulation_Props &EncoderSimulationProps() {return m_EncoderSimulation_Props;}
@@ -118,8 +118,10 @@ class COMMON_API Drive_Train_Characteristics
 		__inline double GetAmp_To_Torque_nm(double Amps) const;
 		__inline double INV_GetVel_To_Torque_nm(double Vel_rps) const;  //depreciated
 		__inline double GetVel_To_Torque_nm(double motor_Vel_rps) const;
+		__inline double GetTorque_To_Vel_nm_V1(double motor_Vel_rps) const;  //depreciated
 
 		__inline double GetWheelTorque(double Torque) const;
+		__inline double INV_GetWheelTorque(double Torque) const; //depreciated
 		__inline double GetWheelStallTorque() const {return m_Props.motor.Stall_Torque_NM / m_Props.GearReduction * m_Props.DriveTrainEfficiency;}
 
 		__inline double GetTorqueAtWheel(double Torque) const;
@@ -131,16 +133,18 @@ class COMMON_API Drive_Train_Characteristics
 		__inline double GetWheelAngular_RPS(double wheel_RPS) const;
 		__inline double GetWheelAngular_LinearVelocity(double LinearVelocity) const;  //accurate as long as there is no skid
 		__inline double GetMotorRPS_Angular(double wheel_AngularVelocity) const;
+		__inline double INV_GetMotorRPS_Angular(double wheel_AngularVelocity) const; //depreciated
 		__inline double GetTorqueFromLinearVelocity(double LinearVelocity) const;
 		__inline double GetWheelTorqueFromVoltage(double Voltage) const;
+		__inline double GetTorqueFromVoltage_V1(double Voltage) const; //depreciated
 		__inline double GetTorqueFromVoltage(double Voltage) const;
-		__inline double INV_GetTorqueFromVelocity(double AngularVelocity) const;  //depreciated
+		__inline double INV_GetTorqueFromVelocity(double wheel_AngularVelocity) const;  //depreciated
 		__inline double GetTorqueFromVelocity(double wheel_AngularVelocity) const;
 
 		__inline double GetMaxTraction() const {return m_Props.PayloadMass*m_Props.COF_Efficiency;}
 		__inline double GetMaxDriveForce() const {return GetWheelStallTorque()/m_Props.DriveWheelRadius*2.0;}
 		__inline double GetCurrentDriveForce(double WheelTorque) const {return WheelTorque/m_Props.DriveWheelRadius*2.0;}
-		__inline double GetMaxPushingForce() const {	return std::min(GetMaxTraction()*9.80665,GetMaxDriveForce());}
+		__inline double GetMaxPushingForce() const;
 
 		const EncoderSimulation_Props &GetDriveTrainProps() const {return m_Props;}
 		void SetGearReduction(double NewGearing) {m_Props.GearReduction=NewGearing;}
@@ -209,7 +213,7 @@ protected:
 	double m_PreviousWheelVelocity;
 	size_t m_EncoderKind;
 private:
-		#ifndef Robot_TesterCode
+		#ifndef _Win32
 		typedef Encoder_Simulator2 __super;
 		#endif
 
@@ -231,7 +235,7 @@ protected:
 private:
 	std::queue<double> m_Slack;  //when going down this will grow to x frames, and going up with shrink... when not moving it will shrink to nothing
 	double m_SlackedValue; // ensure the pop of the slack only happens in the time change
-	#ifndef Robot_TesterCode
+	#ifndef _Win32
 	typedef Encoder_Simulator2 __super;
 	#endif
 };

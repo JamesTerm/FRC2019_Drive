@@ -43,7 +43,12 @@ class RobotTester_Internal
 private:
 	bool m_IsStreaming=false;
 	std::future<void> m_TaskState;
+	#if 0
+	//keep around for diagnostics //taking away control stress
 	FRC_2019_Control m_Control;
+	#else
+	FRC2019_Robot_Control m_Control;
+	#endif
 	FRC2019_Robot_Properties m_RobotProps;
 	FRC2019_Robot *m_pRobot=nullptr;
 	//Framework::UI::JoyStick_Binder m_JoyBinder;

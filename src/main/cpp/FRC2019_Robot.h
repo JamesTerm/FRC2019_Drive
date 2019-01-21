@@ -43,7 +43,7 @@ class FRC2019_Robot_Properties : public Tank_Robot_Properties
 		FRC2019_Robot_Properties();
 		virtual void LoadFromScript(Scripting::Script& script);
 		
-		const Rotary_Properties &GetArmProps() const {return m_ArmProps;}
+		const Rotary_Pot_Properties &GetArmProps() const {return m_ArmProps;}
 		const Rotary_Properties &GetClawProps() const {return m_ClawProps;}
 		const FRC2019_Robot_Props &GetFRC2019RobotProps() const {return m_FRC2019RobotProps;}
 		FRC2019_Robot_Props &GetFRC2019RobotProps_rw() { return m_FRC2019RobotProps; }
@@ -53,7 +53,8 @@ class FRC2019_Robot_Properties : public Tank_Robot_Properties
 		typedef Tank_Robot_Properties __super;
 		#endif
 
-		Rotary_Properties m_ArmProps,m_ClawProps;
+		Rotary_Pot_Properties m_ArmProps;
+		Rotary_Properties m_ClawProps;
 		FRC2019_Robot_Props m_FRC2019RobotProps;
 
 		class ControlEvents : public LUA_Controls_Properties_Interface
@@ -65,10 +66,17 @@ class FRC2019_Robot_Properties : public Tank_Robot_Properties
 		LUA_Controls_Properties m_RobotControls;
 
 };
+
+
+const char * const csz_FRC2019_Robot_SpeedControllerDevices_Enum[] =
+{
+	"arm","roller"
+};
+
 //Note: rotary systems share the same index as their speed controller counterpart
 const char * const csz_FRC2019_Robot_AnalogInputs_Enum[] =
 {
-	"arm_potentiometer"
+	"arm_pot"
 };
 
 ///This is a specific robot that is a robot tank and is composed of an arm, it provides addition methods to control the arm, and applies updates to
@@ -84,9 +92,21 @@ class FRC2019_Robot : public Tank_Robot
 		};
 		enum SpeedControllerDevices
 		{
-			eArm,
-			eRollers
+			eArm,eRoller
 		};
+		static SpeedControllerDevices GetSpeedControllerDevices_Enum(const char *value)
+		{
+			return Enum_GetValue<SpeedControllerDevices>(value, csz_FRC2019_Robot_SpeedControllerDevices_Enum, _countof(csz_FRC2019_Robot_SpeedControllerDevices_Enum));
+		}
+		enum AnalogInputs
+		{
+			eArmPot
+		};
+		static AnalogInputs GetAnalogInputs_Enum(const char *value)
+		{
+			return Enum_GetValue<AnalogInputs>(value, csz_FRC2019_Robot_AnalogInputs_Enum, _countof(csz_FRC2019_Robot_AnalogInputs_Enum));
+		}
+
 
 		FRC2019_Robot(const char EntityName[],FRC2019_Control_Interface *robot_control,bool UseEncoders=false);
 		IEvent::HandlerList ehl;
@@ -183,15 +203,20 @@ namespace FRC2019_Goals
 }
 
 //TODO enable this
-#if 0
+#if 1
 ///This class is a dummy class to use for simulation only.  It does however go through the conversion process, so it is useful to monitor the values
 ///are correct
-class FRC2019_Robot_Control : public FRC2019_Control_Interface
+class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Control_Interface
 {
 	public:
-		FRC2019_Robot_Control();
-		//This is only needed for simulation
+		FRC2019_Robot_Control(bool UseSafety = true);
+		virtual ~FRC2019_Robot_Control();
+		//This is called per enabled session to enable (on not) things dynamically (e.g. compressor)
+		void ResetPos();
+		FRC2019_Control_Interface &AsControlInterface() { return *this; }
+		const FRC2019_Robot_Properties &GetRobotProps() const { return m_RobotProps; }
 	protected: //from Robot_Control_Interface
+		virtual void UpdateVoltage(size_t index, double Voltage);
 		virtual void CloseSolenoid(size_t index,bool Close);
 		virtual void OpenSolenoid(size_t index,bool Open) {CloseSolenoid(index,!Open);}
 	protected: //from Tank_Drive_Control_Interface
@@ -202,26 +227,54 @@ class FRC2019_Robot_Control : public FRC2019_Control_Interface
 		virtual void Tank_Drive_Control_TimeChange(double dTime_s) {m_pTankRobotControl->Tank_Drive_Control_TimeChange(dTime_s);}
 	protected: //from Rotary Interface
 		virtual void Reset_Rotary(size_t index=0); 
-		virtual void UpdateRotaryVoltage(size_t index,double Voltage);
 		//pacify this by returning its current value
 		virtual double GetRotaryCurrentPorV(size_t index);
-		virtual void CloseRist(bool Close) {CloseSolenoid(FRC2019_Robot::eRist,Close);}
-		virtual void OpenRist(bool Close) {CloseSolenoid(FRC2019_Robot::eRist,!Close);}
+		virtual void UpdateRotaryVoltage(size_t index, double Voltage) { UpdateVoltage(index, Voltage); }
+
+		//These should no longer be necessary
+		//virtual void CloseRist(bool Close) {CloseSolenoid(FRC2019_Robot::eRist,Close);}
+		//virtual void OpenRist(bool Close) {CloseSolenoid(FRC2019_Robot::eRist,!Close);}
+		protected: //from RobotControlCommon
+			virtual size_t RobotControlCommon_Get_Victor_EnumValue(const char *name) const
+			{	return FRC2019_Robot::GetSpeedControllerDevices_Enum(name);
+			}
+			virtual size_t RobotControlCommon_Get_DigitalInput_EnumValue(const char *name) const
+			{  //return FRC2019_Robot::GetBoolSensorDevices_Enum(name);
+				return 0;
+			}
+			virtual size_t RobotControlCommon_Get_AnalogInput_EnumValue(const char *name) const
+			{	return FRC2019_Robot::GetAnalogInputs_Enum(name);
+			}
+			virtual size_t RobotControlCommon_Get_DoubleSolenoid_EnumValue(const char *name) const
+			{	//return Curivator_Robot::GetSolenoidDevices_Enum(name);
+				return 0;
+			}
+
 	protected: //from FRC2019_Control_Interface
 		//Will reset various members as needed (e.g. Kalman filters)
 		virtual void Robot_Control_TimeChange(double dTime_s);
 		virtual void Initialize(const Entity_Properties *props);
 
 	protected:
-		Tank_Robot_Control m_TankRobotControl;
 		FRC2019_Robot_Properties m_RobotProps;  //saves a copy of all the properties
+		Tank_Robot_Control m_TankRobotControl;
 		Tank_Drive_Control_Interface * const m_pTankRobotControl;  //This allows access to protected members
+		frc::Compressor *m_Compressor=nullptr;
+		//frc::Accelerometer *m_RoboRIO_Accelerometer=nullptr;   <---for reference
+		//Base::EventMap* m_EventMap=nullptr;  <---TODO see if we need this
+
 		double m_ArmMaxSpeed;
-		Potentiometer_Tester3 m_Potentiometer; //simulate a real potentiometer for calibration testing
-		KalmanFilter m_KalFilter_Arm;
-		//cache voltage values for display
-		double m_ArmVoltage,m_RollerVoltage;
+		//cache voltage values for display   -Depreciated
+		//double m_ArmVoltage,m_RollerVoltage;
 		bool m_Deployment,m_Claw,m_Rist;
+	private:
+		//Note: these may be arrayed if we have more pots
+		KalmanFilter m_KalFilter_Arm;
+		Averager<double, 5> m_Averager;
+		#ifdef _Win32
+		Potentiometer_Tester3 m_Potentiometer; //simulate a real potentiometer for calibration testing
+		#endif
+		bool m_FirstRun = false;
 };
 #endif
 

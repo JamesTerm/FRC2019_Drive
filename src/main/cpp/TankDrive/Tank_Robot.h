@@ -198,8 +198,7 @@ class DRIVE_API Tank_Robot_Properties : public UI_Ship_Properties
 };
 
 #undef __Tank_TestControlAssignments__
-#if defined Robot_TesterCode && !defined __Tank_TestControlAssignments__
-#include "../Common/Calibration_Testing.h"
+#if defined _Win32 && !defined __Tank_TestControlAssignments__
 
 class DRIVE_API Tank_Robot_Control : public Tank_Drive_Control_Interface
 {
@@ -273,7 +272,7 @@ class DRIVE_API Tank_Robot_Control :  public frc::RobotControlCommon, public Tan
 		double m_EncoderLeftScalar, m_EncoderRightScalar;
 		#endif
 		Tank_Robot_Props m_TankRobotProps; //cached in the Initialize from specific robot
-		#ifdef Robot_TesterCode
+		#ifdef _Win32
 		Ship_Props m_ShipProps; //used to simulate encoder
 		#endif
 	private:
