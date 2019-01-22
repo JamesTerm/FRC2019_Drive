@@ -90,7 +90,7 @@ void CommandLineInterface()
 		{
 			if (!_strnicmp(input_line, "test", 4))
 			{
-				_robot_tester.Test();
+				_robot_tester.Test(atoi(str_1));
 			}
 			else if (!_strnicmp(input_line, "cls", 3))
 				cls();

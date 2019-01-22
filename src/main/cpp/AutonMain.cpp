@@ -170,6 +170,18 @@ public:
 		if (m_pRobot)
 			m_pRobot->TimeChange(dTime_s);
 	}
+
+	void Test(const char *test_command)
+	{
+		if (strcmp(test_command, "hook_samples") == 0)
+		{
+			m_pRobot->SetTestAutonCallbackGoal(
+			[](FRC2019_Robot *Robot)
+			{
+				return FRC2019_Goals::Get_Sample_Goal(Robot);
+			});
+		}
+	}
 };
 
 void AutonMain::AutonMain_init(const char *RobotLua)
@@ -180,4 +192,9 @@ void AutonMain::AutonMain_init(const char *RobotLua)
 void AutonMain::Update(double dTime_s)
 {
 	m_p_AutonMain->Update(dTime_s);
+}
+
+void AutonMain::Test(const char *test_command)
+{
+	m_p_AutonMain->Test(test_command);
 }

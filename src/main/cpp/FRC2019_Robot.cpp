@@ -297,6 +297,11 @@ void FRC2019_Robot::StopAuton(bool isOn)
 	//LockPosition(false);
 }
 
+Goal *TestAutonDefaultGoalCallback(FRC2019_Robot *Robot)
+{ 
+	return FRC2019_Goals::Get_FRC2019_Autonomous(Robot);
+}
+
 //No longer are these restricted to simulation
 void FRC2019_Robot::TestAutonomous()
 {
@@ -309,10 +314,13 @@ void FRC2019_Robot::TestAutonomous()
 	{
 		Goal *goal = NULL;
 		//Note: we may change how this gets implemented
-		#if 1
+		#if 0
 		goal = FRC2019_Goals::Get_FRC2019_Autonomous(this);
 		#else
-		goal = FRC2019_Goals::Get_Sample_Goal(this);
+		if (!m_TestAutonGoalCallback)
+			m_TestAutonGoalCallback = TestAutonDefaultGoalCallback;
+		//goal = FRC2019_Goals::Get_Sample_Goal(this);
+		goal = m_TestAutonGoalCallback(this);
 		#endif
 		if (goal)
 			goal->Activate(); //now with the goal(s) loaded activate it

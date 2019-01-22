@@ -6,7 +6,7 @@ class RobotTester
 {
 public:
 	void RobotTester_init(void);  // allows the declaration to remain here
-	void Test();
+	void Test(int test);
 private:
 	std::shared_ptr<RobotTester_Internal> m_p_RobotTester; //a pimpl idiom (using shared_ptr allows declaration to be hidden from destructor)
 };

@@ -172,6 +172,8 @@ class FRC2019_Robot : public Tank_Robot
 		//Accessors needed for setting goals
 		Robot_Arm &GetArm() {return m_Arm;}
 		Robot_Claw &GetClaw() {return m_Claw;}
+		//Allow external code to switch the default goal
+		void SetTestAutonCallbackGoal(std::function<Goal *(FRC2019_Robot *Robot)> callback) { m_TestAutonGoalCallback = callback; }
 	protected:
 		virtual void BindAdditionalEventControls(bool Bind);
 		virtual void BindAdditionalUIControls(bool Bind, void *joy, void *key);
@@ -184,7 +186,7 @@ class FRC2019_Robot : public Tank_Robot
 		Robot_Arm m_Arm;
 		Robot_Claw m_Claw;
 		bool m_VoltageOverride;  //when true will kill voltage
-
+		std::function<Goal *(FRC2019_Robot *Robot)> m_TestAutonGoalCallback=nullptr;  //pointer to function to obtain goal to use for TestAutonomous to use
 		//No longer are these restricted to simulation
 		void TestAutonomous();
 		void StopAuton(bool isOn);

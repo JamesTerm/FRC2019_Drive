@@ -38,6 +38,13 @@ public:
 	{
 		StopStreaming();
 	}
+
+	//Give command ability to switch to different set of goals
+	void HookSampleGoals()
+	{
+		m_Robot.Test("hook_samples");
+	}
+
 	//Keeping around to show benefit of lambda 
 	//void operator() (const void*); //TODO work out how to call this directly
 };
@@ -124,10 +131,12 @@ void RobotTester::RobotTester_init()
 
 //using namespace Framework::Base;
 
-void RobotTester::Test()
+void RobotTester::Test(int test)
 {
 	//time_type Test = time_type::get_current_time();
 	m_p_RobotTester->InitRobot();
+	if (test == 1)
+		m_p_RobotTester->HookSampleGoals();
 	//might as well start it
 	m_p_RobotTester->StartStreaming();
 }
