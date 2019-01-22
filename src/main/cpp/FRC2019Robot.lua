@@ -31,7 +31,7 @@ MainRobot = {
 		--by default module is 1, so only really need it for 2
 		victor =
 		{
-			id_1 = { name= "right_drive_1", channel=1, module=1}, 
+			id_1 = { name= "right_drive_1", channel=1}, 
 			id_2 = { name= "right_drive_2", channel=2}, 
 			id_3 = { name= "right_drive_3", channel=3}, 
 			id_4 = { name="left_drive_1", channel=4},

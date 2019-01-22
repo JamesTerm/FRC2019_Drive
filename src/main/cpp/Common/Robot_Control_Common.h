@@ -1,4 +1,6 @@
 #pragma once
+#include <functional>
+
 namespace frc
 {
 //This parses out the LUA into two table for each control element... its population properties and LUT
@@ -329,6 +331,7 @@ class COMMON_API RobotControlCommon
 {
 	public:
 		typedef std::vector<size_t> Controls_LUT;
+		RobotControlCommon();
 		virtual ~RobotControlCommon();
 
 		//victor methods
@@ -389,6 +392,8 @@ class COMMON_API RobotControlCommon
 			return new BuiltInAccelerometer();
 		}
 		__inline void DestroyBuiltInAccelerometer(Accelerometer *instance) {delete instance;}
+		//Give ability to have controls be created externally
+		void SetExternalVictorHook(std::function<void *(size_t, size_t, const char *)> callback) { m_ExternalVictor = callback; }
 	protected:
 		virtual void RobotControlCommon_Initialize(const Control_Assignment_Properties &props);
 		//Override by derived class
@@ -407,5 +412,6 @@ class COMMON_API RobotControlCommon
 		std::vector<Encoder2 *> m_Encoders;
 
 		Controls_LUT m_VictorLUT,m_ServoLUT,m_RelayLUT,m_DigitalInputLUT,m_AnalogInputLUT,m_DoubleSolenoidLUT,m_EncoderLUT;
+		std::function<void *(size_t,size_t,const char *)> m_ExternalVictor;
 };
 }

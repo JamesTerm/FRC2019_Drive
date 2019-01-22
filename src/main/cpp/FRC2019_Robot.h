@@ -215,6 +215,13 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		void ResetPos();
 		FRC2019_Control_Interface &AsControlInterface() { return *this; }
 		const FRC2019_Robot_Properties &GetRobotProps() const { return m_RobotProps; }
+		//Give access to set hooks in the drive as well
+		void SetDriveExternalVictorHook(std::function<void *(size_t, size_t, const char *)> callback) 
+		{
+			#if !defined _Win32 || defined __Tank_TestControlAssignments__
+			m_TankRobotControl.SetExternalVictorHook(callback);
+			#endif
+		}
 	protected: //from Robot_Control_Interface
 		virtual void UpdateVoltage(size_t index, double Voltage);
 		virtual void CloseSolenoid(size_t index,bool Close);

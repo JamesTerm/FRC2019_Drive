@@ -195,6 +195,14 @@ void Control_Assignment_Properties::LoadFromScript(Scripting::Script& script)
   /***********************************************************************************************************************************/
  /*														RobotControlCommon															*/
 /***********************************************************************************************************************************/
+void *DefaultExternalControlHook(size_t Module, size_t Channel, const char *Name)
+{
+	return nullptr;
+}
+RobotControlCommon::RobotControlCommon()
+{
+	m_ExternalVictor = DefaultExternalControlHook;
+}
 
 RobotControlCommon::~RobotControlCommon()
 {
@@ -203,7 +211,8 @@ RobotControlCommon::~RobotControlCommon()
 
 template <class T>
 __inline void Initialize_1C_LUT(const Control_Assignment_Properties::Controls_1C &control_props,std::vector<T *> &controls,
-								RobotControlCommon::Controls_LUT &control_LUT,RobotControlCommon *instance,size_t (RobotControlCommon::*delegate)(const char *name) const)
+	RobotControlCommon::Controls_LUT &control_LUT,RobotControlCommon *instance,
+	size_t (RobotControlCommon::*delegate)(const char *name) const, std::function<void *(size_t, size_t, const char *)>External)
 {
 	//typedef Control_Assignment_Properties::Controls_1C Controls_1C;
 	typedef Control_Assignment_Properties::Control_Element_1C Control_Element_1C;
@@ -215,14 +224,22 @@ __inline void Initialize_1C_LUT(const Control_Assignment_Properties::Controls_1C
 		//The name may not exist in this list (it may be a name specific to the robot)... in which case there is no work to do
 		if (enumIndex==(size_t)-1)
 			continue;
-		//create the new Control
-		#ifdef _Win32
-		T *NewElement=new T((uint8_t)element.Module,(uint32_t)element.Channel,element.name.c_str());  //adding name for UI
-		#else
-		//quick debug when things are not working
-		printf("new %s as %d\n",element.name.c_str(),element.Channel);
-		T *NewElement=new T(element.Channel);
-		#endif
+		//See if we have an external hook to allocate this control already
+		T *NewElement=(T *)External(element.Module, element.Channel, element.name.c_str());
+		if (NewElement == nullptr)
+		{
+			//create the new Control
+			#ifdef _Win32
+			NewElement = new T((uint8_t)element.Module, (uint32_t)element.Channel, element.name.c_str());  //adding name for UI
+			#else
+			//quick debug when things are not working
+			printf("new %s as %d\n", element.name.c_str(), element.Channel);
+			NewElement = new T(element.Channel);
+			#endif
+		}
+		else
+			printf("external %s as %d\n", element.name.c_str(), element.Channel);  //keep track of things which are external
+
 		const size_t LUT_index=controls.size(); //get size before we add it in
 		//const size_t PopulationIndex=controls.size();  //get the ordinal value before we add it
 		controls.push_back(NewElement);  //add it to our list of victors
@@ -284,17 +301,17 @@ void RobotControlCommon::RobotControlCommon_Initialize(const Control_Assignment_
 	//create control elements and their LUT's
 	//Note: Victors,Servos, and Relays share the PWM slots; therefore they share the same enumeration, and can be used interchangeably in high level code
 	//victors
-	Initialize_1C_LUT<Victor>(props.GetVictors(),m_Victors,m_VictorLUT,this,&RobotControlCommon::RobotControlCommon_Get_Victor_EnumValue);
+	Initialize_1C_LUT<Victor>(props.GetVictors(),m_Victors,m_VictorLUT,this,&RobotControlCommon::RobotControlCommon_Get_Victor_EnumValue, m_ExternalVictor);
 	//servos
-	Initialize_1C_LUT<Servo>(props.GetServos(),m_Servos,m_ServoLUT,this,&RobotControlCommon::RobotControlCommon_Get_Victor_EnumValue);
+	Initialize_1C_LUT<Servo>(props.GetServos(),m_Servos,m_ServoLUT,this,&RobotControlCommon::RobotControlCommon_Get_Victor_EnumValue, DefaultExternalControlHook);
 	//relays
-	Initialize_1C_LUT<Relay>(props.GetRelays(),m_Relays,m_RelayLUT,this,&RobotControlCommon::RobotControlCommon_Get_Victor_EnumValue);
+	Initialize_1C_LUT<Relay>(props.GetRelays(),m_Relays,m_RelayLUT,this,&RobotControlCommon::RobotControlCommon_Get_Victor_EnumValue, DefaultExternalControlHook);
 	//double solenoids
 	Initialize_2C_LUT<DoubleSolenoid>(props.GetDoubleSolenoids(),m_DoubleSolenoids,m_DoubleSolenoidLUT,this,&RobotControlCommon::RobotControlCommon_Get_DoubleSolenoid_EnumValue);
 	//digital inputs
-	Initialize_1C_LUT<DigitalInput>(props.GetDigitalInputs(),m_DigitalInputs,m_DigitalInputLUT,this,&RobotControlCommon::RobotControlCommon_Get_DigitalInput_EnumValue);
+	Initialize_1C_LUT<DigitalInput>(props.GetDigitalInputs(),m_DigitalInputs,m_DigitalInputLUT,this,&RobotControlCommon::RobotControlCommon_Get_DigitalInput_EnumValue, DefaultExternalControlHook);
 	//analog inputs
-	Initialize_1C_LUT<AnalogInput>(props.GetAnalogInputs(),m_AnalogInputs,m_AnalogInputLUT,this,&RobotControlCommon::RobotControlCommon_Get_AnalogInput_EnumValue);
+	Initialize_1C_LUT<AnalogInput>(props.GetAnalogInputs(),m_AnalogInputs,m_AnalogInputLUT,this,&RobotControlCommon::RobotControlCommon_Get_AnalogInput_EnumValue, DefaultExternalControlHook);
 	//encoders
 	Initialize_2C_LUT<Encoder2>(props.GetEncoders(),m_Encoders,m_EncoderLUT,this,&RobotControlCommon::RobotControlCommon_Get_Victor_EnumValue);
 }
