@@ -31,6 +31,10 @@
     <ClCompile Include="..\..\main\cpp\Components\TalonSRXItem.cpp" />
     <ClCompile Include="..\..\main\cpp\Components\VictorSPItem.cpp" />
     <ClCompile Include="..\..\main\cpp\Components\VictorSPXItem.cpp" />
+    <ClCompile Include="..\..\main\cpp\Config\ActiveCollection.cpp" />
+    <ClCompile Include="..\..\main\cpp\Config\Config.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main\cpp\Components\DigitalInputItem.h" />
@@ -44,6 +48,9 @@
     <ClInclude Include="..\..\main\cpp\Components\TalonSRXItem.h" />
     <ClInclude Include="..\..\main\cpp\Components\VictorSPItem.h" />
     <ClInclude Include="..\..\main\cpp\Components\VictorSPXItem.h" />
+    <ClInclude Include="..\..\main\cpp\Config\ActiveCollection.h" />
+    <ClInclude Include="..\..\main\cpp\Config\Config.h" />
+    <ClInclude Include="AHRS.h" />
     <ClInclude Include="ctre\Phoenix.h" />
     <ClInclude Include="frc\WPILib.h" />
   </ItemGroup>

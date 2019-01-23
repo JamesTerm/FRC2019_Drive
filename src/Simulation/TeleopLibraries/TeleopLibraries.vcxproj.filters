@@ -18,6 +18,9 @@
     <Filter Include="Components\Header Files">
       <UniqueIdentifier>{aa61a41b-7597-4e91-841a-e7135731fa5a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Config">
+      <UniqueIdentifier>{07f17dbb-58da-49de-a09c-82697b6dbac0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\main\cpp\Components\DigitalInputItem.cpp">
@@ -40,6 +43,12 @@
     </ClCompile>
     <ClCompile Include="..\..\main\cpp\Components\VictorSPXItem.cpp">
       <Filter>Components\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Config\ActiveCollection.cpp">
+      <Filter>Config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Config\Config.cpp">
+      <Filter>Config</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +89,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ctre\Phoenix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Config\ActiveCollection.h">
+      <Filter>Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Config\Config.h">
+      <Filter>Config</Filter>
+    </ClInclude>
+    <ClInclude Include="AHRS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
