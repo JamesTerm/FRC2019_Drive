@@ -73,18 +73,18 @@ using namespace std;
 
 enum AutonType
 {
-	eDoNothing,
-	eJustMoveForward,
-	eJustRotate,
-	eSimpleMoveRotateSequence,
-	eTestBoxWayPoints,
-	eTurretTracking,
-	eDriveTracking,
-	//autons for 2019
-	eOnePieceAuto,
-	eTwoPieceAuto,
+	eDoNothing,					//0
+	eJustMoveForward,			//1
+	eJustRotate,				//2
+	eSimpleMoveRotateSequence,	//3
+	eTestBoxWayPoints,			//4
+	eTurretTracking,			//5
+	eDriveTracking,				//6
+	//autons for 2019			
+	eOnePieceAuto,				//7
+	eTwoPieceAuto,				//8
 	//end autons
-	eNoAutonTypes
+	eNoAutonTypes				//9
 };
 
 /* GOALS FOR 2019
@@ -983,6 +983,7 @@ SmartDashboard::PutString("GoalMessage","Outtake Cargo util");
 		IntakeHatch(FRC2019_Goals_Impl *parent) : SetUpProps(parent)
 		{
 			m_Status = eInactive;
+			Activate();
 		}
 		virtual void Activate()
 		{
@@ -1000,6 +1001,7 @@ SmartDashboard::PutString("GoalMessage","Outtake Cargo util");
 		IntakeCargo(FRC2019_Goals_Impl *parent) : SetUpProps(parent)
 		{
 			m_Status = eInactive;
+			Activate();
 		}
 		virtual void Activate()
 		{
@@ -1018,14 +1020,18 @@ SmartDashboard::PutString("GoalMessage","Intake Cargo");
 		OuttakeHatch(FRC2019_Goals_Impl *parent) : SetUpProps(parent)
 		{
 			m_Status = eInactive;
+			Activate();
 		}
 		virtual void Activate()
 		{
 			m_Status = eActive;
 			SmartDashboard::PutString("GoalMessage","Outtake Hatch");
+			printf("wait1");
 			AddSubgoal(new Goal_Wait(.5));
 			//AddSubgoal(new OuttakeHatch_util(m_Parent));
-			AddSubgoal(new Goal_Wait(1.0)); //replace with correct goal once implemented
+			printf("wait2");
+			AddSubgoal(new Goal_Wait(4.0)); //replace with correct goal once implemented
+			printf("wait3");
 			AddSubgoal(new Goal_Wait(.5));
 		}
 	};
@@ -1035,11 +1041,13 @@ SmartDashboard::PutString("GoalMessage","Intake Cargo");
 		OuttakeCargo(FRC2019_Goals_Impl *parent) : SetUpProps(parent)
 		{
 			m_Status = eInactive;
-			SmartDashboard::PutString("GoalMessage","Outtake Cargo");
+			Activate();
+			
 		}
 		virtual void Activate()
 		{
 			m_Status = eActive;
+			SmartDashboard::PutString("GoalMessage","Outtake Cargo");
 			AddSubgoal(new Goal_Wait(.5));
 			//AddSubgoal(new OuttakeCargo_util(m_Parent));
 			AddSubgoal(new Goal_Wait(1.0)); //replace with correct goal once implemented
@@ -1059,13 +1067,14 @@ SmartDashboard::PutString("GoalMessage","Intake Cargo");
 	  public:
 		OnePieceAuto(FRC2019_Goals_Impl *parent, Game_Piece gamePiece) : SetUpProps(parent)
 		{
+			printf("constructor\n");
 			m_Status = eInactive;
 			m_gamePiece = gamePiece;
 		}
 		virtual void Activate()
 		{
 			m_Status = eActive;
-
+			printf("activate\n");
 			//TODO goals to get to location
 			if (m_gamePiece == eHatch)
 				AddSubgoal(new OuttakeHatch(m_Parent));
@@ -1154,32 +1163,32 @@ SmartDashboard::PutString("GoalMessage","Intake Cargo");
 		Game_Piece gamePiece2 = eCargo;
 		switch (AutonTest)
 		{
-		case eJustMoveForward:
+		case eJustMoveForward:	//1
 			m_Primer.AddGoal(new MoveForward(this));
 			break;
-		case eJustRotate:
+		case eJustRotate: //2
 			m_Primer.AddGoal(new RotateWithWait(this));
 			break;
-		case eSimpleMoveRotateSequence:
+		case eSimpleMoveRotateSequence: //3
 			m_Primer.AddGoal(new TestMoveRotateSequence(this));
 			break;
-		case eTestBoxWayPoints:
+		case eTestBoxWayPoints: //4
 			m_Primer.AddGoal(GiveRobotSquareWayPointGoal(this));
 			break;
-		case eTurretTracking:
+		case eTurretTracking: //5
 			m_Primer.AddGoal(new TurretTracking(this));
 			break;
-		case eDriveTracking:
+		case eDriveTracking: //6
 			m_Primer.AddGoal(new DriveTracking(this));
 			break;
-		case eOnePieceAuto:
-
+		case eOnePieceAuto: //7
+			printf("test\n");
 			m_Primer.AddGoal(new OnePieceAuto(this, gamePiece));
 			break;
-		case eTwoPieceAuto:
+		case eTwoPieceAuto: //8
 			m_Primer.AddGoal(new TwoPieceAuto(this, gamePiece, gamePiece2));
 			break;
-		case eDoNothing:
+		case eDoNothing: //0
 		case eNoAutonTypes: //grrr windriver and warning 1250
 			break;
 		}
