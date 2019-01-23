@@ -21,6 +21,21 @@
     <Filter Include="Config">
       <UniqueIdentifier>{07f17dbb-58da-49de-a09c-82697b6dbac0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Controls">
+      <UniqueIdentifier>{e7247398-176c-4f40-a058-a208c4e6a774}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controls\Source Files">
+      <UniqueIdentifier>{be12a4fc-b1b4-4c51-bc60-c78a7fda3c71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controls\Header Files">
+      <UniqueIdentifier>{662eb29b-9722-4a2c-9dba-d0173ceef82f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frc">
+      <UniqueIdentifier>{7414c6ee-9d28-49bf-b12f-aad67a0e4ffd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems">
+      <UniqueIdentifier>{5d8b740d-78c6-433d-93d1-9ae0280e6109}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\main\cpp\Components\DigitalInputItem.cpp">
@@ -49,6 +64,30 @@
     </ClCompile>
     <ClCompile Include="..\..\main\cpp\Config\Config.cpp">
       <Filter>Config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Controls\AxisControl.cpp">
+      <Filter>Controls\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Controls\ButtonControl.cpp">
+      <Filter>Controls\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Controls\ControlItem.cpp">
+      <Filter>Controls\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Controls\ToggleButtonControl.cpp">
+      <Filter>Controls\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frc\Joystick.cpp">
+      <Filter>frc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Systems\Drive.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Robot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frc\SampleRobot.cpp">
+      <Filter>frc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -85,9 +124,6 @@
     <ClInclude Include="..\..\main\cpp\Components\VictorSPXItem.h">
       <Filter>Components\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="frc\WPILib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ctre\Phoenix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -99,6 +135,33 @@
     </ClInclude>
     <ClInclude Include="AHRS.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Controls\AxisControl.h">
+      <Filter>Controls\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Controls\ButtonControl.h">
+      <Filter>Controls\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Controls\ControlItem.h">
+      <Filter>Controls\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Controls\ToggleButtonControl.h">
+      <Filter>Controls\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frc\WPILib.h">
+      <Filter>frc</Filter>
+    </ClInclude>
+    <ClInclude Include="frc\Joystick.h">
+      <Filter>frc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Systems\Drive.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Robot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frc\SampleRobot.h">
+      <Filter>frc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

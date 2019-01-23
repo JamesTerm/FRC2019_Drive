@@ -33,8 +33,17 @@
     <ClCompile Include="..\..\main\cpp\Components\VictorSPXItem.cpp" />
     <ClCompile Include="..\..\main\cpp\Config\ActiveCollection.cpp" />
     <ClCompile Include="..\..\main\cpp\Config\Config.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Controls\AxisControl.cpp" />
+    <ClCompile Include="..\..\main\cpp\Controls\ButtonControl.cpp" />
+    <ClCompile Include="..\..\main\cpp\Controls\ControlItem.cpp" />
+    <ClCompile Include="..\..\main\cpp\Controls\ToggleButtonControl.cpp" />
+    <ClCompile Include="..\..\main\cpp\Robot.cpp" />
+    <ClCompile Include="..\..\main\cpp\Systems\Drive.cpp" />
+    <ClCompile Include="frc\Joystick.cpp" />
+    <ClCompile Include="frc\SampleRobot.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main\cpp\Components\DigitalInputItem.h" />
@@ -50,8 +59,16 @@
     <ClInclude Include="..\..\main\cpp\Components\VictorSPXItem.h" />
     <ClInclude Include="..\..\main\cpp\Config\ActiveCollection.h" />
     <ClInclude Include="..\..\main\cpp\Config\Config.h" />
+    <ClInclude Include="..\..\main\cpp\Controls\AxisControl.h" />
+    <ClInclude Include="..\..\main\cpp\Controls\ButtonControl.h" />
+    <ClInclude Include="..\..\main\cpp\Controls\ControlItem.h" />
+    <ClInclude Include="..\..\main\cpp\Controls\ToggleButtonControl.h" />
+    <ClInclude Include="..\..\main\cpp\Robot.h" />
+    <ClInclude Include="..\..\main\cpp\Systems\Drive.h" />
     <ClInclude Include="AHRS.h" />
     <ClInclude Include="ctre\Phoenix.h" />
+    <ClInclude Include="frc\Joystick.h" />
+    <ClInclude Include="frc\SampleRobot.h" />
     <ClInclude Include="frc\WPILib.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

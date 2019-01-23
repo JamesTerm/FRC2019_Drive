@@ -197,3 +197,19 @@ std::string SmartDashboard::GetString(std::string keyName)
 {
 	return m_table->GetString(keyName);
 }
+
+//This is the newer calling interface, but the underlying system doesn't support this, so we can implement it by using try..catch technique
+std::string SmartDashboard::GetString(std::string keyName, std::string defaultValue)
+{
+	std::string ret = defaultValue;
+	try
+	{
+		ret = SmartDashboard::GetString(keyName);
+	}
+	catch (...)
+	{
+		//I may need to prime the pump here
+		SmartDashboard::PutString(keyName, defaultValue);
+	}
+	return ret;
+}
