@@ -81,14 +81,14 @@ class Victor : public Control_1C_Element_UI
 public:
 	Victor(uint8_t moduleNumber, uint32_t channel,const char *name) : Control_1C_Element_UI(moduleNumber,channel,name),
 	  m_ModuleNumber(moduleNumber), m_Channel(channel) {}
-	virtual void Set(float value, uint8_t syncGroup=0) {m_CurrentVoltage=value; display_number(value);}
-	virtual float Get() {return m_CurrentVoltage;}
+	virtual void Set(double value, uint8_t syncGroup=0) {m_CurrentVoltage=value; display_number(value);}
+	virtual double Get() {return m_CurrentVoltage;}
 	virtual void Disable() {}
 	//virtual void PIDWrite(float output);
 private:
 	uint8_t m_ModuleNumber;
 	uint32_t m_Channel;
-	float m_CurrentVoltage;
+	double m_CurrentVoltage;
 };
 
 class Servo : public Control_1C_Element_UI
@@ -119,6 +119,8 @@ class DigitalInput : public Control_1C_Element_UI
 public:
 	DigitalInput(uint8_t moduleNumber, uint32_t channel,const char *name) : Control_1C_Element_UI(moduleNumber,channel,name,1.0),
 		m_ModuleNumber(moduleNumber), m_Channel(channel) {}
+	DigitalInput(uint32_t channel, const char *name="DigitalInput") : Control_1C_Element_UI(0, channel, name, 1.0),
+		m_ModuleNumber(0), m_Channel(channel) {}
 	uint32_t Get() {return (uint32_t)get_number();}
 	uint32_t GetChannel() {return m_Channel;}
 private:
@@ -147,6 +149,11 @@ public:
 	DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel, uint32_t reverseChannel,const char *name) : 
 		Control_2C_Element_UI(moduleNumber,forwardChannel,reverseChannel,name),
 		m_ModuleNumber(moduleNumber),m_forwardChannel(forwardChannel),m_reverseChannel(reverseChannel) {}
+
+	DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel, const char *name="DoubleSolenoid") :
+		Control_2C_Element_UI(0, forwardChannel, reverseChannel, name),
+		m_ModuleNumber(0), m_forwardChannel(forwardChannel), m_reverseChannel(reverseChannel) {}
+
 	virtual void Set(Value value) {m_CurrentValue=value; display_bool(value==kForward);}
 	virtual Value Get() {return m_CurrentValue=get_bool()?kForward:kReverse;}
 private:
