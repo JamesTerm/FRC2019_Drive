@@ -138,6 +138,7 @@ public:
 	AutonMain_Internal(const char *RobotLua)
 	{
 		m_LuaPath = RobotLua;
+		#if 1
 		//Hook in our own victor allocator here
 		m_Control.SetExternalVictorHook(
 		[&](size_t module, size_t Channel, const char *Name)
@@ -155,7 +156,7 @@ public:
 			//printf("Drive: Get External Victor %s[%d,%d]\n", Name, module, Channel);
 			return nullptr;
 		});
-
+		#endif
 		//We can call init now:
 		InitRobot();
 	}

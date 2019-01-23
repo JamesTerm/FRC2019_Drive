@@ -3,6 +3,8 @@
 
 using namespace frc;
 
+//TODO nuke this file
+#if 0
 bool RobotBase::IsEnabled() const
 {
 	return false;
@@ -28,3 +30,4 @@ bool RobotBase::IsTest() const
 {
 	return false;
 }
+#endif

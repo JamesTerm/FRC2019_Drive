@@ -11,21 +11,50 @@ namespace frc {
 	{	std::this_thread::sleep_for(std::chrono::duration<double>(seconds));
 	}
 
+	__inline double GetTime() {
+		using std::chrono::duration;
+		using std::chrono::duration_cast;
+		using std::chrono::system_clock;
+
+		return duration_cast<duration<double>>(system_clock::now().time_since_epoch())
+			.count();
+	}
+
 	class RobotBase {
+	private:
+		enum GameMode
+		{
+			eAuton,
+			eTeleop,
+			eTest
+		};
+		static bool DefaultIsEnabledCallback(void)
+		{	return false;
+		}
+		static int DefaultGameModeCallback(void)
+		{	return RobotBase::eTest;
+		}
+
+		//using std::function<bool()> as SimpleCallbackProto;
+		std::function<bool(void)> m_IsEnabledCallback= DefaultIsEnabledCallback;
+		std::function<int(void)> m_GameModeCallback= DefaultGameModeCallback;
 	public:
+		//Client code set these up
+		void SetIsEnabledCallback(std::function<bool (void)> callback) { m_IsEnabledCallback = callback; }
+		void SetIsGameModeCallback(std::function<int (void)> callback) { m_GameModeCallback = callback; }
 		/**
 		 * Determine if the Robot is currently enabled.
 		 *
 		 * @return True if the Robot is currently enabled by the field controls.
 		 */
-		bool IsEnabled() const;
+		bool IsEnabled() const { return m_IsEnabledCallback(); }
 
 		/**
 		 * Determine if the Robot is currently disabled.
 		 *
 		 * @return True if the Robot is currently disabled by the field controls.
 		 */
-		bool IsDisabled() const;
+		bool IsDisabled() const { return !IsEnabled(); }
 
 		/**
 		 * Determine if the robot is currently in Autonomous mode.
@@ -33,7 +62,7 @@ namespace frc {
 		 * @return True if the robot is currently operating Autonomously as determined
 		 *         by the field controls.
 		 */
-		bool IsAutonomous() const;
+		bool IsAutonomous() const { return m_GameModeCallback() == eAuton; }
 
 		/**
 		 * Determine if the robot is currently in Operator Control mode.
@@ -41,7 +70,7 @@ namespace frc {
 		 * @return True if the robot is currently operating in Tele-Op mode as
 		 *         determined by the field controls.
 		 */
-		bool IsOperatorControl() const;
+		bool IsOperatorControl() const { return m_GameModeCallback() == eTeleop; }
 
 		/**
 		 * Determine if the robot is currently in Test mode.
@@ -49,7 +78,7 @@ namespace frc {
 		 * @return True if the robot is currently running tests as determined by the
 		 *         field controls.
 		 */
-		bool IsTest() const;
+		bool IsTest() const { return m_GameModeCallback() == eTest; }
 
 		/**
 		 * Indicates if new data is available from the driver station.
