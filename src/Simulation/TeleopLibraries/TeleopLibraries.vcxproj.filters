@@ -86,9 +86,6 @@
     <ClCompile Include="..\..\main\cpp\Robot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="frc\SampleRobot.cpp">
-      <Filter>frc</Filter>
-    </ClCompile>
     <ClCompile Include="frc\DirectInput_Joystick.cpp">
       <Filter>frc</Filter>
     </ClCompile>

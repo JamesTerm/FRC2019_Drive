@@ -40,8 +40,16 @@ namespace frc {
 		std::function<int(void)> m_GameModeCallback= DefaultGameModeCallback;
 	public:
 		//Client code set these up
-		void SetIsEnabledCallback(std::function<bool (void)> callback) { m_IsEnabledCallback = callback; }
-		void SetIsGameModeCallback(std::function<int (void)> callback) { m_GameModeCallback = callback; }
+		void SetIsEnabledCallback(std::function<bool (void)> callback) 
+		{ 
+			m_IsEnabledCallback = callback; 
+			DriverStation::GetInstance().SetIsEnabledCallback(callback);   // pass it to DS
+		}
+		void SetIsGameModeCallback(std::function<int (void)> callback) 
+		{ 
+			m_GameModeCallback = callback; 
+			DriverStation::GetInstance().SetIsGameModeCallback(callback);   // pass it to DS
+		}
 		/**
 		 * Determine if the Robot is currently enabled.
 		 *

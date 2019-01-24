@@ -177,6 +177,7 @@ namespace frc
 
 //TODO implement
 namespace frc {
+	#if 0
 	//class DriverStation : public ErrorBase {
 	class DriverStation {
 	public:
@@ -265,7 +266,7 @@ namespace frc {
 
 		//double m_nextMessageTime = 0;
 	};
-
+	#endif
 	int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs, int32_t leftRumble, int32_t rightRumble);
 
 }

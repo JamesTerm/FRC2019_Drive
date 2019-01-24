@@ -11,9 +11,39 @@
 
 namespace frc {
 
-	//class DriverStation;
 	class DirectJoystick_Interface {
+	private:
+		enum GameMode
+		{
+			eAuton,
+			eTeleop,
+			eTest
+		};
+		static bool DefaultIsEnabledCallback(void)
+		{
+			return false;
+		}
+		static int DefaultGameModeCallback(void)
+		{
+			return DirectJoystick_Interface::eTeleop;
+		}
+
+		//using std::function<bool()> as SimpleCallbackProto;
+		std::function<bool(void)> m_IsEnabledCallback = DefaultIsEnabledCallback;
+		std::function<int(void)> m_GameModeCallback = DefaultGameModeCallback;
 	public:
+		bool IsEnabled() const { return m_IsEnabledCallback(); }
+		bool IsDisabled() const { return !IsEnabled(); }
+		bool IsAutonomous() const { return m_GameModeCallback() == eAuton; }
+		bool IsOperatorControl() const { return m_GameModeCallback() == eTeleop; }
+		bool IsTest() const { return m_GameModeCallback() == eTest; }
+
+	public:
+		//Client code set these up
+		void SetIsEnabledCallback(std::function<bool(void)> callback) { m_IsEnabledCallback = callback; }
+		void SetIsGameModeCallback(std::function<int(void)> callback) { m_GameModeCallback = callback; }
+
+
 		DirectJoystick_Interface() {}
 		~DirectJoystick_Interface() {}
 
@@ -38,10 +68,11 @@ namespace frc {
 		int GetJoystickType(int stick) const;
 		std::string GetJoystickName(int stick) const;
 		int GetJoystickAxisType(int stick, int axis) const;
-		bool IsTest() const { return false; }
 		bool IsDSAttached() const { return false; }
-	private:
 	};
+
+	using DriverStation = DirectJoystick_Interface;
+	//typedef DirectJoystick_Interface DriverStation;
 
 	/**
 	 * GenericHID Interface.

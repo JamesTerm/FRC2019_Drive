@@ -1,6 +1,5 @@
-#ifndef _Win32
+#if 1
 #include <frc/WPILib.h>
-
 #include "../Base/Base_Includes.h"
 #include <math.h>
 #include <assert.h>
@@ -40,7 +39,7 @@ using namespace frc;
  /*																Encoder2															*/
 /***********************************************************************************************************************************/
 
-
+#ifndef _Win32
 Encoder2::Encoder2(UINT8 ModuleNumber,UINT32 aChannel, UINT32 bChannel, bool reverseDirection, EncodingType encodingType) : 
 	Encoder(aChannel,bChannel,reverseDirection,encodingType),m_LastDistance(0.0)
 {
@@ -60,7 +59,7 @@ double Encoder2::GetRate2(double dTime_s)
 	m_LastDistance=CurrentDistance;
 	return delta/dTime_s;
 }
-
+#endif
   /***********************************************************************************************************************************/
  /*														Driver_Station_Joystick														*/
 /***********************************************************************************************************************************/
@@ -92,7 +91,7 @@ unsigned long GetCapabilitiesFlags(const LUA_Controls_Properties &control_props,
 	//Testing
 	std::string VarName="AxisCount_";
 	VarName+=ControlName;
-	SmartDashboard::PutNumber(VarName,AxisCount);
+	SmartDashboard::PutNumber(VarName,(double)AxisCount);
 	#endif
 
 	switch (AxisCount)
@@ -133,7 +132,7 @@ void Driver_Station_Joystick::SetSlotList(const LUA_Controls_Properties &control
 		return;
 
 	m_SlotList=list;
-	m_NoJoysticks=list.size();
+	m_NoJoysticks=(int)list.size();
 	m_JoyInfo.clear();  //we'll repopulate with the slot names
 
 	Framework::Base::IJoystick::JoystickInfo common;
@@ -158,7 +157,8 @@ void Driver_Station_Joystick::SetSlotList(const LUA_Controls_Properties &control
 bool Driver_Station_Joystick::read_joystick (size_t nr, JoyState &Info)
 {
 	//First weed out numbers not in range
-	int Number=(int)nr;
+	const int nr_int= (int)nr;
+	int Number = nr_int;
 	Number-=m_StartingPort;
 	bool ret=false;
 	int AxisOffset=0;  //for cRIO compatibility
@@ -175,17 +175,17 @@ bool Driver_Station_Joystick::read_joystick (size_t nr, JoyState &Info)
 
 		//The axis selection is also ordinal
 		if ((JoyCapFlags & JoystickInfo::fX_Axis)!=0)
-			Info.lX=m_ds->GetStickAxis(nr,0+AxisOffset);
+			Info.lX=(float)m_ds->GetStickAxis(nr_int,0+AxisOffset);
 		if ((JoyCapFlags & JoystickInfo::fY_Axis)!=0)
-			Info.lY=m_ds->GetStickAxis(nr,1+AxisOffset);
+			Info.lY=(float)m_ds->GetStickAxis(nr_int,1+AxisOffset);
 		if ((JoyCapFlags & JoystickInfo::fZ_Axis)!=0)
-			Info.lZ=m_ds->GetStickAxis(nr,2+AxisOffset);
+			Info.lZ=(float)m_ds->GetStickAxis(nr_int,2+AxisOffset);
 		if ((JoyCapFlags & JoystickInfo::fX_Rot)!=0)
-			Info.lRx=m_ds->GetStickAxis(nr,3+AxisOffset);
+			Info.lRx=(float)m_ds->GetStickAxis(nr_int,3+AxisOffset);
 		if ((JoyCapFlags & JoystickInfo::fY_Rot)!=0)
-			Info.lRy=m_ds->GetStickAxis(nr,4+AxisOffset);
+			Info.lRy=(float)m_ds->GetStickAxis(nr_int,4+AxisOffset);
 		if ((JoyCapFlags & JoystickInfo::fZ_Rot)!=0)
-			Info.lRz=m_ds->GetStickAxis(nr,5+AxisOffset);
+			Info.lRz=(float)m_ds->GetStickAxis(nr_int,5+AxisOffset);
 		//Testing---
 		#if 0
 		if (nr==AxisOffset)   //using AxisOffset is just a clever way of checking the first Joystick for both cRIO and roboRIO
@@ -206,7 +206,7 @@ bool Driver_Station_Joystick::read_joystick (size_t nr, JoyState &Info)
 				SmartDashboard::PutNumber("axis5",Info.lRz);
 		}
 		#endif
-		Info.ButtonBank[0]=m_ds->GetStickButtons(nr);
+		Info.ButtonBank[0]=m_ds->GetStickButtons(nr_int);
 		ret=true;
 	}
 	return ret;

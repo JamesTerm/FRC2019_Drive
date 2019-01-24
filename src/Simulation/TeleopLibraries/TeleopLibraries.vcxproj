@@ -44,9 +44,6 @@
     <ClCompile Include="..\..\main\cpp\Systems\Drive.cpp" />
     <ClCompile Include="frc\DirectInput_Joystick.cpp" />
     <ClCompile Include="frc\Joystick.cpp" />
-    <ClCompile Include="frc\SampleRobot.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main\cpp\Components\DigitalInputItem.h" />

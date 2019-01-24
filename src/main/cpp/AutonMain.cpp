@@ -26,10 +26,10 @@
 #include "Common/PIDController.h"
 #include "Base/Joystick.h"
 #include "Base/JoystickBinder.h"
-#ifndef _Win32
+
 #include <frc/WPILib.h>
 #include "Common/InOut_Interface.h"
-#else
+#ifdef _Win32
 #include "Common/Calibration_Testing.h"
 #endif
 #include "Common/Debug.h"
@@ -90,7 +90,8 @@ private:
 #endif
 	FRC2019_Robot_Properties m_RobotProps;
 	FRC2019_Robot *m_pRobot = nullptr;
-	//Framework::UI::JoyStick_Binder m_JoyBinder;
+	frc::Driver_Station_Joystick m_Joystick;
+	Framework::UI::JoyStick_Binder m_JoyBinder;
 	UI_Controller *m_pUI;
 
 	Framework::Base::EventMap m_EventMap;
@@ -106,19 +107,21 @@ public:
 			script.NameMap["EXISTING_ENTITIES"] = "EXISTING_SHIPS";
 			m_RobotProps.SetUpGlobalTable(script);
 			m_RobotProps.LoadFromScript(script);
-			//m_Joystick.SetSlotList(m_RobotProps.Get_RobotControls());
+			m_Joystick.SetSlotList(m_RobotProps.Get_RobotControls());
 			m_pRobot->Initialize(m_EventMap, &m_RobotProps);
 		}
 		//The script must be loaded before initializing control since the wiring assignments are set there
-		//m_Control.AsControlInterface().Initialize(&m_RobotProps);
+		#if 1
+		m_Control.AsControlInterface().Initialize(&m_RobotProps);
 					//Bind the ship's eventmap to the joystick
-		//m_JoyBinder.SetControlledEventMap(m_pRobot->GetEventMap());
+		m_JoyBinder.SetControlledEventMap(m_pRobot->GetEventMap());
+		#endif
 
 		//To to bind the UI controller to the robot
 		AI_Base_Controller *controller = m_pRobot->GetController();
 		assert(controller);
-		//m_pUI = new UI_Controller(m_JoyBinder, controller);
-		m_pUI = new UI_Controller(nullptr, controller);
+		m_pUI = new UI_Controller(&m_JoyBinder, controller);
+		//m_pUI = new UI_Controller(nullptr, controller);
 		if (controller->Try_SetUIController(m_pUI))
 		{
 			//Success... now to let the entity set things up
@@ -135,7 +138,8 @@ public:
 		SmartDashboard::PutNumber("AutonTest", 0.0);
 	}
 
-	AutonMain_Internal(const char *RobotLua)
+	AutonMain_Internal(const char *RobotLua) : 
+		m_Joystick(3,0),m_JoyBinder(m_Joystick)
 	{
 		m_LuaPath = RobotLua;
 		#if 1
@@ -169,7 +173,10 @@ public:
 	void Update(double dTime_s)
 	{
 		if (m_pRobot)
+		{
+			m_JoyBinder.UpdateJoyStick(dTime_s);
 			m_pRobot->TimeChange(dTime_s);
+		}
 	}
 
 	void Test(const char *test_command)

@@ -9,13 +9,6 @@ using namespace frc;
 constexpr double kPi = 3.14159265358979323846;
 
 
-#if 0
-DriverStation& DriverStation::GetInstance()
-{
-	static DriverStation s_DriverStation;
-	return s_DriverStation;
-}
-#else
 
 void PollJoyInfo();
 static GG_Framework::Base::IJoystick *s_joy=nullptr;  
@@ -26,7 +19,7 @@ DirectJoystick_Interface& DirectJoystick_Interface::GetInstance()
 	PollJoyInfo(); //initial poll
 	return s_DJI;
 }
-#endif
+
 
   /*******************************************************************************************************************************/
  /*													DirectJoystick_Interface													*/
@@ -65,6 +58,9 @@ bool DirectJoystick_Interface::GetStickButtonReleased(int stick, int button)
 double DirectJoystick_Interface::GetStickAxis(int stick, int axis) 
 {
 	assert(stick < 3);
+	//It is possible that I make calls to joysticks that are not connected... check for this
+	if (stick >= s_joy->GetNoJoysticksFound())
+		return 0.0;
 	s_joy->read_joystick(stick, s_joy_state[stick]);
 	double ret = 0.0;
 	switch (axis)
