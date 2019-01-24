@@ -10,6 +10,7 @@ class COMMON_API Control_Assignment_Properties
 		virtual ~Control_Assignment_Properties() {}
 		struct Control_Element_1C
 		{
+			std::string type; //Used to distinguish derived kinds of the same group (e.g. Victor, VictorSP)
 			std::string name;
 			size_t Channel;
 			size_t Module;
@@ -25,7 +26,7 @@ class COMMON_API Control_Assignment_Properties
 
 		virtual void LoadFromScript(Scripting::Script& script);
 
-		const Controls_1C &GetVictors() const {return m_Victors;}
+		const Controls_1C &GetPWMSpeedControllers() const {return m_PWMSpeedControllers;}
 		const Controls_1C &GetServos() const {return m_Servos;}
 		const Controls_1C &GetRelays() const {return m_Relays;}
 		const Controls_1C &GetDigitalInputs() const {return m_Digital_Inputs;}
@@ -35,7 +36,7 @@ class COMMON_API Control_Assignment_Properties
 		size_t GetCompressorRelay() {return m_Compressor_Relay;}
 		size_t GetCompressorLimit() {return m_Compressor_Limit;}
 	private:
-		Controls_1C m_Victors,m_Servos,m_Relays,m_Digital_Inputs,m_Analog_Inputs;
+		Controls_1C m_PWMSpeedControllers,m_Servos,m_Relays,m_Digital_Inputs,m_Analog_Inputs;
 		Controls_2C m_Double_Solenoids,m_Encoders;
 		size_t m_Compressor_Relay=-1,m_Compressor_Limit=-1;
 };
@@ -76,19 +77,58 @@ protected:
 	std::string m_Name;
 };
 
-class Victor : public Control_1C_Element_UI
+class PWMSpeedController : public Control_1C_Element_UI
 {
 public:
-	Victor(uint8_t moduleNumber, uint32_t channel,const char *name) : Control_1C_Element_UI(moduleNumber,channel,name),
-	  m_ModuleNumber(moduleNumber), m_Channel(channel) {}
+	PWMSpeedController(PWMSpeedController&&) = default;
+	PWMSpeedController& operator=(PWMSpeedController&&) = default;
+
 	virtual void Set(double value, uint8_t syncGroup=0) {m_CurrentVoltage=value; display_number(value);}
 	virtual double Get() {return m_CurrentVoltage;}
 	virtual void Disable() {}
 	//virtual void PIDWrite(float output);
+protected:
+	PWMSpeedController(uint32_t channel) : Control_1C_Element_UI(0, channel, "PWMSpeedController"),
+		m_ModuleNumber(0), m_Channel(channel) {}
+	PWMSpeedController(uint8_t moduleNumber, uint32_t channel, const char *name) : Control_1C_Element_UI(moduleNumber, channel, name),
+		m_ModuleNumber(moduleNumber), m_Channel(channel) {}
 private:
 	uint8_t m_ModuleNumber;
 	uint32_t m_Channel;
 	double m_CurrentVoltage;
+};
+
+class Victor : public PWMSpeedController
+{
+public:
+	Victor(int channel) : PWMSpeedController(0, channel, "Victor") 
+	{
+	}
+	Victor(uint8_t moduleNumber, uint32_t channel, const char *name) : PWMSpeedController(0, channel, name)
+	{
+	}
+	Victor(Victor&&) = default;
+	Victor& operator=(Victor&&) = default;
+};
+
+class VictorSP : public PWMSpeedController
+{
+public:
+	/**
+	 * Constructor for a VictorSP.
+	 *
+	 * @param channel The PWM channel that the VictorSP is attached to. 0-9 are
+	 *                on-board, 10-19 are on the MXP port
+	 */
+	VictorSP(int channel) : PWMSpeedController(0, channel, "VictorSP")
+	{
+	}
+	VictorSP(uint8_t moduleNumber, uint32_t channel, const char *name) : PWMSpeedController(0, channel, name)
+	{
+	}
+
+	VictorSP(VictorSP&&) = default;
+	VictorSP& operator=(VictorSP&&) = default;
 };
 
 class Servo : public Control_1C_Element_UI
@@ -277,8 +317,8 @@ public:
 		kRearRightMotor = 3
 	};
 
-	RobotDrive2(Victor *frontLeftMotor, Victor *rearLeftMotor,Victor *frontRightMotor, Victor *rearRightMotor);
-	RobotDrive2(Victor &frontLeftMotor, Victor &rearLeftMotor,Victor &frontRightMotor, Victor &rearRightMotor);
+	RobotDrive2(PWMSpeedController *frontLeftMotor, PWMSpeedController *rearLeftMotor,PWMSpeedController *frontRightMotor, PWMSpeedController *rearRightMotor);
+	RobotDrive2(PWMSpeedController &frontLeftMotor, PWMSpeedController &rearLeftMotor,PWMSpeedController &frontRightMotor, PWMSpeedController &rearRightMotor);
 	virtual ~RobotDrive2();
 
 	virtual void SetLeftRightMotorOutputs(float leftOutput, float rightOutput);
@@ -306,10 +346,10 @@ protected:
 	float m_sensitivity;
 	double m_maxOutput;
 	bool m_deleteSpeedControllers;
-	Victor *m_frontLeftMotor;
-	Victor *m_frontRightMotor;
-	Victor *m_rearLeftMotor;
-	Victor *m_rearRightMotor;
+	PWMSpeedController *m_frontLeftMotor;
+	PWMSpeedController *m_frontRightMotor;
+	PWMSpeedController *m_rearLeftMotor;
+	PWMSpeedController *m_rearRightMotor;
 
 private:
 	int32_t GetNumMotors()
@@ -341,10 +381,10 @@ class COMMON_API RobotControlCommon
 		RobotControlCommon();
 		virtual ~RobotControlCommon();
 
-		//victor methods
-		__inline double Victor_GetCurrentPorV(size_t index) {return LUT_VALID(m_VictorLUT)?m_Victors[m_VictorLUT[index]]->Get() : 0.0;}
-		__inline void Victor_UpdateVoltage(size_t index,double Voltage) {IF_LUT(m_VictorLUT) m_Victors[m_VictorLUT[index]]->Set((float)Voltage);}
-		__inline Victor *Victor_GetInstance(size_t index) {return LUT_VALID(m_VictorLUT)?m_Victors[m_VictorLUT[index]] : NULL;}
+		//PWMSpeedController methods
+		__inline double PWMSpeedController_GetCurrentPorV(size_t index) {return LUT_VALID(m_PWMSpeedControllerLUT)?m_PWMSpeedControllers[m_PWMSpeedControllerLUT[index]]->Get() : 0.0;}
+		__inline void PWMSpeedController_UpdateVoltage(size_t index,double Voltage) {IF_LUT(m_PWMSpeedControllerLUT) m_PWMSpeedControllers[m_PWMSpeedControllerLUT[index]]->Set((float)Voltage);}
+		__inline PWMSpeedController *PWMSpeedController_GetInstance(size_t index) {return LUT_VALID(m_PWMSpeedControllerLUT)?m_PWMSpeedControllers[m_PWMSpeedControllerLUT[index]] : NULL;}
 
 		//servo methods
 		__inline double Servo_GetCurrentPorV(size_t index) {return LUT_VALID(m_ServoLUT)?m_Servos[m_ServoLUT[index]]->Get() : 0.0;}
@@ -400,17 +440,17 @@ class COMMON_API RobotControlCommon
 		}
 		__inline void DestroyBuiltInAccelerometer(Accelerometer *instance) {delete instance;}
 		//Give ability to have controls be created externally
-		void SetExternalVictorHook(std::function<void *(size_t, size_t, const char *)> callback) { m_ExternalVictor = callback; }
+		void SetExternalPWMSpeedControllerHook(std::function<void *(size_t, size_t, const char *,const char *)> callback) { m_ExternalPWMSpeedController = callback; }
 	protected:
 		virtual void RobotControlCommon_Initialize(const Control_Assignment_Properties &props);
 		//Override by derived class
-		virtual size_t RobotControlCommon_Get_Victor_EnumValue(const char *name) const =0;
+		virtual size_t RobotControlCommon_Get_PWMSpeedController_EnumValue(const char *name) const =0;
 		virtual size_t RobotControlCommon_Get_DigitalInput_EnumValue(const char *name) const =0;
 		virtual size_t RobotControlCommon_Get_AnalogInput_EnumValue(const char *name) const =0;
 		virtual size_t RobotControlCommon_Get_DoubleSolenoid_EnumValue(const char *name) const =0;
 	private:
 		Control_Assignment_Properties m_Props;  //cache a copy of the assignment props
-		std::vector<Victor *> m_Victors;
+		std::vector<PWMSpeedController *> m_PWMSpeedControllers;
 		std::vector<Servo * > m_Servos;
 		std::vector<Relay *> m_Relays;
 		std::vector<DigitalInput *> m_DigitalInputs;
@@ -418,7 +458,7 @@ class COMMON_API RobotControlCommon
 		std::vector<DoubleSolenoid *> m_DoubleSolenoids;
 		std::vector<Encoder2 *> m_Encoders;
 
-		Controls_LUT m_VictorLUT,m_ServoLUT,m_RelayLUT,m_DigitalInputLUT,m_AnalogInputLUT,m_DoubleSolenoidLUT,m_EncoderLUT;
-		std::function<void *(size_t,size_t,const char *)> m_ExternalVictor;
+		Controls_LUT m_PWMSpeedControllerLUT,m_ServoLUT,m_RelayLUT,m_DigitalInputLUT,m_AnalogInputLUT,m_DoubleSolenoidLUT,m_EncoderLUT;
+		std::function<void *(size_t,size_t,const char *,const char *)> m_ExternalPWMSpeedController;
 };
 }

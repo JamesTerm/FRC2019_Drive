@@ -12,7 +12,8 @@
 
 namespace frc
 {
-	class VictorSP : public Victor
+	#if 0
+	class VictorSP : public PWMSpeedController
 	{
 	public:
 		/**
@@ -21,19 +22,19 @@ namespace frc
 		 * @param channel The PWM channel that the VictorSP is attached to. 0-9 are
 		 *                on-board, 10-19 are on the MXP port
 		 */
-		VictorSP(int channel) : Victor(0, channel, "VictorSP")  //Note: the name will need to be merged after construction
+		VictorSP(int channel) : PWMSpeedController(0, channel, "VictorSP")  //Note: the name will need to be merged after construction
 		{
 		}
 
 		VictorSP(VictorSP&&) = default;
 		VictorSP& operator=(VictorSP&&) = default;
 	};
+	#endif
 
 	enum ErrorCode : int32_t
 	{
 		OK = 0
 	};
-
 
 	enum FeedbackDevice
 	{
@@ -84,18 +85,18 @@ namespace frc
 		Disabled = 15,
 	};
 
-	class VictorSPX : public Victor
+	class VictorSPX : public PWMSpeedController
 	{
 	public:
-		VictorSPX(int channel) : Victor(0, channel, "VictorSPX")  //Note: the name will need to be merged after construction
+		VictorSPX(int channel) : PWMSpeedController(0, channel, "VictorSPX")  //Note: the name will need to be merged after construction
 		{
 		}
 		//for derived classes
-		VictorSPX(int channel, const char *name) : Victor(0, channel, name)
+		VictorSPX(int channel, const char *name) : PWMSpeedController(0, channel, name)
 		{
 		}
 
-		void Set(ControlMode mode, double Value) { Victor::Set(Value); }
+		void Set(ControlMode mode, double Value) { PWMSpeedController::Set(Value); }
 		virtual double GetMotorOutputPercent() { return 0.0; }
 		virtual ErrorCode ConfigSelectedFeedbackSensor(RemoteFeedbackDevice feedbackDevice, int pidIdx, int timeoutMs) { return OK; }
 		virtual ErrorCode ConfigSelectedFeedbackSensor(FeedbackDevice feedbackDevice, int pidIdx, int timeoutMs) { return OK; }

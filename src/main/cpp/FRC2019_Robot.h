@@ -218,10 +218,10 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		FRC2019_Control_Interface &AsControlInterface() { return *this; }
 		const FRC2019_Robot_Properties &GetRobotProps() const { return m_RobotProps; }
 		//Give access to set hooks in the drive as well
-		void SetDriveExternalVictorHook(std::function<void *(size_t, size_t, const char *)> callback) 
+		void SetDriveExternalPWMSpeedControllerHook(std::function<void *(size_t, size_t, const char *, const char*)> callback) 
 		{
 			#if !defined _Win32 || defined __Tank_TestControlAssignments__
-			m_TankRobotControl.SetExternalVictorHook(callback);
+			m_TankRobotControl.SetExternalPWMSpeedControllerHook(callback);
 			#endif
 		}
 	protected: //from Robot_Control_Interface
@@ -244,7 +244,7 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		//virtual void CloseRist(bool Close) {CloseSolenoid(FRC2019_Robot::eRist,Close);}
 		//virtual void OpenRist(bool Close) {CloseSolenoid(FRC2019_Robot::eRist,!Close);}
 		protected: //from RobotControlCommon
-			virtual size_t RobotControlCommon_Get_Victor_EnumValue(const char *name) const
+			virtual size_t RobotControlCommon_Get_PWMSpeedController_EnumValue(const char *name) const
 			{	return FRC2019_Robot::GetSpeedControllerDevices_Enum(name);
 			}
 			virtual size_t RobotControlCommon_Get_DigitalInput_EnumValue(const char *name) const

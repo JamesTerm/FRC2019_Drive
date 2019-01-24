@@ -143,21 +143,21 @@ public:
 	{
 		m_LuaPath = RobotLua;
 		#if 1
-		//Hook in our own victor allocator here
-		m_Control.SetExternalVictorHook(
-		[&](size_t module, size_t Channel, const char *Name)
+		//Hook in our own PWMSpeedController allocator here
+		m_Control.SetExternalPWMSpeedControllerHook(
+		[&](size_t module, size_t Channel, const char *Name, const char*Type)
 		{
 			//TODO hook our active collection here
-			//printf("Robot: Get External Victor %s[%d,%d]\n",Name,module,Channel);
+			//printf("Robot: Get External PWMSpeedController %s[%d,%d]\n",Name,module,Channel);
 			return nullptr;
 		});
 		//Note: For Simulation, Tank_Robot_Control needs __Tank_TestControlAssignments__ defined; otherwise there are no hooks to set
 		//Swerve drive merged both techniques, and eventually Tank could do the same, for now, they are still separate
-		m_Control.SetDriveExternalVictorHook(
-			[&](size_t module, size_t Channel, const char *Name)
+		m_Control.SetDriveExternalPWMSpeedControllerHook(
+			[&](size_t module, size_t Channel, const char *Name, const char*Type)
 		{
 			//TODO hook our active collection here
-			//printf("Drive: Get External Victor %s[%d,%d]\n", Name, module, Channel);
+			//printf("Drive: Get External PWMSpeedController %s[%d,%d]\n", Name, module, Channel);
 			return nullptr;
 		});
 		#endif

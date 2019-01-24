@@ -29,7 +29,7 @@ MainRobot = {
 	control_assignments =
 	{
 		--by default module is 1, so only really need it for 2
-		victor =
+		victor_sp =
 		{
 			id_1 = { name= "right_drive_1", channel=1}, 
 			id_2 = { name= "right_drive_2", channel=2}, 

@@ -43,7 +43,7 @@ using namespace frc;
  /*													Control_Assignment_Properties													*/
 /***********************************************************************************************************************************/
 
-static void LoadControlElement_1C_Internal(Scripting::Script& script,Control_Assignment_Properties::Controls_1C &Output)
+static void LoadControlElement_1C_Internal(Scripting::Script& script,Control_Assignment_Properties::Controls_1C &Output,const char *type)
 {
 	typedef Control_Assignment_Properties::Control_Element_1C Control_Element_1C;
 	const char* err=NULL;
@@ -58,6 +58,7 @@ static void LoadControlElement_1C_Internal(Scripting::Script& script,Control_Ass
 		{
 			Control_Element_1C newElement;
 			{
+				newElement.type = type;
 				double fTest;
 				err = script.GetField("channel",NULL,NULL,&fTest);
 				assert(!err);
@@ -131,32 +132,38 @@ void Control_Assignment_Properties::LoadFromScript(Scripting::Script& script)
 		err = script.GetFieldTable("victor");
 		if (!err)
 		{
-			LoadControlElement_1C_Internal(script,m_Victors);
+			LoadControlElement_1C_Internal(script,m_PWMSpeedControllers,"Victor");
+			script.Pop();
+		}
+		err = script.GetFieldTable("victor_sp");
+		if (!err)
+		{
+			LoadControlElement_1C_Internal(script, m_PWMSpeedControllers, "VictorSP");
 			script.Pop();
 		}
 		err = script.GetFieldTable("servo");
 		if (!err)
 		{
-			LoadControlElement_1C_Internal(script,m_Servos);
+			LoadControlElement_1C_Internal(script,m_Servos,"servo");
 			script.Pop();
 		}
 		err = script.GetFieldTable("relay");
 		if (!err)
 		{
-			LoadControlElement_1C_Internal(script,m_Relays);
+			LoadControlElement_1C_Internal(script,m_Relays,"relay");
 			script.Pop();
 		}
 		err = script.GetFieldTable("digital_input");
 		if (!err)
 		{
-			LoadControlElement_1C_Internal(script,m_Digital_Inputs);
+			LoadControlElement_1C_Internal(script,m_Digital_Inputs, "digital_input");
 			script.Pop();
 		}
 
 		err = script.GetFieldTable("analog_input");
 		if (!err)
 		{
-			LoadControlElement_1C_Internal(script,m_Analog_Inputs);
+			LoadControlElement_1C_Internal(script,m_Analog_Inputs, "analog_input");
 			script.Pop();
 		}
 
@@ -195,13 +202,13 @@ void Control_Assignment_Properties::LoadFromScript(Scripting::Script& script)
   /***********************************************************************************************************************************/
  /*														RobotControlCommon															*/
 /***********************************************************************************************************************************/
-void *DefaultExternalControlHook(size_t Module, size_t Channel, const char *Name)
+void *DefaultExternalControlHook(size_t Module, size_t Channel, const char *Name,const char *Type)
 {
 	return nullptr;
 }
 RobotControlCommon::RobotControlCommon()
 {
-	m_ExternalVictor = DefaultExternalControlHook;
+	m_ExternalPWMSpeedController = DefaultExternalControlHook;
 }
 
 RobotControlCommon::~RobotControlCommon()
@@ -209,10 +216,10 @@ RobotControlCommon::~RobotControlCommon()
 
 }
 
-template <class T>
-__inline void Initialize_1C_LUT(const Control_Assignment_Properties::Controls_1C &control_props,std::vector<T *> &controls,
+template <class T, class BaseT>
+__inline void Initialize_1C_LUT(const Control_Assignment_Properties::Controls_1C &control_props,std::vector<BaseT *> &controls,
 	RobotControlCommon::Controls_LUT &control_LUT,RobotControlCommon *instance,
-	size_t (RobotControlCommon::*delegate)(const char *name) const, std::function<void *(size_t, size_t, const char *)>External)
+	size_t (RobotControlCommon::*delegate)(const char *name) const, std::function<void *(size_t, size_t, const char *,const char *)>External)
 {
 	//typedef Control_Assignment_Properties::Controls_1C Controls_1C;
 	typedef Control_Assignment_Properties::Control_Element_1C Control_Element_1C;
@@ -225,7 +232,7 @@ __inline void Initialize_1C_LUT(const Control_Assignment_Properties::Controls_1C
 		if (enumIndex==(size_t)-1)
 			continue;
 		//See if we have an external hook to allocate this control already
-		T *NewElement=(T *)External(element.Module, element.Channel, element.name.c_str());
+		T *NewElement=(T *)External(element.Module, element.Channel, element.name.c_str(),element.type.c_str());
 		if (NewElement == nullptr)
 		{
 			//create the new Control
@@ -242,12 +249,12 @@ __inline void Initialize_1C_LUT(const Control_Assignment_Properties::Controls_1C
 
 		const size_t LUT_index=controls.size(); //get size before we add it in
 		//const size_t PopulationIndex=controls.size();  //get the ordinal value before we add it
-		controls.push_back(NewElement);  //add it to our list of victors
+		controls.push_back(NewElement);  //add it to our list of PWMSpeedControllers
 		//Now to work out the new LUT
 		//our LUT is the EnumIndex position set to the value of i... make sure we have the slots created
-		//Note: with the more board we can have more victors, so I've increased this to 20... also this index does not represent pin count, but is a separate index
+		//Note: with the more board we can have more PWMSpeedControllers, so I've increased this to 20... also this index does not represent pin count, but is a separate index
 		//that is mapped to the pin count index
-		assert(enumIndex<20);  //sanity check we have a limit to how many victors we have
+		assert(enumIndex<20);  //sanity check we have a limit to how many PWMSpeedControllers we have
 		while(control_LUT.size()<=enumIndex)
 			control_LUT.push_back(-1);  //fill with -1 as a way to indicate nothing is located for that slot
 		control_LUT[enumIndex]=LUT_index;
@@ -278,10 +285,10 @@ __inline void Initialize_2C_LUT(const Control_Assignment_Properties::Controls_2C
 		#endif
 		const size_t LUT_index=controls.size(); //get size before we add it in
 		//const size_t PopulationIndex=controls.size();  //get the ordinal value before we add it
-		controls.push_back(NewElement);  //add it to our list of victors
+		controls.push_back(NewElement);  //add it to our list of PWMSpeedControllers
 		//Now to work out the new LUT
 		//our LUT is the EnumIndex position set to the value of i... make sure we have the slots created
-		assert(enumIndex<20);  //sanity check we have a limit to how many victors we have
+		assert(enumIndex<20);  //sanity check we have a limit to how many PWMSpeedControllers we have
 		while(control_LUT.size()<=enumIndex)
 			control_LUT.push_back(-1);  //fill with -1 as a way to indicate nothing is located for that slot
 		control_LUT[enumIndex]=LUT_index;
@@ -299,21 +306,50 @@ void RobotControlCommon::RobotControlCommon_Initialize(const Control_Assignment_
 	typedef Control_Assignment_Properties::Control_Element_2C Control_Element_2C;
 	#endif
 	//create control elements and their LUT's
-	//Note: Victors,Servos, and Relays share the PWM slots; therefore they share the same enumeration, and can be used interchangeably in high level code
-	//victors
-	Initialize_1C_LUT<Victor>(props.GetVictors(),m_Victors,m_VictorLUT,this,&RobotControlCommon::RobotControlCommon_Get_Victor_EnumValue, m_ExternalVictor);
+	//Note: PWMSpeedControllers,Servos, and Relays share the PWM slots; therefore they share the same enumeration, and can be used interchangeably in high level code
+	//PWMSpeedControllers
+	Initialize_1C_LUT<Victor,PWMSpeedController>(props.GetPWMSpeedControllers(),m_PWMSpeedControllers,m_PWMSpeedControllerLUT,this,&RobotControlCommon::RobotControlCommon_Get_PWMSpeedController_EnumValue, 
+		[&](size_t Module, size_t Channel, const char *Name, const char *Type)
+		{
+			//Ok Explanation is needed here... first we try the external use case, if it returns a pointer we are good
+			void *ret = m_ExternalPWMSpeedController(Module,Channel,Name,Type);
+			//If not... we create the correct control based off of its type
+			if (ret == nullptr)
+			{
+				//Currently we have either Victor or VictorSP
+				if (strcmp(Type, "VictorSP") == 0)
+				{
+					#ifdef _Win32
+					std::string NameToUse = "VictorSP_";  //I could assign Type, but I want to monitor the logic path
+					NameToUse += Name;
+					ret = new VictorSP((uint8_t)Module, (uint32_t)Channel, NameToUse.c_str());  //adding name for UI
+					#else
+					//quick debug when things are not working
+					printf("new %s as %d\n", Name, Channel);
+					ret = new VictorSP((int)Channel);
+					#endif
+				}
+				else
+				{
+					assert(strcmp(Type, "Victor") == 0);  //better be a victor
+					ret = nullptr;  //let it fall back to default implmentation 
+				}
+			}
+			return	ret;
+		}
+		);
 	//servos
-	Initialize_1C_LUT<Servo>(props.GetServos(),m_Servos,m_ServoLUT,this,&RobotControlCommon::RobotControlCommon_Get_Victor_EnumValue, DefaultExternalControlHook);
+	Initialize_1C_LUT<Servo, Servo>(props.GetServos(),m_Servos,m_ServoLUT,this,&RobotControlCommon::RobotControlCommon_Get_PWMSpeedController_EnumValue, DefaultExternalControlHook);
 	//relays
-	Initialize_1C_LUT<Relay>(props.GetRelays(),m_Relays,m_RelayLUT,this,&RobotControlCommon::RobotControlCommon_Get_Victor_EnumValue, DefaultExternalControlHook);
+	Initialize_1C_LUT<Relay, Relay>(props.GetRelays(),m_Relays,m_RelayLUT,this,&RobotControlCommon::RobotControlCommon_Get_PWMSpeedController_EnumValue, DefaultExternalControlHook);
 	//double solenoids
 	Initialize_2C_LUT<DoubleSolenoid>(props.GetDoubleSolenoids(),m_DoubleSolenoids,m_DoubleSolenoidLUT,this,&RobotControlCommon::RobotControlCommon_Get_DoubleSolenoid_EnumValue);
 	//digital inputs
-	Initialize_1C_LUT<DigitalInput>(props.GetDigitalInputs(),m_DigitalInputs,m_DigitalInputLUT,this,&RobotControlCommon::RobotControlCommon_Get_DigitalInput_EnumValue, DefaultExternalControlHook);
+	Initialize_1C_LUT<DigitalInput, DigitalInput>(props.GetDigitalInputs(),m_DigitalInputs,m_DigitalInputLUT,this,&RobotControlCommon::RobotControlCommon_Get_DigitalInput_EnumValue, DefaultExternalControlHook);
 	//analog inputs
-	Initialize_1C_LUT<AnalogInput>(props.GetAnalogInputs(),m_AnalogInputs,m_AnalogInputLUT,this,&RobotControlCommon::RobotControlCommon_Get_AnalogInput_EnumValue, DefaultExternalControlHook);
+	Initialize_1C_LUT<AnalogInput, AnalogInput>(props.GetAnalogInputs(),m_AnalogInputs,m_AnalogInputLUT,this,&RobotControlCommon::RobotControlCommon_Get_AnalogInput_EnumValue, DefaultExternalControlHook);
 	//encoders
-	Initialize_2C_LUT<Encoder2>(props.GetEncoders(),m_Encoders,m_EncoderLUT,this,&RobotControlCommon::RobotControlCommon_Get_Victor_EnumValue);
+	Initialize_2C_LUT<Encoder2>(props.GetEncoders(),m_Encoders,m_EncoderLUT,this,&RobotControlCommon::RobotControlCommon_Get_PWMSpeedController_EnumValue);
 }
 
 
@@ -415,8 +451,8 @@ void RobotDrive2::InitRobotDrive() {
 	m_LeftOutput=0.0,m_RightOutput=0.0;
 }
 
-RobotDrive2::RobotDrive2(Victor *frontLeftMotor, Victor *rearLeftMotor,
-						Victor *frontRightMotor, Victor *rearRightMotor)
+RobotDrive2::RobotDrive2(PWMSpeedController *frontLeftMotor, PWMSpeedController *rearLeftMotor,
+						PWMSpeedController *frontRightMotor, PWMSpeedController *rearRightMotor)
 {
 	InitRobotDrive();
 	if (frontLeftMotor == NULL || rearLeftMotor == NULL || frontRightMotor == NULL || rearRightMotor == NULL)
@@ -439,8 +475,8 @@ RobotDrive2::RobotDrive2(Victor *frontLeftMotor, Victor *rearLeftMotor,
 	m_deleteSpeedControllers = false;
 }
 
-RobotDrive2::RobotDrive2(Victor &frontLeftMotor, Victor &rearLeftMotor,
-						Victor &frontRightMotor, Victor &rearRightMotor)
+RobotDrive2::RobotDrive2(PWMSpeedController &frontLeftMotor, PWMSpeedController &rearLeftMotor,
+						PWMSpeedController &frontRightMotor, PWMSpeedController &rearRightMotor)
 {
 	InitRobotDrive();
 	m_frontLeftMotor = &frontLeftMotor;

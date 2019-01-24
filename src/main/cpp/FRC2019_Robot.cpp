@@ -498,7 +498,7 @@ void FRC2019_Robot_Control::UpdateVoltage(size_t index,double Voltage)
 		SmartDashboard::PutNumber(SmartLabel.c_str(),Voltage);
 		if (SafetyLock)
 			Voltage=0.0;
-		Victor_UpdateVoltage(index,Voltage);
+		PWMSpeedController_UpdateVoltage(index,Voltage);
 	}
 }
 
