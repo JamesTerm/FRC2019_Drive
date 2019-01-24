@@ -27,6 +27,7 @@ void DisplayHelp()
 		"Start   Like hitting enable button from driver station\n"
 		"Stop    for disable\n"
 		"Game <0 auton 1 teleop 2 test>\n"
+		"ShowControls <1=show>\n "
 		"Help (displays this)\n"
 		"\nType \"Quit\" at anytime to exit this application\n"
 	);
@@ -70,11 +71,11 @@ std::string DefaultCommandPrompt()
 	return ">";
 }
 
-std::function<std::string(void)> g_CommandPrompt = DefaultCommandPrompt;
+static std::function<std::string(void)> s_CommandPrompt = DefaultCommandPrompt;
 
 void SetCommandPromptCallback(std::function<std::string(void)> callback)
 {
-	g_CommandPrompt = callback;
+	s_CommandPrompt = callback;
 }
 
 void CommandLineInterface()
@@ -87,7 +88,7 @@ void CommandLineInterface()
 	cout << "Ready." << endl;
 
 	char input_line[128];
-	while (cout << g_CommandPrompt(), cin.getline(input_line, 128))
+	while (cout << s_CommandPrompt(), cin.getline(input_line, 128))
 	{
 		char		command[32];
 		char		str_1[MAX_PATH];
@@ -113,6 +114,8 @@ void CommandLineInterface()
 				_robot_tester.StopStreaming();
 			else if (!_strnicmp(input_line, "game", 4))
 				_robot_tester.SetGameMode(atoi(str_1));
+			else if (!_strnicmp(input_line, "showc", 5))
+				_robot_tester.ShowControls(atoi(str_1)!=0);
 			else if (!_strnicmp(input_line, "cls", 3))
 				cls();
 			else if (!_strnicmp(input_line, "Help", 4))

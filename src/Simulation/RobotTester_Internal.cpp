@@ -4,6 +4,8 @@
 //#define __TestGoalsDirect__
 void SetCommandPromptCallback(std::function<std::string(void)> callback);  //allow this code to manipulate the command prompt
 std::string DefaultCommandPrompt();  //set back for proper closing
+void RobotControlCommon_SetShowControlsCallback(std::function<bool(void)> callback);
+bool RobotControlCommon_ShowControlsDefault();    //set back for proper closing
 
 #ifdef __TestGoalsDirect__ 
 #include "../main/cpp/AutonMain.h"
@@ -49,6 +51,11 @@ public:
 	void HookSampleGoals()
 	{
 		m_Robot.Test("hook_samples");
+	}
+
+	//Not supported... use other version
+	void ShowControls(bool show)
+	{
 	}
 
 	//Keeping around to show benefit of lambda 
@@ -176,6 +183,7 @@ private:
 		eTeleop,
 		eTest
 	} m_GameMode=eTest;
+	bool m_DisplayControls = false;
 public:
 	RobotTester_Internal()
 	{
@@ -187,10 +195,17 @@ public:
 			return ret;
 		}
 		);
+		RobotControlCommon_SetShowControlsCallback(
+			[&](void)
+		{
+			return m_DisplayControls;
+		}
+		);
 	}
 	~RobotTester_Internal()
 	{
 		SetCommandPromptCallback(DefaultCommandPrompt);
+		RobotControlCommon_SetShowControlsCallback(RobotControlCommon_ShowControlsDefault);
 		StopStreaming();
 	}
 
@@ -231,8 +246,13 @@ public:
 	{	m_GameMode = (GameMode)mode;
 	}
 	//Give command ability to switch to different set of goals
-	void HookSampleGoals()
-	{	m_Robot.TestCommand("hook_samples");
+	void HookSampleGoals(bool hook=true)
+	{	m_Robot.TestCommand(hook?"hook_samples":"default_goals");
+	}
+
+	void ShowControls(bool show)
+	{
+		m_DisplayControls = show;
 	}
 };
 
@@ -287,9 +307,9 @@ void RobotTester::RobotTester_init()
 
 void RobotTester::Test(int test)
 {
+	m_p_RobotTester->StopStreaming();  //give ability to test consecutively while being able to switch between goal sets
 	SetGameMode(2);
-	if (test == 1)
-		m_p_RobotTester->HookSampleGoals();
+	m_p_RobotTester->HookSampleGoals(test==1);
 	m_p_RobotTester->StartStreaming();
 }
 
@@ -307,4 +327,9 @@ void RobotTester::StartStreaming()
 void RobotTester::StopStreaming()
 {
 	m_p_RobotTester->StopStreaming();
+}
+
+void RobotTester::ShowControls(bool show)
+{
+	m_p_RobotTester->ShowControls(show);
 }

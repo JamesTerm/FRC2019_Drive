@@ -578,9 +578,22 @@ void RobotDrive2::StopMotor()
 
 
 #ifdef _Win32
+
+bool RobotControlCommon_ShowControlsDefault()
+{
+	return false;
+}
+static std::function<bool(void)> s_ShowControlsCallback = RobotControlCommon_ShowControlsDefault;
+
+void RobotControlCommon_SetShowControlsCallback(std::function<bool(void)> callback)
+{
+	s_ShowControlsCallback = callback;
+}
+
+
 //Ideally we have only one robot control for both the tester and the main app... we can use this macro in tester to control if we want to see that the calls
 //are correctly working.  Typically we shouldn't need to enable this unless there is a problem, or alternatively to verify the actual controls are being sent out
-//#define __SHOW_SMARTDASHBOARD__
+#define __SHOW_SMARTDASHBOARD__
 
 #ifdef __SHOW_SMARTDASHBOARD__
   /***********************************************************************************************************************************/
@@ -602,12 +615,14 @@ Control_1C_Element_UI::Control_1C_Element_UI(uint8_t moduleNumber, uint32_t chan
 
 void Control_1C_Element_UI::display_number(double value)
 {
-	SmartDashboard::PutNumber(m_Name,value);
+	if (s_ShowControlsCallback())
+		SmartDashboard::PutNumber(m_Name,value);
 }
 
 void Control_1C_Element_UI::display_bool(bool value)
 {
-	SmartDashboard::PutBoolean(m_Name,value);
+	if (s_ShowControlsCallback())
+		SmartDashboard::PutBoolean(m_Name,value);
 }
 
 //Note: For the get implementation, I restrict use of the bool used members to these functions as a first run
@@ -615,22 +630,32 @@ void Control_1C_Element_UI::display_bool(bool value)
 
 bool Control_1C_Element_UI::get_bool() const
 {
-	if (!m_PutBoolUsed)
+	bool ret = false;
+	if (s_ShowControlsCallback())
 	{
-		SmartDashboard::PutBoolean(m_Name,false);
-		m_PutBoolUsed=true;
+		if (!m_PutBoolUsed)
+		{
+			SmartDashboard::PutBoolean(m_Name, false);
+			m_PutBoolUsed = true;
+		}
+		ret=SmartDashboard::GetBoolean(m_Name);
 	}
-	return SmartDashboard::GetBoolean(m_Name);
+	return ret;
 }
 
 double Control_1C_Element_UI::get_number() const
 {
-	if (!m_PutNumber_Used)
+	double ret = 0.0;
+	if (s_ShowControlsCallback())
 	{
-		SmartDashboard::PutNumber(m_Name,m_DefaultNumber);
-		m_PutNumber_Used=true;
+		if (!m_PutNumber_Used)
+		{
+			SmartDashboard::PutNumber(m_Name, m_DefaultNumber);
+			m_PutNumber_Used = true;
+		}
+		ret=(double)SmartDashboard::GetNumber(m_Name);
 	}
-	return (double)SmartDashboard::GetNumber(m_Name);
+	return ret;
 }
 
   /***********************************************************************************************************************************/
@@ -654,22 +679,30 @@ Control_2C_Element_UI::Control_2C_Element_UI(uint8_t moduleNumber, uint32_t forw
 
 void Control_2C_Element_UI::display_bool(bool value)
 {
-	SmartDashboard::PutBoolean(m_Name,value);
+	if (s_ShowControlsCallback())
+		SmartDashboard::PutBoolean(m_Name,value);
 }
 
 void Control_2C_Element_UI::display_number(double value)
 {
-	SmartDashboard::PutNumber(m_Name,value);
+	if (s_ShowControlsCallback())
+		SmartDashboard::PutNumber(m_Name,value);
 }
 
 bool Control_2C_Element_UI::get_bool() const
 {
-	return SmartDashboard::GetBoolean(m_Name);
+	bool ret = false;
+	if (s_ShowControlsCallback())
+		ret=SmartDashboard::GetBoolean(m_Name);
+	return ret;
 }
 
 double Control_2C_Element_UI::get_number() const
 {
-	return SmartDashboard::GetNumber(m_Name);
+	double ret = 0.0;
+	if (s_ShowControlsCallback())
+		ret=SmartDashboard::GetNumber(m_Name);
+	return ret;
 }
 
 

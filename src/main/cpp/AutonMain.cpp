@@ -182,6 +182,8 @@ public:
 				return FRC2019_Goals::Get_Sample_Goal(Robot);
 			});
 		}
+		else if (strcmp(test_command, "default_goals") == 0)
+			m_pRobot->SetTestAutonCallbackGoal(nullptr);
 	}
 };
 
