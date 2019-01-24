@@ -245,7 +245,7 @@ __inline void Initialize_1C_LUT(const Control_Assignment_Properties::Controls_1C
 			#endif
 		}
 		else
-			printf("external %s as %d\n", element.name.c_str(), element.Channel);  //keep track of things which are external
+			printf("external %s=%s[%d]\n", element.name.c_str(), element.type.c_str(), element.Channel);  //keep track of things which are external
 
 		const size_t LUT_index=controls.size(); //get size before we add it in
 		//const size_t PopulationIndex=controls.size();  //get the ordinal value before we add it

@@ -33,7 +33,7 @@ NativeComponent* ActiveCollection::Get(string name)
 		for(int i=0; i<(int)activeCollection.size();i++)
 			if((*activeCollection[i]).name == (string)name)
 				ret=activeCollection[i];
-		throw "AHHH";
+		if(!ret) throw "AHHH";
 	}
 	catch(...){
 		cout << "Cannot find component " << name << ", it does not exist in the active collection!\nCheck your type correlation!" << endl;
@@ -53,7 +53,7 @@ VictorSPItem* ActiveCollection::GetVictor(string name)
 				ret=(VictorSPItem*)activeCollection[i];
 			}
 		}
-		throw "AHHH";
+		if (!ret) throw "AHHH";
 	}
 	catch(...){
 		cout << "Cannot find victor " << name << ", it does not exist in the active collection!\n" << endl;
@@ -73,7 +73,7 @@ TalonSRXItem* ActiveCollection::GetTalon(string name)
 				ret=(TalonSRXItem*)activeCollection[i];
 			}
 		}
-		throw "AHHH";
+		if (!ret) throw "AHHH";
 	}
 	catch(...){
 		cout << "Cannot find talon " << name << ", it does not exist in the active collection!\n" << endl;
@@ -93,7 +93,7 @@ EncoderItem* ActiveCollection::GetEncoder(string name)
 				ret=(EncoderItem*)activeCollection[i];
 			}
 		}
-		throw "AHHH";
+		if (!ret) throw "AHHH";
 	}
 	catch(...){
 		cout << "Cannot find encoder " << name << ", it does not exist in the active collection!\n" << endl;
@@ -113,7 +113,7 @@ NavX* ActiveCollection::GetNavX()
 				ret=(NavX*)activeCollection[i];
 			}
 		}
-		throw "AHHH";
+		if (!ret) throw "AHHH";
 	}
 	catch(...){
 		cout << "Cannot find the NavX, check the config." << endl;

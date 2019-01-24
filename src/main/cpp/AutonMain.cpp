@@ -39,7 +39,7 @@
 #include "FRC2019_Robot.h"
 #include "Common/SmartDashboard.h"
 
-
+#include "Config/ActiveCollection.h"
 #include "AutonMain.h"
 
 //This is only for diagnostics... if there are problems with the robot control
@@ -96,6 +96,8 @@ private:
 
 	Framework::Base::EventMap m_EventMap;
 	std::string m_LuaPath;  //keep a copy of the lua path
+
+	Configuration::ActiveCollection *m_Collection=nullptr;
 public:
 	void InitRobot()
 	{
@@ -138,8 +140,8 @@ public:
 		SmartDashboard::PutNumber("AutonTest", 0.0);
 	}
 
-	AutonMain_Internal(const char *RobotLua) : 
-		m_Joystick(3,0),m_JoyBinder(m_Joystick)
+	AutonMain_Internal(const char *RobotLua, Configuration::ActiveCollection *Collection) :
+		m_Joystick(3,0),m_JoyBinder(m_Joystick), m_Collection(Collection)
 	{
 		m_LuaPath = RobotLua;
 		#if 1
@@ -156,9 +158,28 @@ public:
 		m_Control.SetDriveExternalPWMSpeedControllerHook(
 			[&](size_t module, size_t Channel, const char *Name, const char*Type)
 		{
-			//TODO hook our active collection here
+			if (!m_Collection) return (void *)nullptr;  //support if I'm not going to use a collection
+			void *ret = nullptr;
 			//printf("Drive: Get External PWMSpeedController %s[%d,%d]\n", Name, module, Channel);
-			return nullptr;
+			Tank_Robot::SpeedControllerDevices motor = Tank_Robot::GetSpeedControllerDevices_Enum(Name);
+			//Translate our naming convention to the config naming convention
+			const char *ConfigNaming = nullptr;
+			switch (motor)
+			{
+			case Tank_Robot::eLeftDrive1:		ConfigNaming = "Left_0";		break;
+			case Tank_Robot::eLeftDrive2:		ConfigNaming = "Left_1";		break;
+			case Tank_Robot::eRightDrive1:		ConfigNaming = "Right_0";		break;
+			case Tank_Robot::eRightDrive2:		ConfigNaming = "Right_1";		break;
+			default:
+				assert(false);  //should not happen
+			}
+			VictorSPItem *item=m_Collection->GetVictor(ConfigNaming);
+			assert(item);  //should have it unless someone has changed them (this is recoverable)
+			if (item)
+			{
+				ret = (void *)item->AsVictorSP();
+			}
+			return ret;
 		});
 		#endif
 		//We can call init now:
@@ -194,9 +215,9 @@ public:
 	}
 };
 
-void AutonMain::AutonMain_init(const char *RobotLua)
+void AutonMain::AutonMain_init(const char *RobotLua, Configuration::ActiveCollection *Collection)
 {
-	m_p_AutonMain = std::make_shared<AutonMain_Internal>(RobotLua);
+	m_p_AutonMain = std::make_shared<AutonMain_Internal>(RobotLua, Collection);
 }
 
 void AutonMain::Update(double dTime_s)

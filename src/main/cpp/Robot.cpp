@@ -103,7 +103,7 @@ void Robot::Test()
 {
 	//Fow now keep this detached from manual solution... can macro define it later
 	AutonMain m_Robot;
-	m_Robot.AutonMain_init("FRC2019Robot.lua");
+	m_Robot.AutonMain_init("FRC2019Robot.lua",m_activeCollection);
 	#ifdef _Win32
 	m_Robot.Test(g_Command.c_str());
 	#endif
