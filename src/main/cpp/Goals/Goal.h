@@ -87,10 +87,11 @@ class  MultitaskGoal : public Goal
 		///first add the goals here
 		void AddGoal(Goal *g) {m_GoalsToProcess.push_back(g);}
 		///Then call this to manually activate once all goals are added
-		virtual void Activate();
+		void Activate();
 		Goal &AsGoal() {return *this;}
-	protected:  //from Goal
 		virtual Goal_Status Process(double dTime_s);
+	protected:  //from Goal
+		
 		virtual void Terminate();
 		void RemoveAllGoals();
 	private:

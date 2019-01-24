@@ -23,6 +23,7 @@ using namespace std;
 	{
 		m_drive = new Drive();
 		m_activeCollection = new ActiveCollection();
+		m_masterGoal = new MultitaskGoal();
 	}
 
 	/**
@@ -47,6 +48,16 @@ using namespace std;
 		cout << "Autonomous Started." << endl;
 				string autoSelected = SmartDashboard::GetString("Auto Selector", m_driveStraight);
 		cout << autoSelected << endl;
+
+		m_masterGoal->AddGoal(new Goal_DoNothing(5.0));
+		m_masterGoal->Activate();
+		double dTime = 0.010;
+		while(m_masterGoal->GetStatus() == Goal::eActive)
+		{
+			m_masterGoal->Process(dTime);
+			Wait(dTime);
+		}
+		#if 0 //old code
 		if (autoSelected == m_driveStraight) //!< Drive Straight Autonomous
 		{
 			DriveStraight *driveStraight = new DriveStraight(m_activeCollection);
@@ -58,6 +69,7 @@ using namespace std;
 			DriveStraight *driveStraight = new DriveStraight(m_activeCollection);
 			driveStraight->Start();
 		}
+		#endif
 	}
 
     /**
