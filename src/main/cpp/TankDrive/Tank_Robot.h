@@ -67,7 +67,7 @@ class Tank_Robot_UI;
 
 const char * const csz_Tank_Robot_SpeedControllerDevices_Enum[] =
 {
-	"left_drive_1","left_drive_2","right_drive_1","right_drive_2"
+	"left_drive_1","left_drive_2","left_drive_3","right_drive_1","right_drive_2","right_drive_3"
 };
 
 ///This is a specific robot that is a robot tank and is composed of an arm, it provides addition methods to control the arm, and applies updates to
@@ -80,8 +80,10 @@ class DRIVE_API Tank_Robot : public Ship_Tester,
 		{
 			eLeftDrive1,
 			eLeftDrive2,
+			eLeftDrive3,
 			eRightDrive1,
-			eRightDrive2
+			eRightDrive2,
+			eRightDrive3
 		};
 
 		static SpeedControllerDevices GetSpeedControllerDevices_Enum (const char *value)

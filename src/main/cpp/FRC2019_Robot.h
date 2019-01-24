@@ -218,7 +218,7 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		FRC2019_Control_Interface &AsControlInterface() { return *this; }
 		const FRC2019_Robot_Properties &GetRobotProps() const { return m_RobotProps; }
 		//Give access to set hooks in the drive as well
-		void SetDriveExternalPWMSpeedControllerHook(std::function<void *(size_t, size_t, const char *, const char*)> callback) 
+		void SetDriveExternalPWMSpeedControllerHook(std::function<void *(size_t, size_t, const char *, const char*,bool &)> callback) 
 		{
 			#if !defined _Win32 || defined __Tank_TestControlAssignments__
 			m_TankRobotControl.SetExternalPWMSpeedControllerHook(callback);

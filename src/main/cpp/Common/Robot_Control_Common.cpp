@@ -202,7 +202,7 @@ void Control_Assignment_Properties::LoadFromScript(Scripting::Script& script)
   /***********************************************************************************************************************************/
  /*														RobotControlCommon															*/
 /***********************************************************************************************************************************/
-void *DefaultExternalControlHook(size_t Module, size_t Channel, const char *Name,const char *Type)
+void *DefaultExternalControlHook(size_t Module, size_t Channel, const char *Name,const char *Type,bool &DoNotCreate)
 {
 	return nullptr;
 }
@@ -219,7 +219,7 @@ RobotControlCommon::~RobotControlCommon()
 template <class T, class BaseT>
 __inline void Initialize_1C_LUT(const Control_Assignment_Properties::Controls_1C &control_props,std::vector<BaseT *> &controls,
 	RobotControlCommon::Controls_LUT &control_LUT,RobotControlCommon *instance,
-	size_t (RobotControlCommon::*delegate)(const char *name) const, std::function<void *(size_t, size_t, const char *,const char *)>External)
+	size_t (RobotControlCommon::*delegate)(const char *name) const, std::function<void *(size_t, size_t, const char *,const char *,bool &DoNotCreate)>External)
 {
 	//typedef Control_Assignment_Properties::Controls_1C Controls_1C;
 	typedef Control_Assignment_Properties::Control_Element_1C Control_Element_1C;
@@ -231,8 +231,11 @@ __inline void Initialize_1C_LUT(const Control_Assignment_Properties::Controls_1C
 		//The name may not exist in this list (it may be a name specific to the robot)... in which case there is no work to do
 		if (enumIndex==(size_t)-1)
 			continue;
+		bool DoNotCreate = false;
 		//See if we have an external hook to allocate this control already
-		T *NewElement=(T *)External(element.Module, element.Channel, element.name.c_str(),element.type.c_str());
+		T *NewElement=(T *)External(element.Module, element.Channel, element.name.c_str(),element.type.c_str(), DoNotCreate);
+		if (DoNotCreate)
+			continue;
 		if (NewElement == nullptr)
 		{
 			//create the new Control
@@ -309,12 +312,12 @@ void RobotControlCommon::RobotControlCommon_Initialize(const Control_Assignment_
 	//Note: PWMSpeedControllers,Servos, and Relays share the PWM slots; therefore they share the same enumeration, and can be used interchangeably in high level code
 	//PWMSpeedControllers
 	Initialize_1C_LUT<Victor,PWMSpeedController>(props.GetPWMSpeedControllers(),m_PWMSpeedControllers,m_PWMSpeedControllerLUT,this,&RobotControlCommon::RobotControlCommon_Get_PWMSpeedController_EnumValue, 
-		[&](size_t Module, size_t Channel, const char *Name, const char *Type)
+		[&](size_t Module, size_t Channel, const char *Name, const char *Type,bool &DoNotCreate)
 		{
 			//Ok Explanation is needed here... first we try the external use case, if it returns a pointer we are good
-			void *ret = m_ExternalPWMSpeedController(Module,Channel,Name,Type);
+			void *ret = m_ExternalPWMSpeedController(Module,Channel,Name,Type,DoNotCreate);
 			//If not... we create the correct control based off of its type
-			if (ret == nullptr)
+			if ((ret == nullptr)&&(DoNotCreate==false))
 			{
 				//Currently we have either Victor or VictorSP
 				if (strcmp(Type, "VictorSP") == 0)
@@ -439,20 +442,23 @@ void Encoder2::SetReverseDirection(bool reverseDirection)
  /*																RobotDrive2															*/
 /***********************************************************************************************************************************/
 
-const int32_t kMaxNumberOfMotors=4;
+const int32_t kMaxNumberOfMotors=6;
 
 void RobotDrive2::InitRobotDrive() {
 	m_frontLeftMotor = NULL;
 	m_frontRightMotor = NULL;
 	m_rearRightMotor = NULL;
 	m_rearLeftMotor = NULL;
+	m_centerLeftMotor = NULL;
+	m_centerRightMotor = NULL;
 	m_sensitivity = 0.5;
 	m_maxOutput = 1.0;
 	m_LeftOutput=0.0,m_RightOutput=0.0;
 }
 
 RobotDrive2::RobotDrive2(PWMSpeedController *frontLeftMotor, PWMSpeedController *rearLeftMotor,
-						PWMSpeedController *frontRightMotor, PWMSpeedController *rearRightMotor)
+						PWMSpeedController *frontRightMotor, PWMSpeedController *rearRightMotor,
+						PWMSpeedController *centerLeftMotor, PWMSpeedController *centerRightMotor)
 {
 	InitRobotDrive();
 	if (frontLeftMotor == NULL || rearLeftMotor == NULL || frontRightMotor == NULL || rearRightMotor == NULL)
@@ -468,6 +474,8 @@ RobotDrive2::RobotDrive2(PWMSpeedController *frontLeftMotor, PWMSpeedController 
 	m_rearLeftMotor = rearLeftMotor;
 	m_frontRightMotor = frontRightMotor;
 	m_rearRightMotor = rearRightMotor;
+	m_centerLeftMotor = centerLeftMotor;
+	m_centerRightMotor = centerRightMotor;
 	for (int32_t i=0; i < kMaxNumberOfMotors; i++)
 	{
 		m_invertedMotors[i] = 1;
@@ -498,6 +506,8 @@ RobotDrive2::~RobotDrive2()
 		delete m_rearLeftMotor;
 		delete m_frontRightMotor;
 		delete m_rearRightMotor;
+		delete m_centerLeftMotor;
+		delete m_centerRightMotor;
 	}
 }
 
@@ -517,6 +527,11 @@ void RobotDrive2::SetLeftRightMotorOutputs(float leftOutput, float rightOutput)
 
 	m_frontRightMotor->Set((float)(-Limit(rightOutput) * m_invertedMotors[kFrontRightMotor] * m_maxOutput));
 	m_rearRightMotor->Set((float)(-Limit(rightOutput) * m_invertedMotors[kRearRightMotor] * m_maxOutput));
+
+	if (m_centerLeftMotor)
+		m_centerLeftMotor->Set((float)(Limit(leftOutput) * m_invertedMotors[kCenterLeftMotor] * m_maxOutput));
+	if (m_centerRightMotor)
+		m_centerRightMotor->Set((float)(Limit(rightOutput) * m_invertedMotors[kCenterRightMotor] * m_maxOutput));
 
 	//TODO should eventually update to reflect this, but this shouldn't affect the functionality
 	#if 0

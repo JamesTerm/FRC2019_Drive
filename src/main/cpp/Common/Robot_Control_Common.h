@@ -314,10 +314,13 @@ public:
 		kFrontLeftMotor = 0,
 		kFrontRightMotor = 1,
 		kRearLeftMotor = 2,
-		kRearRightMotor = 3
+		kRearRightMotor = 3,
+		kCenterLeftMotor = 4,
+		kCenterRightMotor =5
 	};
 
-	RobotDrive2(PWMSpeedController *frontLeftMotor, PWMSpeedController *rearLeftMotor,PWMSpeedController *frontRightMotor, PWMSpeedController *rearRightMotor);
+	RobotDrive2(PWMSpeedController *frontLeftMotor, PWMSpeedController *rearLeftMotor,PWMSpeedController *frontRightMotor, PWMSpeedController *rearRightMotor,
+		PWMSpeedController *centerLeftMotor=nullptr, PWMSpeedController *centerRightMotor=nullptr);
 	RobotDrive2(PWMSpeedController &frontLeftMotor, PWMSpeedController &rearLeftMotor,PWMSpeedController &frontRightMotor, PWMSpeedController &rearRightMotor);
 	virtual ~RobotDrive2();
 
@@ -342,7 +345,7 @@ protected:
 
 	//static const int32_t kMaxNumberOfMotors = 4;
 
-	int32_t m_invertedMotors[4];
+	int32_t m_invertedMotors[6];
 	float m_sensitivity;
 	double m_maxOutput;
 	bool m_deleteSpeedControllers;
@@ -350,7 +353,8 @@ protected:
 	PWMSpeedController *m_frontRightMotor;
 	PWMSpeedController *m_rearLeftMotor;
 	PWMSpeedController *m_rearRightMotor;
-
+	PWMSpeedController *m_centerLeftMotor;
+	PWMSpeedController *m_centerRightMotor;
 private:
 	int32_t GetNumMotors()
 	{
@@ -359,6 +363,8 @@ private:
 		if (m_frontRightMotor) motors++;
 		if (m_rearLeftMotor) motors++;
 		if (m_rearRightMotor) motors++;
+		if (m_centerLeftMotor) motors++;
+		if (m_centerRightMotor) motors++;
 		return motors;
 	}
 	float m_LeftOutput,m_RightOutput;
@@ -384,7 +390,10 @@ class COMMON_API RobotControlCommon
 		//PWMSpeedController methods
 		__inline double PWMSpeedController_GetCurrentPorV(size_t index) {return LUT_VALID(m_PWMSpeedControllerLUT)?m_PWMSpeedControllers[m_PWMSpeedControllerLUT[index]]->Get() : 0.0;}
 		__inline void PWMSpeedController_UpdateVoltage(size_t index,double Voltage) {IF_LUT(m_PWMSpeedControllerLUT) m_PWMSpeedControllers[m_PWMSpeedControllerLUT[index]]->Set((float)Voltage);}
-		__inline PWMSpeedController *PWMSpeedController_GetInstance(size_t index) {return LUT_VALID(m_PWMSpeedControllerLUT)?m_PWMSpeedControllers[m_PWMSpeedControllerLUT[index]] : NULL;}
+		__inline PWMSpeedController *PWMSpeedController_GetInstance(size_t index) 
+		{
+			return LUT_VALID(m_PWMSpeedControllerLUT)?m_PWMSpeedControllers[m_PWMSpeedControllerLUT[index]] : NULL;
+		}
 
 		//servo methods
 		__inline double Servo_GetCurrentPorV(size_t index) {return LUT_VALID(m_ServoLUT)?m_Servos[m_ServoLUT[index]]->Get() : 0.0;}
@@ -440,7 +449,7 @@ class COMMON_API RobotControlCommon
 		}
 		__inline void DestroyBuiltInAccelerometer(Accelerometer *instance) {delete instance;}
 		//Give ability to have controls be created externally
-		void SetExternalPWMSpeedControllerHook(std::function<void *(size_t, size_t, const char *,const char *)> callback) { m_ExternalPWMSpeedController = callback; }
+		void SetExternalPWMSpeedControllerHook(std::function<void *(size_t, size_t, const char *,const char *,bool &)> callback) { m_ExternalPWMSpeedController = callback; }
 	protected:
 		virtual void RobotControlCommon_Initialize(const Control_Assignment_Properties &props);
 		//Override by derived class
@@ -459,6 +468,6 @@ class COMMON_API RobotControlCommon
 		std::vector<Encoder2 *> m_Encoders;
 
 		Controls_LUT m_PWMSpeedControllerLUT,m_ServoLUT,m_RelayLUT,m_DigitalInputLUT,m_AnalogInputLUT,m_DoubleSolenoidLUT,m_EncoderLUT;
-		std::function<void *(size_t,size_t,const char *,const char *)> m_ExternalPWMSpeedController;
+		std::function<void *(size_t,size_t,const char *,const char *,bool &)> m_ExternalPWMSpeedController;
 };
 }

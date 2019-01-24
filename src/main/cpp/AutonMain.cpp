@@ -147,7 +147,7 @@ public:
 		#if 1
 		//Hook in our own PWMSpeedController allocator here
 		m_Control.SetExternalPWMSpeedControllerHook(
-		[&](size_t module, size_t Channel, const char *Name, const char*Type)
+		[&](size_t module, size_t Channel, const char *Name, const char*Type,bool &DoNotCreate)
 		{
 			//TODO hook our active collection here
 			//printf("Robot: Get External PWMSpeedController %s[%d,%d]\n",Name,module,Channel);
@@ -156,7 +156,7 @@ public:
 		//Note: For Simulation, Tank_Robot_Control needs __Tank_TestControlAssignments__ defined; otherwise there are no hooks to set
 		//Swerve drive merged both techniques, and eventually Tank could do the same, for now, they are still separate
 		m_Control.SetDriveExternalPWMSpeedControllerHook(
-			[&](size_t module, size_t Channel, const char *Name, const char*Type)
+			[&](size_t module, size_t Channel, const char *Name, const char*Type, bool &DoNotCreate)
 		{
 			if (!m_Collection) return (void *)nullptr;  //support if I'm not going to use a collection
 			void *ret = nullptr;
@@ -168,17 +168,20 @@ public:
 			{
 			case Tank_Robot::eLeftDrive1:		ConfigNaming = "Left_0";		break;
 			case Tank_Robot::eLeftDrive2:		ConfigNaming = "Left_1";		break;
+			case Tank_Robot::eLeftDrive3:		ConfigNaming = "Left_2";		break;
 			case Tank_Robot::eRightDrive1:		ConfigNaming = "Right_0";		break;
 			case Tank_Robot::eRightDrive2:		ConfigNaming = "Right_1";		break;
-			default:
-				assert(false);  //should not happen
+			case Tank_Robot::eRightDrive3:		ConfigNaming = "Right_2";		break;
 			}
-			VictorSPItem *item=m_Collection->GetVictor(ConfigNaming);
-			assert(item);  //should have it unless someone has changed them (this is recoverable)
-			if (item)
+			if (ConfigNaming)
 			{
-				ret = (void *)item->AsVictorSP();
+				VictorSPItem *item = m_Collection->GetVictor(ConfigNaming);
+				if (item)
+					ret = (void *)item->AsVictorSP();
 			}
+
+			if (!ret)
+				DoNotCreate = true;   //Let caller know to not create this, since we do not have a resource for it
 			return ret;
 		});
 		#endif
