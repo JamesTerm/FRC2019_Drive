@@ -182,7 +182,7 @@ private:
 		eAuton,
 		eTeleop,
 		eTest
-	} m_GameMode=eTest;
+	} m_GameMode= eTeleop;  //default is like it is on the driver station
 	bool m_DisplayControls = false;
 public:
 	RobotTester_Internal()

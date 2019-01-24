@@ -11,7 +11,37 @@
 
 namespace frc {
 
-	class DriverStation;
+	//class DriverStation;
+	class DirectJoystick_Interface {
+	public:
+		DirectJoystick_Interface() {}
+		~DirectJoystick_Interface() {}
+
+		DirectJoystick_Interface(const DirectJoystick_Interface&) = delete;
+		DirectJoystick_Interface& operator=(const DirectJoystick_Interface&) = delete;
+
+		static DirectJoystick_Interface& GetInstance();
+		//static void ReportError(const wpi::Twine& error);
+		//static void ReportWarning(const wpi::Twine& error);
+		//static void ReportError(bool isError, int code, const wpi::Twine& error,const wpi::Twine& location, const wpi::Twine& stack);
+		static constexpr int kJoystickPorts = 6;
+		bool GetStickButton(int stick, int button);
+		bool GetStickButtonPressed(int stick, int button);
+		bool GetStickButtonReleased(int stick, int button);
+		double GetStickAxis(int stick, int axis);
+		int GetStickPOV(int stick, int pov);
+		int GetStickButtons(int stick) const;
+		int GetStickAxisCount(int stick) const;
+		int GetStickPOVCount(int stick) const;
+		int GetStickButtonCount(int stick) const;
+		bool GetJoystickIsXbox(int stick) const;
+		int GetJoystickType(int stick) const;
+		std::string GetJoystickName(int stick) const;
+		int GetJoystickAxisType(int stick, int axis) const;
+		bool IsTest() const { return false; }
+		bool IsDSAttached() const { return false; }
+	private:
+	};
 
 	/**
 	 * GenericHID Interface.
@@ -176,7 +206,7 @@ namespace frc {
 		void SetRumble(RumbleType type, double value);
 
 	private:
-		DriverStation& m_ds;
+		DirectJoystick_Interface& m_ds;
 		int m_port;
 		int m_outputs = 0;
 		uint16_t m_leftRumble = 0;

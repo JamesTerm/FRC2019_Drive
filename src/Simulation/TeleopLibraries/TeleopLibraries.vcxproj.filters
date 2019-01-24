@@ -89,6 +89,9 @@
     <ClCompile Include="frc\SampleRobot.cpp">
       <Filter>frc</Filter>
     </ClCompile>
+    <ClCompile Include="frc\DirectInput_Joystick.cpp">
+      <Filter>frc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main\cpp\Components\DigitalInputItem.h">
@@ -161,6 +164,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="frc\SampleRobot.h">
+      <Filter>frc</Filter>
+    </ClInclude>
+    <ClInclude Include="frc\DirectInput_Joystick.h">
       <Filter>frc</Filter>
     </ClInclude>
   </ItemGroup>

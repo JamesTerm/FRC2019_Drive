@@ -42,6 +42,7 @@
     <ClCompile Include="..\..\main\cpp\Controls\ToggleButtonControl.cpp" />
     <ClCompile Include="..\..\main\cpp\Robot.cpp" />
     <ClCompile Include="..\..\main\cpp\Systems\Drive.cpp" />
+    <ClCompile Include="frc\DirectInput_Joystick.cpp" />
     <ClCompile Include="frc\Joystick.cpp" />
     <ClCompile Include="frc\SampleRobot.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -69,6 +70,7 @@
     <ClInclude Include="..\..\main\cpp\Systems\Drive.h" />
     <ClInclude Include="AHRS.h" />
     <ClInclude Include="ctre\Phoenix.h" />
+    <ClInclude Include="frc\DirectInput_Joystick.h" />
     <ClInclude Include="frc\Joystick.h" />
     <ClInclude Include="frc\SampleRobot.h" />
     <ClInclude Include="frc\WPILib.h" />

@@ -1,17 +1,140 @@
 
 #include <frc/WPILib.h>
 #include "Joystick.h"
+#define FRAMEWORK_BASE_API
+#include "DirectInput_Joystick.h"
 
 using namespace frc;
 
 constexpr double kPi = 3.14159265358979323846;
 
 
+#if 0
 DriverStation& DriverStation::GetInstance()
 {
 	static DriverStation s_DriverStation;
 	return s_DriverStation;
 }
+#else
+
+void PollJoyInfo();
+static GG_Framework::Base::IJoystick *s_joy=nullptr;  
+DirectJoystick_Interface& DirectJoystick_Interface::GetInstance()
+{
+	static DirectJoystick_Interface s_DJI;
+	s_joy = &GG_Framework::Base::GetDirectInputJoystick();
+	PollJoyInfo(); //initial poll
+	return s_DJI;
+}
+#endif
+
+  /*******************************************************************************************************************************/
+ /*													DirectJoystick_Interface													*/
+/*******************************************************************************************************************************/
+
+static GG_Framework::Base::IJoystick::JoyState s_joy_state[3];
+static GG_Framework::Base::IJoystick::JoystickInfo s_joy_info[3];
+
+void PollJoyInfo()
+{
+	size_t joy_count = s_joy->GetNoJoysticksFound();
+	assert(joy_count < 4);
+	for (size_t i = 0; i < joy_count; i++)
+	{
+		s_joy_info[i] = s_joy->GetJoyInfo(i);
+	}
+}
+
+
+bool DirectJoystick_Interface::GetStickButton(int stick, int button) 
+{
+	assert(button < 32);
+	//and a shift bit against the current button bank state to see if its pressed
+	int test = s_joy_state[stick].ButtonBank[0] & (1 << button);
+	return test!=0; 
+}
+bool DirectJoystick_Interface::GetStickButtonPressed(int stick, int button) 
+{
+	return false; 
+}
+bool DirectJoystick_Interface::GetStickButtonReleased(int stick, int button) 
+{ 
+	return false; 
+}
+//Keep things on one thread... we'll issue the read here
+double DirectJoystick_Interface::GetStickAxis(int stick, int axis) 
+{
+	assert(stick < 3);
+	s_joy->read_joystick(stick, s_joy_state[stick]);
+	double ret = 0.0;
+	switch (axis)
+	{
+	case 0:	ret = s_joy_state[stick].lX; break;
+	case 1:	ret = s_joy_state[stick].lY; break;
+	case 2:	ret = s_joy_state[stick].lZ; break;
+	case 3:	ret = s_joy_state[stick].lRx; break;
+	case 4:	ret = s_joy_state[stick].lRy; break;
+	case 5:	ret = s_joy_state[stick].lRz; break;
+	default:
+		assert(false);  //what axis is this?
+	}
+	return ret; 
+}
+int DirectJoystick_Interface::GetStickPOV(int stick, int pov) 
+{ 
+	assert(pov < 4);
+	return (int)s_joy_state[stick].rgPOV[pov]; 
+}
+int DirectJoystick_Interface::GetStickButtons(int stick) const 
+{
+	//Not sure about this one
+	return s_joy_state[stick].ButtonBank[0];
+}
+int DirectJoystick_Interface::GetStickAxisCount(int stick) const 
+{ 
+	size_t flags = s_joy_info[stick].JoyCapFlags  & 0x3F; //mask for only the first 6 bits
+	int count = 0;
+	//Gah
+	int BitCount_LUT[64] =
+	{ 
+		0,1,1,2,1,2,2,3, 1,2,2,3,2,3,3,4,   //0-F
+		1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5,   //0001 10-1F
+		1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5,   //0010 20-2F
+		2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6,   //0011 30-3F
+	};
+
+	return BitCount_LUT[flags];
+}
+int DirectJoystick_Interface::GetStickPOVCount(int stick) const 
+{ 
+	int count = s_joy_info[stick].nPOVCount;
+	assert(count < 4);
+	return count; 
+}
+int DirectJoystick_Interface::GetStickButtonCount(int stick) const 
+{ 
+	int count = s_joy_info[stick].nButtonCount;
+	assert(count < 32);
+	return count;
+}
+bool DirectJoystick_Interface::GetJoystickIsXbox(int stick) const 
+{ 
+	return false;  //direct input doesn't support this
+}
+int DirectJoystick_Interface::GetJoystickType(int stick) const 
+{ 
+	return GenericHID::kHIDGamepad;  //doesn't support this either
+}
+std::string DirectJoystick_Interface::GetJoystickName(int stick) const 
+{ 
+	return s_joy_info->InstanceName;  //instance may be preferred when having multiple of the same
+}
+int DirectJoystick_Interface::GetJoystickAxisType(int stick, int axis) const 
+{ 
+	//currently I'm not remapping, but if I do this will need to be fixed
+	return axis; 
+}
+
 
 int32_t frc::HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
 	int32_t leftRumble, int32_t rightRumble) {
@@ -23,7 +146,8 @@ int32_t frc::HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
   /*******************************************************************************************************************************/
  /*															GenericHID															*/
 /*******************************************************************************************************************************/
-GenericHID::GenericHID(int port) : m_ds(DriverStation::GetInstance()) {
+//GenericHID::GenericHID(int port) : m_ds(DriverStation::GetInstance()) {
+GenericHID::GenericHID(int port) : m_ds(DirectJoystick_Interface::GetInstance()) {
 	//if (port >= DriverStation::kJoystickPorts) {
 	//	wpi_setWPIError(BadJoystickIndex);
 	//}
