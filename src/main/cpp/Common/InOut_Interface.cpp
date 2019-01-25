@@ -87,7 +87,7 @@ unsigned long GetCapabilitiesFlags(const LUA_Controls_Properties &control_props,
 	if (posn!= controls.end())
 		AxisCount=(*posn).AxisCount;
 
-	#if 1
+	#if 0
 	//Testing
 	std::string VarName="AxisCount_";
 	VarName+=ControlName;

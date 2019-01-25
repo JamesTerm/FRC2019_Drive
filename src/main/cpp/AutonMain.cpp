@@ -136,8 +136,8 @@ public:
 		}
 
 		//start in auton (can manage this later)
-		SmartDashboard::PutBoolean("Test_Auton", true);
-		SmartDashboard::PutNumber("AutonTest", 0.0);
+		SmartDashboard::SetDefaultBoolean("Test_Auton", true);
+		SmartDashboard::SetDefaultNumber("AutonTest", 0.0);
 	}
 
 	AutonMain_Internal(const char *RobotLua, Configuration::ActiveCollection *Collection) :

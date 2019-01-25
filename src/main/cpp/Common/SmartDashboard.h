@@ -36,9 +36,36 @@ public:
 
 	static void PutBoolean(std::string keyName, bool value);
 	static bool GetBoolean(std::string keyName);
-
+	static bool SetDefaultBoolean(std::string keyName, bool defaultValue)
+	{
+		bool ret = true;
+		try
+		{
+			SmartDashboard::GetBoolean(keyName);
+			ret = false;   //* @return        False if the table key already exists with a different type
+		}
+		catch (...)
+		{
+			SmartDashboard::PutBoolean(keyName, defaultValue);
+		}
+		return ret;
+	}
 	static void PutNumber(std::string keyName, double value);
 	static double GetNumber(std::string keyName);
+	static bool SetDefaultNumber(std::string keyName, double defaultValue)
+	{
+		bool ret = true;
+		try
+		{
+			SmartDashboard::GetNumber(keyName);
+			ret = false;   //* @return        False if the table key already exists with a different type
+		}
+		catch (...)
+		{
+			SmartDashboard::PutNumber(keyName, defaultValue);
+		}
+		return ret;
+	}
 
 	static void PutString(std::string keyName, std::string value);
 	static int GetString(std::string keyName, char *value, unsigned int valueLen);

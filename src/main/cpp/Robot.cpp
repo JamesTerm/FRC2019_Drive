@@ -117,10 +117,10 @@ void Robot::Test()
 		LastTime = CurrentTime;
 		if (DeltaTime == 0.0) continue;  //never send 0 time
 		//printf("DeltaTime=%.2f\n",DeltaTime);
-		#if 1
+		#ifndef _Win32
 		m_Robot.Update(DeltaTime);
 		#else
-		m_Robot.Update(0.01);
+		m_Robot.Update(0.01);  //It's best to use sythetic time for simulation to step through code
 		#endif
 		//using this from test runs from robo wranglers code
 		Wait(0.010);

@@ -155,8 +155,8 @@ class FRC2019_Robot : public Tank_Robot
 				virtual void BindAdditionalEventControls(bool Bind);
 				void Advance(bool on);
 				void Retract(bool on);
-				//events are a bit picky on what to subscribe so we'll just wrap from here
-				void SetRequestedVelocity_FromNormalized(double Velocity) {__super::SetRequestedVelocity_FromNormalized(Velocity);}
+				//events are a bit picky on what to subscribe so we'll just wrap from here... also great place for breakpoint
+				void SetRequestedVelocity_FromNormalized(double Velocity);
 
 				void SetPotentiometerSafety(bool DisableFeedback) {__super::SetPotentiometerSafety(DisableFeedback);}
 				virtual void TimeChange(double dTime_s);
