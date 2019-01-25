@@ -31,3 +31,4 @@ class Goal_DriveWithTimer : public Goal_DoNothing
     virtual Goal::Goal_Status Process(double dTime_s);
     void Terminate();
 };
+

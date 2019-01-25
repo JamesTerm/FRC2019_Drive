@@ -108,9 +108,7 @@ class  MultitaskGoal : public Goal
 class Generic_CompositeGoal : public CompositeGoal
 {
 	private:
-		#ifndef _Win32
-		typedef CompositeGoal __super;
-		#endif
+		
 		bool m_AutoActivate;
 	public:
 		Generic_CompositeGoal(bool AutoActivate=false) : m_AutoActivate(AutoActivate)
