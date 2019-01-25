@@ -3,7 +3,7 @@
 #include <list>
 #include "Goal.h"
 
-
+using namespace std;
 
   /***************************************************************************************************************/
  /*												CompositeGoal													*/
@@ -56,9 +56,10 @@ Goal::Goal_Status CompositeGoal::ProcessSubgoals(double dTime_s)
  /*												MultitaskGoal													*/
 /***************************************************************************************************************/
 
-MultitaskGoal::MultitaskGoal(bool WaitAll) : m_WaitAll(WaitAll)
+MultitaskGoal::MultitaskGoal(ActiveCollection* activeCollection, bool WaitAll) : m_WaitAll(WaitAll)
 {
 	m_Status=eInactive;
+
 }
 
 void MultitaskGoal::RemoveAllGoals()
@@ -80,6 +81,7 @@ void MultitaskGoal::Activate()
 {
 	for (GoalList::iterator it = m_GoalsToProcess.begin(); it!=m_GoalsToProcess.end(); ++it)
 		(*it)->Activate();
+	m_Status = eActive;
 }
 Goal::Goal_Status MultitaskGoal::Process(double dTime_s)
 {
@@ -92,12 +94,18 @@ Goal::Goal_Status MultitaskGoal::Process(double dTime_s)
 	//detected... This way any success that happened will be reflected and dealt with below
 	for (GoalList::iterator it = m_GoalsToProcess.begin(); it!=m_GoalsToProcess.end(); ++it)
 	{
-		status=(*it)->Process(dTime_s);
-		//If any subgoal fails... bail
+		
+		status= (*it)->Process(dTime_s);
+
 		if (status==eFailed)
+		{
+			cout << "eFailed" << endl;
 			return eFailed;
+		}
+			
 		if (status!=eActive)
 		{
+			cout << "not active" << endl;
 			NonActiveCount++;
 			SuccessDetected|=(status==eCompleted);
 		}

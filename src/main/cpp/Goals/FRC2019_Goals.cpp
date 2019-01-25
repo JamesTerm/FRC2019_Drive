@@ -50,12 +50,41 @@ Goal::Goal_Status Goal_DoNothing::Process(double dTime_s)
         cout << m_currentTime << endl;
         if (m_currentTime >= m_timeOut)
         {
+            cout << "eCompleted" << endl;
             return eCompleted;
             Terminate();
         }
+        return eActive;
     }
     else
     {
         return eInactive;
     }
+}
+
+Goal::Goal_Status Goal_DriveWithTimer::Process(double dTime_s)
+{
+    if (m_Status == eActive)
+    {
+        m_currentTime += dTime_s;
+        cout << "process " << m_currentTime << endl;
+        SetDrive(.5,.5,m_activeCollection);
+        if (m_currentTime >= m_timeOut)
+        {
+
+            cout << "eCompleted" << endl;
+            Terminate();
+            return eCompleted;
+        }
+        return eActive;
+    }
+    else
+    {
+        return eInactive;
+    }
+}
+
+void Goal_DriveWithTimer::Terminate()
+{
+    StopDrive(m_activeCollection);
 }

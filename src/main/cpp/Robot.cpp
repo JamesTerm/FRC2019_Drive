@@ -23,7 +23,7 @@ using namespace std;
 	{
 		m_drive = new Drive();
 		m_activeCollection = new ActiveCollection();
-		m_masterGoal = new MultitaskGoal();
+		
 	}
 
 	/**
@@ -44,19 +44,26 @@ using namespace std;
 	 * Uses the SmartDashboard to select the proper Autonomous mode to run
 	 */
 	void Robot::Autonomous()
-	{
+	{	
+		m_masterGoal = new MultitaskGoal(m_activeCollection);
 		cout << "Autonomous Started." << endl;
 				string autoSelected = SmartDashboard::GetString("Auto Selector", m_driveStraight);
 		cout << autoSelected << endl;
 
-		m_masterGoal->AddGoal(new Goal_DoNothing(5.0));
+		m_masterGoal->AddGoal(new Goal_DoNothing(m_activeCollection, 5.0));
+		cout << "test1" << endl;
 		m_masterGoal->Activate();
+		//cout << m_masterGoal->GetStatus() << endl;
+		//Pcout << m_masterGoal->listSize() << endl;
 		double dTime = 0.010;
 		while(m_masterGoal->GetStatus() == Goal::eActive)
 		{
+			cout << "loop" << endl;
 			m_masterGoal->Process(dTime);
+			cout << "loop: " << m_masterGoal->GetStatus() << endl;
 			Wait(dTime);
 		}
+		cout << "goal loop complete" << endl;
 		#if 0 //old code
 		if (autoSelected == m_driveStraight) //!< Drive Straight Autonomous
 		{

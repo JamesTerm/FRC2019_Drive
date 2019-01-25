@@ -28,18 +28,18 @@ static void SetDrive(double left, double right, ActiveCollection *activeCollecti
 {
 	VictorSPItem *left_0 = activeCollection->GetVictor("Left_0"); //creates pointers to motor objects. This robot has three left motors and three right motors
 	VictorSPItem *left_1 = activeCollection->GetVictor("Left_1");
-	VictorSPItem *left_2 = activeCollection->GetVictor("Left_2");
+	//VictorSPItem *left_2 = activeCollection->GetVictor("Left_2");
 	VictorSPItem *right_0 = activeCollection->GetVictor("Right_0");
 	VictorSPItem *right_1 = activeCollection->GetVictor("Right_1");
-	VictorSPItem *right_2 = activeCollection->GetVictor("Right_2");
+	//VictorSPItem *right_2 = activeCollection->GetVictor("Right_2");
 	
 
 	left_0->Set(left); //sets left and right motors to desired power
 	left_1->Set(left);
-	left_2->Set(left);
+	//left_2->Set(left);
 	right_0->Set(right);
 	right_1->Set(right);
-	right_2->Set(right);
+	//right_2->Set(right);
 }
 static void StopDrive(ActiveCollection *activeCollection) //sets drive power to zero
 {
