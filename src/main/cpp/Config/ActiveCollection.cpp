@@ -26,91 +26,106 @@ ActiveCollection::ActiveCollection(){}
  * Method to return a NativeComponent of a certain type and name
 **/
 
-NativeComponent* ActiveCollection::Get(string name){
+NativeComponent* ActiveCollection::Get(string name)
+{
+	NativeComponent *ret = nullptr;
 	try{
 		for(int i=0; i<(int)activeCollection.size();i++)
 			if((*activeCollection[i]).name == (string)name)
-				return activeCollection[i];
-		throw "AHHH";
+				ret=activeCollection[i];
+		if(!ret) throw "AHHH";
 	}
 	catch(...){
 		cout << "Cannot find component " << name << ", it does not exist in the active collection!\nCheck your type correlation!" << endl;
 	}
+	return ret;
 }
 
 /**
  * Method to return a VictorSP of a certain name
 **/
-VictorSPItem* ActiveCollection::GetVictor(string name){
+VictorSPItem* ActiveCollection::GetVictor(string name)
+{
+	VictorSPItem *ret = nullptr;
 	try{
 		for(int i=0; i<(int)activeCollection.size();i++){
 			if((*activeCollection[i]).name == (string)name){
-				return (VictorSPItem*)activeCollection[i];
+				ret=(VictorSPItem*)activeCollection[i];
 			}
 		}
-		throw "AHHH";
+		if (!ret) throw "AHHH";
 	}
 	catch(...){
 		cout << "Cannot find victor " << name << ", it does not exist in the active collection!\n" << endl;
 	}
+	return ret;
 }
 
 /**
  * Method to return a TalonSRX of a certain name
 **/
-TalonSRXItem* ActiveCollection::GetTalon(string name){
+TalonSRXItem* ActiveCollection::GetTalon(string name)
+{
+	TalonSRXItem *ret = nullptr;
 	try{
 		for(int i=0; i<(int)activeCollection.size();i++){
 			if((*activeCollection[i]).name == (string)name){
-				return (TalonSRXItem*)activeCollection[i];
+				ret=(TalonSRXItem*)activeCollection[i];
 			}
 		}
-		throw "AHHH";
+		if (!ret) throw "AHHH";
 	}
 	catch(...){
 		cout << "Cannot find talon " << name << ", it does not exist in the active collection!\n" << endl;
 	}
+	return ret;
 }
 
 /**
  * Method to return an Encoder of a certain name
 **/
-EncoderItem* ActiveCollection::GetEncoder(string name){
+EncoderItem* ActiveCollection::GetEncoder(string name)
+{
+	EncoderItem *ret = nullptr;
 	try{
 		for(int i=0; i<(int)activeCollection.size();i++){
 			if((*activeCollection[i]).name == (string)name){
-				return (EncoderItem*)activeCollection[i];
+				ret=(EncoderItem*)activeCollection[i];
 			}
 		}
-		throw "AHHH";
+		if (!ret) throw "AHHH";
 	}
 	catch(...){
 		cout << "Cannot find encoder " << name << ", it does not exist in the active collection!\n" << endl;
 	}
+	return ret;
 }
 
 /**
  * Method to return the NavX
 **/
-NavX* ActiveCollection::GetNavX(){
+NavX* ActiveCollection::GetNavX()
+{
+	NavX *ret = nullptr;
 	try{
 		for(int i=0; i<(int)activeCollection.size();i++){
 			if((*activeCollection[i]).name == "NavX"){
-				return (NavX*)activeCollection[i];
+				ret=(NavX*)activeCollection[i];
 			}
 		}
-		throw "AHHH";
+		if (!ret) throw "AHHH";
 	}
 	catch(...){
 		cout << "Cannot find the NavX, check the config." << endl;
 	}
+	return ret;
 }
 
 /**
  * Method to return the current size of the ActiveCollection list
 **/
 int ActiveCollection::GetSize(){
-	return activeCollection.size();
+	return (int)activeCollection.size();
 }
 
 /**

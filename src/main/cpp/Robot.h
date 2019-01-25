@@ -31,6 +31,7 @@ class Robot : public SampleRobot
 {   
     public:
         Robot();
+		~Robot();
 
         void RobotInit() override;
         void Autonomous() override;
