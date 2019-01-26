@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stack>
 #include <list>
 #include <iostream>
 
@@ -58,7 +59,7 @@ class   AtomicGoal : public Goal
 		//bool HandleMessage()  //TODO get event equivalent
 
 };
-
+#if 0
 class   CompositeGoal : public Goal
 {
 	protected:  //from Goal
@@ -78,6 +79,19 @@ class   CompositeGoal : public Goal
 	private:
 		typedef std::list<Goal *> SubgoalList;
 		SubgoalList m_SubGoals;
+};
+#endif
+class CompositeGoal : public Goal
+{
+	protected:
+	virtual void Activate();
+	virtual Goal_Status Process(double dTime);
+	virtual void Terminate();
+
+	virtual void AddSubgoal(Goal* g) {m_SubGoals.push(g);}
+	private:
+	typedef std::stack<Goal*> SubgoalStack;
+	SubgoalStack m_SubGoals;
 };
 
 //Similar to a Composite goal where it is composed of a list of goals, but this one will process all goals simultaneously
@@ -104,6 +118,7 @@ class  MultitaskGoal : public Goal
 		bool m_WaitAll;
 };
 
+#if 0
 //This class can be used as a stand-alone composite which does nothing special but goes through a list
 class Generic_CompositeGoal : public CompositeGoal
 {
@@ -119,10 +134,11 @@ class Generic_CompositeGoal : public CompositeGoal
 			m_activeCollection = activeCollection;
 		}
 		//give public access for client to populate goals
-		//virtual void AddSubgoal(Goal *g) {__super::AddSubgoal(g);} 
+		virtual void AddSubgoal(Goal *g) {__super::AddSubgoal(g);} 
 		//client activates manually when goals are added
 		virtual void Activate()
 		{
+			cout << "Generic activate" << endl;
 			m_Status=eActive; 
 			
 		}
@@ -150,3 +166,4 @@ class Generic_CompositeGoal : public CompositeGoal
 	protected:
 	ActiveCollection* m_activeCollection;
 };
+#endif

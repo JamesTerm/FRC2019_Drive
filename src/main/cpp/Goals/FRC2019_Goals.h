@@ -50,10 +50,10 @@ class Goal_DriveWithTimer : public Goal_Timer
 /* Goal_WaitThenDrive
  * This is just a test composite goal. Unlikely it will be used IRL
  */
-class Goal_WaitThenDrive : public Generic_CompositeGoal
+class Goal_WaitThenDrive : public CompositeGoal
 {
   public:
-    Goal_WaitThenDrive(ActiveCollection *activeCollection, double leftSpeed, double rightSpeed, double waitTime, double driveTime) : Generic_CompositeGoal(activeCollection, true)
+    Goal_WaitThenDrive(ActiveCollection *activeCollection, double leftSpeed, double rightSpeed, double waitTime, double driveTime)
     {
         m_activeCollection = activeCollection;
         m_leftSpeed = leftSpeed;
@@ -63,6 +63,7 @@ class Goal_WaitThenDrive : public Generic_CompositeGoal
     }
     virtual void Activate();
   private:
+    ActiveCollection *m_activeCollection;
     double m_leftSpeed, m_rightSpeed, m_waitTime, m_driveTime;
 };
 

@@ -5,10 +5,10 @@
 
 using namespace std;
 
-  /***************************************************************************************************************/
- /*												CompositeGoal													*/
 /***************************************************************************************************************/
-
+/*												CompositeGoal													*/
+/***************************************************************************************************************/
+#if 0
 void CompositeGoal::RemoveAllSubgoals()
 {
 	for (SubgoalList::iterator it = m_SubGoals.begin(); it!=m_SubGoals.end(); ++it)
@@ -52,22 +52,65 @@ Goal::Goal_Status CompositeGoal::ProcessSubgoals(double dTime_s)
 	cout << "Goal.cpp:51 " << StatusOfSubGoals << endl;
 	return StatusOfSubGoals;
 }
+#endif
+void CompositeGoal::Activate()
+{
+	m_Status = eActive;
+}
+Goal::Goal_Status CompositeGoal::Process(double dTime)
+{
+	if (m_Status == eActive)
+	{
+		Goal_Status newStatus = eFailed;
+		//remove finished goals
+		while (!m_SubGoals.empty() && (m_SubGoals.top()->GetStatus() == eCompleted || m_SubGoals.top()->GetStatus() == eFailed))
+		{
+			m_SubGoals.pop();
+		}
+		if (!m_SubGoals.empty())
+		{
+			//create pointer to next goal for simplicity
+			Goal* currentGoal = m_SubGoals.top();
+			//active the next goal if it isnt already
+			if (currentGoal->GetStatus() == eInactive)
+			{
+				currentGoal->Activate();
+			}
+			newStatus = currentGoal->Process(dTime);
 
+			if(newStatus == eCompleted && m_SubGoals.size() > 1)
+			{
+				newStatus = eActive;
+			}
+		}
+		else
+		{
+			Terminate();
+		}
+		return newStatus;
+	}
+	else
+	{
+		return m_Status;
+	}
+}
 
-
-  /***************************************************************************************************************/
- /*												MultitaskGoal													*/
+void CompositeGoal::Terminate()
+{
+	m_Status = eInactive;
+}
+/***************************************************************************************************************/
+/*												MultitaskGoal													*/
 /***************************************************************************************************************/
 
-MultitaskGoal::MultitaskGoal(ActiveCollection* activeCollection, bool WaitAll) : m_WaitAll(WaitAll)
+MultitaskGoal::MultitaskGoal(ActiveCollection *activeCollection, bool WaitAll) : m_WaitAll(WaitAll)
 {
-	m_Status=eInactive;
-
+	m_Status = eInactive;
 }
 
 void MultitaskGoal::RemoveAllGoals()
 {
-	for (GoalList::iterator it = m_GoalsToProcess.begin(); it!=m_GoalsToProcess.end(); ++it)
+	for (GoalList::iterator it = m_GoalsToProcess.begin(); it != m_GoalsToProcess.end(); ++it)
 	{
 		(*it)->Terminate();
 		delete *it;
@@ -82,55 +125,56 @@ MultitaskGoal::~MultitaskGoal()
 
 void MultitaskGoal::Activate()
 {
-	
-	for (GoalList::iterator it = m_GoalsToProcess.begin(); it!=m_GoalsToProcess.end(); ++it)
+
+	for (GoalList::iterator it = m_GoalsToProcess.begin(); it != m_GoalsToProcess.end(); ++it)
 		(*it)->Activate();
+	cout << "multitask activate" << endl;
 	m_Status = eActive;
 }
 Goal::Goal_Status MultitaskGoal::Process(double dTime_s)
 {
 	ActivateIfInactive();
-	Goal_Status status=eFailed;
-	size_t NonActiveCount=0;
+	Goal_Status status = eFailed;
+	size_t NonActiveCount = 0;
 
-	bool SuccessDetected=false;
+	bool SuccessDetected = false;
 	//To keep things simple we'll always run a complete iteration of all the goals for the given process cycle, and simply or in the success
 	//detected... This way any success that happened will be reflected and dealt with below
-	for (GoalList::iterator it = m_GoalsToProcess.begin(); it!=m_GoalsToProcess.end(); ++it)
+	for (GoalList::iterator it = m_GoalsToProcess.begin(); it != m_GoalsToProcess.end(); ++it)
 	{
-		
-		status= (*it)->Process(dTime_s);
+
+		status = (*it)->Process(dTime_s);
 		cout << "Goal.cpp:100 " << status << endl;
-		if (status==eFailed)
+		if (status == eFailed)
 		{
 			cout << "mtg0: eFailed" << endl;
 			m_Status = eFailed;
 			return eFailed;
 		}
-			
-		if (status!=eActive)
+
+		if (status != eActive)
 		{
 			//cout << "not active" << endl;
 			NonActiveCount++;
-			SuccessDetected|=(status==eCompleted);
+			SuccessDetected |= (status == eCompleted);
 		}
 	}
 
 	//Either we wait until no more active goals exist, or if the wait all option is false, we can complete when the first detected successful completion
 	//has occurred.  So for that... if no successful completion then it would fall back to the wait all logic and then evaluate if it failed
-	const bool IsCompleted=((NonActiveCount>=m_GoalsToProcess.size()) || ((!m_WaitAll)&&(SuccessDetected)));
+	const bool IsCompleted = ((NonActiveCount >= m_GoalsToProcess.size()) || ((!m_WaitAll) && (SuccessDetected)));
 	if (!IsCompleted)
-		m_Status=eActive;
+		m_Status = eActive;
 	else
 	{
-		status=eCompleted;
+		status = eCompleted;
 		//Check the final status it is completed unless any goal failed
-		for (GoalList::iterator it = m_GoalsToProcess.begin(); it!=m_GoalsToProcess.end(); ++it)
+		for (GoalList::iterator it = m_GoalsToProcess.begin(); it != m_GoalsToProcess.end(); ++it)
 		{
-			if ((*it)->GetStatus()==eFailed)
-				status=eFailed;
+			if ((*it)->GetStatus() == eFailed)
+				status = eFailed;
 		}
-		m_Status=status;
+		m_Status = status;
 	}
 	//cout << "mtg: " << status << endl;
 	return status;
@@ -140,5 +184,5 @@ void MultitaskGoal::Terminate()
 {
 	//ensure its all clean
 	RemoveAllGoals();
-	m_Status=eInactive; //make this inactive
+	m_Status = eInactive; //make this inactive
 }

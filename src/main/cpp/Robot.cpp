@@ -45,7 +45,7 @@ using namespace std;
 	 */
 	void Robot::Autonomous()
 	{	
-		m_masterGoal = new MultitaskGoal(m_activeCollection);
+		m_masterGoal = new MultitaskGoal(m_activeCollection, false);
 		cout << "Autonomous Started." << endl;
 				string autoSelected = SmartDashboard::GetString("Auto Selector", m_driveStraight);
 		cout << autoSelected << endl;
@@ -58,7 +58,7 @@ using namespace std;
 		m_masterGoal->Activate();
 		//cout << m_masterGoal->GetStatus() << endl;
 		//Pcout << m_masterGoal->listSize() << endl;
-		double dTime = 1.0;
+		double dTime = 0.010;
 		while(m_masterGoal->GetStatus() == Goal::eActive)
 		{
 			//cout << "loop" << endl;

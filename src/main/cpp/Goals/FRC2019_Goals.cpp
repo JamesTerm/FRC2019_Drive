@@ -6,6 +6,8 @@ using namespace std;
 void Goal_Timer::Activate()
 {
     m_Status = eActive;
+    cout << "Goal_Timer activate" << endl;
+
 }
 Goal::Goal_Status Goal_Timer::Process(double dTime)
 {
@@ -18,7 +20,7 @@ Goal::Goal_Status Goal_Timer::Process(double dTime)
         {
             //cout << "I am here" << endl;
             Terminate();
-            return eFailed; //return failed because it timed out. Even though technically this goal worked as intended, any time out should be a fail (besided drive with timer)
+            return eCompleted;
         }
         
         return eActive;
@@ -31,7 +33,7 @@ Goal::Goal_Status Goal_Timer::Process(double dTime)
 }
 void Goal_Timer::Terminate()
 {
-    m_Status = eInactive;
+    m_Status = eCompleted;
 }
 /////////////////////////Goal_DriveWithTimer/////////////////////////
 Goal::Goal_Status Goal_DriveWithTimer::Process(double dTime)
@@ -59,13 +61,14 @@ Goal::Goal_Status Goal_DriveWithTimer::Process(double dTime)
 void Goal_DriveWithTimer::Terminate()
 {
     StopDrive(m_activeCollection);
-    m_Status = eInactive;
+    m_Status = eCompleted;
 }
 
 /////////////////////////Goal_WaitThenDrive/////////////////////////
 void Goal_WaitThenDrive::Activate()
 {
-    
+    cout << "Goal_WaitThenDrive activate" << endl;
+    AddSubgoal(new Goal_DriveWithTimer(m_activeCollection, -m_leftSpeed, -m_rightSpeed, m_waitTime)); //was wait
     AddSubgoal(new Goal_Timer(m_activeCollection, m_waitTime));
     AddSubgoal(new Goal_DriveWithTimer(m_activeCollection, m_leftSpeed, m_rightSpeed, m_driveTime));
     m_Status = eActive;
