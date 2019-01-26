@@ -50,7 +50,10 @@ using namespace std;
 				string autoSelected = SmartDashboard::GetString("Auto Selector", m_driveStraight);
 		cout << autoSelected << endl;
 
-		m_masterGoal->AddGoal(new Goal_DoNothing(m_activeCollection, 5.0));
+		//m_masterGoal->AddGoal(new Goal_DriveWithTimer(m_activeCollection, .5, .5, 5.0));
+		//m_masterGoal->AddGoal(new Goal_DriveWithTimer(m_activeCollection,.5,.5,10.0));
+		m_masterGoal->AddGoal(new Goal_WaitThenDrive(m_activeCollection,.5,.5,5.0,5.0));
+		//m_masterGoal->AddGoal(new Goal_Timer(m_activeCollection,15.0));
 		cout << "test1" << endl;
 		m_masterGoal->Activate();
 		//cout << m_masterGoal->GetStatus() << endl;
@@ -58,11 +61,11 @@ using namespace std;
 		double dTime = 0.010;
 		while(m_masterGoal->GetStatus() == Goal::eActive)
 		{
-			cout << "loop" << endl;
+			//cout << "loop" << endl;
 			m_masterGoal->Process(dTime);
-			cout << "loop: " << m_masterGoal->GetStatus() << endl;
 			Wait(dTime);
 		}
+		m_masterGoal->~MultitaskGoal();
 		cout << "goal loop complete" << endl;
 		#if 0 //old code
 		if (autoSelected == m_driveStraight) //!< Drive Straight Autonomous

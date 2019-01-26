@@ -32,7 +32,7 @@ class Goal
 		};
 		//TODO we may want to pass in the delta time slice here
 		/// This is executed during the update step
-		virtual Goal_Status Process(double dTime_s)=0;
+		virtual Goal_Status Process(double dTime)=0;
 		/// This undertakes any necessary tidying up before a goal is exited and is called just before a goal is destroyed.
 		virtual void Terminate()=0;
 		//bool HandleMessage()  //TODO get event equivalent
@@ -53,7 +53,7 @@ class   AtomicGoal : public Goal
 {
 	protected:  //from Goal
 		virtual void Activate() {}
-		virtual Goal_Status Process(double dTime_s) {return eCompleted;}
+		virtual Goal_Status Process(double dTime) {return eCompleted;}
 		virtual void Terminate() {}
 		//bool HandleMessage()  //TODO get event equivalent
 
@@ -64,7 +64,7 @@ class   CompositeGoal : public Goal
 	protected:  //from Goal
 		~CompositeGoal();
 		virtual void Activate() {}
-		virtual Goal_Status Process(double dTime_s) {return eCompleted;}
+		virtual Goal_Status Process(double dTime) {return eCompleted;}
 		virtual void Terminate() {}
 		//bool HandleMessage()  //TODO get event equivalent
 		//Subgoals are pushed in LIFO like a stack
@@ -73,7 +73,7 @@ class   CompositeGoal : public Goal
 		/// All composite goals call this method each update step to process their subgoals.  The method ensures that all completed and failed goals
 		/// are removed from the list before processing the next subgoal in line and returning its status.  If the subgoal is empty eCompleted is
 		/// returned.
-		Goal_Status ProcessSubgoals(double dTime_s);
+		Goal_Status ProcessSubgoals(double dTime);
 		void RemoveAllSubgoals();
 	private:
 		typedef std::list<Goal *> SubgoalList;
@@ -93,7 +93,7 @@ class  MultitaskGoal : public Goal
 		///Then call this to manually activate once all goals are added
 		void Activate();
 		Goal &AsGoal() {return *this;}
-		virtual Goal_Status Process(double dTime_s);
+		virtual Goal_Status Process(double dTime);
 	protected:  //from Goal
 		
 		virtual void Terminate();
@@ -108,31 +108,35 @@ class  MultitaskGoal : public Goal
 class Generic_CompositeGoal : public CompositeGoal
 {
 	private:
-		
+		#ifndef _Win32
+		typedef CompositeGoal __super; //NOTE: the error here doesn't actually exist. Code still builds
+		#endif
 		bool m_AutoActivate;
 	public:
-		Generic_CompositeGoal(bool AutoActivate=false) : m_AutoActivate(AutoActivate)
+		Generic_CompositeGoal(ActiveCollection* activeCollection, bool AutoActivate=false) : m_AutoActivate(AutoActivate)
 		{
 			m_Status=eInactive;
+			m_activeCollection = activeCollection;
 		}
 		//give public access for client to populate goals
-		virtual void AddSubgoal(Goal *g) {__super::AddSubgoal(g);}
+		virtual void AddSubgoal(Goal *g) {__super::AddSubgoal(g);} 
 		//client activates manually when goals are added
 		virtual void Activate()
 		{
 			m_Status=eActive; 
 		}
 
-		virtual Goal_Status Process(double dTime_s)
+		virtual Goal_Status Process(double dTime)
 		{
 			//Client will activate if m_AutoActivate is not enabled
 			if (m_AutoActivate)
 				ActivateIfInactive();
+			cout << "Goal.h:134 " << m_Status << endl;
 			if (m_Status==eInactive)
 				return m_Status;
 
 			if (m_Status==eActive)
-				m_Status=ProcessSubgoals(dTime_s);
+				m_Status=ProcessSubgoals(dTime);
 
 			return m_Status;
 		}
@@ -142,4 +146,6 @@ class Generic_CompositeGoal : public CompositeGoal
 			RemoveAllSubgoals();
 			m_Status=eInactive; //make this inactive
 		}
+	protected:
+	ActiveCollection* m_activeCollection;
 };

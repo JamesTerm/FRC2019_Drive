@@ -38,8 +38,9 @@ Goal::Goal_Status CompositeGoal::ProcessSubgoals(double dTime_s)
 	if (!m_SubGoals.empty())
 	{
 		//grab the status of the front-most subgoal
+		
 		StatusOfSubGoals = m_SubGoals.front()->Process(dTime_s);
-
+		cout << "Goal.cpp:43 " << StatusOfSubGoals << endl;
 		//we have to test for the special case where the front-most subgoal reports "completed" and the subgoal list contains additional goals.
 		//When this is the case, to ensure the parent keeps processing its subgoal list, the "active" status is returned.
 		if (StatusOfSubGoals == eCompleted && m_SubGoals.size() > 1)
@@ -47,6 +48,7 @@ Goal::Goal_Status CompositeGoal::ProcessSubgoals(double dTime_s)
 	}
 	else
 		StatusOfSubGoals=eCompleted;
+	cout << "Goal.cpp:51 " << StatusOfSubGoals << endl;
 	return StatusOfSubGoals;
 }
 
@@ -96,16 +98,17 @@ Goal::Goal_Status MultitaskGoal::Process(double dTime_s)
 	{
 		
 		status= (*it)->Process(dTime_s);
-
+		cout << "Goal.cpp:100 " << status << endl;
 		if (status==eFailed)
 		{
-			cout << "eFailed" << endl;
+			cout << "mtg0: eFailed" << endl;
+			m_Status = eFailed;
 			return eFailed;
 		}
 			
 		if (status!=eActive)
 		{
-			cout << "not active" << endl;
+			//cout << "not active" << endl;
 			NonActiveCount++;
 			SuccessDetected|=(status==eCompleted);
 		}
@@ -127,6 +130,7 @@ Goal::Goal_Status MultitaskGoal::Process(double dTime_s)
 		}
 		m_Status=status;
 	}
+	//cout << "mtg: " << status << endl;
 	return status;
 }
 
