@@ -56,11 +56,15 @@ class Goal_WaitThenDrive : public Generic_CompositeGoal
     Goal_WaitThenDrive(ActiveCollection *activeCollection, double leftSpeed, double rightSpeed, double waitTime, double driveTime) : Generic_CompositeGoal(activeCollection)
     {
         m_activeCollection = activeCollection;
-        AddSubgoal(new Goal_Timer(m_activeCollection, waitTime));
-        AddSubgoal(new Goal_DriveWithTimer(m_activeCollection, leftSpeed, rightSpeed, driveTime));
+        m_leftSpeed = leftSpeed;
+        m_rightSpeed = rightSpeed;
+        m_waitTime = waitTime;
+        m_driveTime = driveTime;
     }
-    virtual void Activate() {m_Status = eActive;}
+    virtual void Activate();
     Goal::Goal_Status Process(double dTime) {return Generic_CompositeGoal::Process(dTime);}
+  private:
+    double m_leftSpeed, m_rightSpeed, m_waitTime, m_driveTime;
 };
 
 /* Goal_Turn

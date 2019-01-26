@@ -61,7 +61,12 @@ void Goal_DriveWithTimer::Terminate()
 }
 
 /////////////////////////Goal_WaitThenDrive/////////////////////////
-//no code here
+void Goal_WaitThenDrive::Activate()
+{
+    AddSubgoal(new Goal_Timer(m_activeCollection, m_waitTime));
+    AddSubgoal(new Goal_DriveWithTimer(m_activeCollection, m_leftSpeed, m_rightSpeed, m_driveTime));
+    m_Status = eActive;
+}
 
 /////////////////////////Goal_Turn/////////////////////////
 void Goal_Turn::Activate()
