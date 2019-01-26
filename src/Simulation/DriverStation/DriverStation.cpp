@@ -49,6 +49,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		timeBeginPeriod(TimeCaps_.wPeriodMin);
 	}
 
+	//Well this is a bit painful, but we must ensure our path is aligned to obtain the LUA file
 	{
 		std::wstring path;
 		wchar_t Buffer[MAX_PATH];
@@ -88,6 +89,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		switch (message)
 		{
 		case WM_INITDIALOG:
+			//TO avoid needing to read from the tester... match the current state against the current default
+			CheckDlgButton(hWnd, IDC_Tele, BM_SETCHECK);
+			CheckDlgButton(hWnd, IDC_Stop, BM_SETCHECK);
+			//Button_SetState(hWnd, IDStop, BM_CLICK, true, 0);
 			return (INT_PTR)TRUE;
 		case WM_COMMAND:
 		{
@@ -95,32 +100,45 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			// Parse the menu selections:
 			switch (wmId)
 			{
-			case IDStart:
+			case IDC_Start:
 				//DebugBreak();
 				OutputDebugStringW(L"Start\n");
 				//printf("start");
 				s_pRobotTester->StartStreaming();
-				ret = DefWindowProc(hWnd, message, wParam, lParam);
+				CheckDlgButton(hWnd, IDC_Stop, BST_UNCHECKED);
+				CheckDlgButton(hWnd, IDC_Start, BM_SETCHECK);
 				break;
-			case IDStop:
+			case IDC_Stop:
 				OutputDebugStringW(L"Stop\n");
 				//printf("stop");
 				s_pRobotTester->StopStreaming();
-				ret = DefWindowProc(hWnd, message, wParam, lParam);
+				CheckDlgButton(hWnd, IDC_Stop, BM_SETCHECK);
+				CheckDlgButton(hWnd, IDC_Start, BST_UNCHECKED);
 				break;
 			case IDC_Tele:
 			case IDC_Auton:
 			case IDC_Test:
 			{
+				CheckDlgButton(hWnd, IDC_Tele, BST_UNCHECKED);
+				CheckDlgButton(hWnd, IDC_Auton, BST_UNCHECKED);
+				CheckDlgButton(hWnd, IDC_Test, BST_UNCHECKED);
 				int game_mode = 0;
 				switch (wmId)
 				{
-				case IDC_Auton: game_mode = 0; break;
-				case IDC_Tele: game_mode = 1; break;
-				case IDC_Test: game_mode = 2; break;
+				case IDC_Auton: 
+					CheckDlgButton(hWnd, IDC_Auton, BM_SETCHECK);
+					game_mode = 0;
+					break;
+				case IDC_Tele: 
+					CheckDlgButton(hWnd, IDC_Tele, BM_SETCHECK);
+					game_mode = 1;
+					break;
+				case IDC_Test: 
+					CheckDlgButton(hWnd, IDC_Test, BM_SETCHECK);
+					game_mode = 2; 
+					break;
 				}
 				s_pRobotTester->SetGameMode(game_mode);
-				ret = DefWindowProc(hWnd, message, wParam, lParam);
 				break;
 			}
 			case IDM_EXIT:
@@ -165,10 +183,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	s_pRobotTester = &_robot_tester;
 	_robot_tester.RobotTester_init();
 
-	//Robot must be started before sending out these messages
-	//TO avoid needing to read from the tester... match the current state against the current default
-	SendDlgItemMessageW(m_hDlg, IDC_Tele, BM_SETCHECK, true, 0);
-	SendDlgItemMessageW(m_hDlg, IDStop, BM_CLICK, true, 0);
 	ShowWindow(m_hDlg, nCmdShow);
 	UpdateWindow(m_hDlg);
 
