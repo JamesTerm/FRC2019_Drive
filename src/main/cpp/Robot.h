@@ -39,10 +39,6 @@ class Robot : public SampleRobot
         void OperatorControl() override;
         void Test() override;
 
-		//for simulation testing purposes only
-		#ifdef _Win32
-		void TestCommand(const char *test_command);
-		#endif
     private:
 	    Drive *m_drive;
 	    ActiveCollection *m_activeCollection; //!< Pointer to the only instantiation of the ActiveCollection Class in the program

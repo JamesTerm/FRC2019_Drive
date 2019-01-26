@@ -42,6 +42,21 @@
 #include "Config/ActiveCollection.h"
 #include "AutonMain.h"
 
+
+#ifdef _Win32
+void DefaultParentBind(AutonMain *)
+{
+}
+
+static std::function<void(AutonMain *)> s_ParentBind = DefaultParentBind;
+
+void SetParentBindCallback(std::function<void(AutonMain *)> callback)
+{
+	s_ParentBind = callback;
+}
+#endif
+
+
 //This is only for diagnostics... if there are problems with the robot control
 class FRC_2019_Control : public FRC2019_Control_Interface
 {
@@ -202,25 +217,24 @@ public:
 			m_pRobot->TimeChange(dTime_s);
 		}
 	}
-
-	void Test(const char *test_command)
-	{
-		if (strcmp(test_command, "hook_samples") == 0)
-		{
-			m_pRobot->SetTestAutonCallbackGoal(
-			[](FRC2019_Robot *Robot)
-			{
-				return FRC2019_Goals::Get_Sample_Goal(Robot);
-			});
-		}
-		else if (strcmp(test_command, "default_goals") == 0)
-			m_pRobot->SetTestAutonCallbackGoal(nullptr);
-	}
+	Ship_Tester *GetRobot() { return m_pRobot; }
 };
 
 void AutonMain::AutonMain_init(const char *RobotLua, Configuration::ActiveCollection *Collection)
 {
 	m_p_AutonMain = std::make_shared<AutonMain_Internal>(RobotLua, Collection);
+	//establish the parent bind
+	#ifdef _Win32
+	s_ParentBind(this);
+	#endif
+}
+
+AutonMain::~AutonMain()
+{
+	//no longer binding... let parent know before destorying AutoMain
+	#ifdef _Win32
+	s_ParentBind(nullptr);
+	#endif
 }
 
 void AutonMain::Update(double dTime_s)
@@ -228,7 +242,9 @@ void AutonMain::Update(double dTime_s)
 	m_p_AutonMain->Update(dTime_s);
 }
 
-void AutonMain::Test(const char *test_command)
+#ifdef _Win32
+Ship_Tester *AutonMain::GetRobot()
 {
-	m_p_AutonMain->Test(test_command);
+	return m_p_AutonMain->GetRobot();
 }
+#endif
