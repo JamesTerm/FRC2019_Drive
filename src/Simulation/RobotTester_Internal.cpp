@@ -36,6 +36,7 @@ private:
 	bool m_DisplayControls = false;
 	AutonMain *m_pAutonMain=nullptr;  //this is dynamic so we must always check for null
 	bool m_HookSamples = false; //cache incase the call is made while robot is not available
+	std::function<void(AutonMain *)> m_ParentBind = nullptr;
 public:
 	RobotTester_Internal()
 	{
@@ -54,6 +55,9 @@ public:
 		SetParentBindCallback(
 			[&](AutonMain *instance)
 		{
+			//call parent first if available
+			if (m_ParentBind)
+				m_ParentBind(instance);
 			m_pAutonMain = instance;
 			if (m_pAutonMain == nullptr)
 				m_HookSamples = false;  //unhook if we are being destroyed (pedantic)
@@ -68,6 +72,11 @@ public:
 		StopStreaming();
 	}
 
+
+	void RobotTester_SetParentBindCallback(std::function<void(AutonMain *)> callback)
+	{
+		m_ParentBind = callback;
+	}
 	void InitRobot()
 	{
 		m_Robot.RobotInit();
@@ -210,4 +219,9 @@ void RobotTester::ShowControls(bool show)
 void RobotTester::HookSampleGoals(bool hook)
 {
 	m_p_RobotTester->HookSampleGoals(hook);
+}
+
+void RobotTester::RobotTester_SetParentBindCallback(std::function<void(AutonMain *)> callback)
+{
+	m_p_RobotTester->RobotTester_SetParentBindCallback(callback);
 }

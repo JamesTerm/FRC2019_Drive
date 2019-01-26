@@ -29,9 +29,12 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 #include <timeapi.h>
 #include <shlwapi.h>
 #include "../Robot_Tester.h"
+#include "Keyboard.h"
 
 //Since the lambda cannot capture, we must give it access to the robot here
 RobotTester *s_pRobotTester = nullptr;  
+void BindRobot(RobotTester &_robot_tester);  //forward declare
+Keyboard *s_Keyboard = nullptr;
 
 __inline void GetParentDirectory(std::wstring &path)
 {
@@ -155,6 +158,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//case WM_CLOSE:
 		//	DestroyWindow(hWnd);
 		//	break;
+		case WM_KEYUP:
+			OutputDebugStringW(L"KeyPressedUp\n");
+			if (s_Keyboard)
+				s_Keyboard->KeyPressRelease((int)wParam, false);
+			break;
+		case WM_KEYDOWN:
+			OutputDebugStringW(L"KeyPressedDN\n");
+			if (s_Keyboard)
+				s_Keyboard->KeyPressRelease((int)wParam, true);
+			break;
 		case WM_PAINT:
 		{
 			PAINTSTRUCT ps;
@@ -182,7 +195,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	RobotTester _robot_tester;
 	s_pRobotTester = &_robot_tester;
 	_robot_tester.RobotTester_init();
-
+	//Bind robot for Keyboard binding
+	BindRobot(_robot_tester);
 	ShowWindow(m_hDlg, nCmdShow);
 	UpdateWindow(m_hDlg);
 
@@ -203,4 +217,56 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 
 	return (int)msg.wParam;
+}
+
+
+//To bind the keyboard we'll need to access AutonMain and Eventmap
+#include "../../main/cpp/Base/Base_Includes.h"
+#include "../../main/cpp/Base/Vec2d.h"
+#include "../../main/cpp/Base/Misc.h"
+#include "../../main/cpp/Base/Event.h"
+#include "../../main/cpp/Base/EventMap.h"
+#include "../../main/cpp/Base/Script.h"
+#include "../../main/cpp/Common/Entity_Properties.h"
+#include "../../main/cpp/Common/Physics_1D.h"
+#include "../../main/cpp/Common/Physics_2D.h"
+#include "../../main/cpp/Common/Entity2D.h"
+#include "../../main/cpp/Common/Goal.h"
+#include "../../main/cpp/Common/Ship_1D.h"
+#include "../../main/cpp/Common/Ship.h"
+
+#include "../../main/cpp/Config/ActiveCollection.h"
+#include "../../main/cpp/AutonMain.h"
+AutonMain *s_RobotContainer=nullptr;
+void BindKeyboard()
+{
+	if (s_RobotContainer)
+	{
+		if (s_Keyboard)
+		{
+			assert(false);  //recoverable but need to see use-case
+			delete s_Keyboard;
+		}
+		Ship_Tester *_pRobot = s_RobotContainer->GetRobot();
+		Keyboard *_Keyboard = new Keyboard;
+		_Keyboard->Keyboard_init(_pRobot->GetEventMap());
+		s_Keyboard = _Keyboard;
+	}
+	else
+	{
+		delete s_Keyboard;
+		s_Keyboard = nullptr;
+	}
+
+}
+
+void BindRobot(RobotTester &_robot_tester)
+{
+	_robot_tester.RobotTester_SetParentBindCallback(
+		[](AutonMain *instance)
+	{
+		s_RobotContainer = instance;
+		BindKeyboard();
+	}
+	);
 }
