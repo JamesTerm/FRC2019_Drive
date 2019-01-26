@@ -119,11 +119,12 @@ class Generic_CompositeGoal : public CompositeGoal
 			m_activeCollection = activeCollection;
 		}
 		//give public access for client to populate goals
-		virtual void AddSubgoal(Goal *g) {__super::AddSubgoal(g);} 
+		//virtual void AddSubgoal(Goal *g) {__super::AddSubgoal(g);} 
 		//client activates manually when goals are added
 		virtual void Activate()
 		{
 			m_Status=eActive; 
+			
 		}
 
 		virtual Goal_Status Process(double dTime)

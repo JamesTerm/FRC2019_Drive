@@ -53,7 +53,7 @@ class Goal_DriveWithTimer : public Goal_Timer
 class Goal_WaitThenDrive : public Generic_CompositeGoal
 {
   public:
-    Goal_WaitThenDrive(ActiveCollection *activeCollection, double leftSpeed, double rightSpeed, double waitTime, double driveTime) : Generic_CompositeGoal(activeCollection)
+    Goal_WaitThenDrive(ActiveCollection *activeCollection, double leftSpeed, double rightSpeed, double waitTime, double driveTime) : Generic_CompositeGoal(activeCollection, true)
     {
         m_activeCollection = activeCollection;
         m_leftSpeed = leftSpeed;
@@ -62,7 +62,6 @@ class Goal_WaitThenDrive : public Generic_CompositeGoal
         m_driveTime = driveTime;
     }
     virtual void Activate();
-    Goal::Goal_Status Process(double dTime) {return Generic_CompositeGoal::Process(dTime);}
   private:
     double m_leftSpeed, m_rightSpeed, m_waitTime, m_driveTime;
 };

@@ -30,6 +30,7 @@ Goal::Goal_Status CompositeGoal::ProcessSubgoals(double dTime_s)
 	//Remove all completed and failed goals from the front of the subgoal list
 	while (!m_SubGoals.empty() && (m_SubGoals.front()->GetStatus()==eCompleted || m_SubGoals.front()->GetStatus()==eFailed))
 	{
+		cout << "i am here yeet" << endl;
 		m_SubGoals.front()->Terminate();
 		delete m_SubGoals.front();
 		m_SubGoals.pop_front();
@@ -38,9 +39,9 @@ Goal::Goal_Status CompositeGoal::ProcessSubgoals(double dTime_s)
 	if (!m_SubGoals.empty())
 	{
 		//grab the status of the front-most subgoal
-		
+		m_SubGoals.front()->Activate();
 		StatusOfSubGoals = m_SubGoals.front()->Process(dTime_s);
-		cout << "Goal.cpp:43 " << StatusOfSubGoals << endl;
+		cout << "Goal.cpp:43 " << m_SubGoals.size() << endl;
 		//we have to test for the special case where the front-most subgoal reports "completed" and the subgoal list contains additional goals.
 		//When this is the case, to ensure the parent keeps processing its subgoal list, the "active" status is returned.
 		if (StatusOfSubGoals == eCompleted && m_SubGoals.size() > 1)
@@ -81,6 +82,7 @@ MultitaskGoal::~MultitaskGoal()
 
 void MultitaskGoal::Activate()
 {
+	
 	for (GoalList::iterator it = m_GoalsToProcess.begin(); it!=m_GoalsToProcess.end(); ++it)
 		(*it)->Activate();
 	m_Status = eActive;

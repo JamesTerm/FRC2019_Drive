@@ -9,6 +9,7 @@ void Goal_Timer::Activate()
 }
 Goal::Goal_Status Goal_Timer::Process(double dTime)
 {
+    cout << "i wish i were here" << endl;
     if (m_Status == eActive)
     {
         m_currentTime += dTime;
@@ -19,6 +20,7 @@ Goal::Goal_Status Goal_Timer::Process(double dTime)
             Terminate();
             return eFailed; //return failed because it timed out. Even though technically this goal worked as intended, any time out should be a fail (besided drive with timer)
         }
+        
         return eActive;
     }
     else
@@ -63,6 +65,7 @@ void Goal_DriveWithTimer::Terminate()
 /////////////////////////Goal_WaitThenDrive/////////////////////////
 void Goal_WaitThenDrive::Activate()
 {
+    
     AddSubgoal(new Goal_Timer(m_activeCollection, m_waitTime));
     AddSubgoal(new Goal_DriveWithTimer(m_activeCollection, m_leftSpeed, m_rightSpeed, m_driveTime));
     m_Status = eActive;
