@@ -62,8 +62,7 @@ void Goal_DriveWithTimer::Terminate()
 /////////////////////////Goal_WaitThenDrive/////////////////////////
 void Goal_WaitThenDrive::Activate()
 {
-   
-    //TODO dont be backwards
+ 
     AddSubgoal(new Goal_DriveWithTimer(m_activeCollection, m_leftSpeed, m_rightSpeed, m_driveTime));
     AddSubgoal(new Goal_Timer(m_activeCollection, m_waitTime));
     m_Status = eActive;
