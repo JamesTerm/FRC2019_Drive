@@ -46,10 +46,11 @@ using namespace std;
 	void Robot::Autonomous()
 	{	
 		m_masterGoal = new MultitaskGoal(m_activeCollection, false);
+
 		cout << "Autonomous Started." << endl;
 				string autoSelected = SmartDashboard::GetString("Auto Selector", m_driveStraight);
 		cout << autoSelected << endl;
-
+		//TODO another class that takes master goal as param and auton selection and adds correct goal
 		//m_masterGoal->AddGoal(new Goal_DriveWithTimer(m_activeCollection, .5, .5, 5.0));
 		//m_masterGoal->AddGoal(new Goal_DriveWithTimer(m_activeCollection,.5,.5,10.0));
 		m_masterGoal->AddGoal(new Goal_WaitThenDrive(m_activeCollection,.2,.2,5.0,5.0));

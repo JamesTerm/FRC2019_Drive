@@ -13,7 +13,9 @@ Email: cooper.ryan@centaurisoft.org, ruizdylann@gmail.com
 
 #ifndef SRC_UTIL_UTILITYFUNCTIONS_H_
 #define SRC_UTIL_UTILITYFUNCTIONS_H_
-
+/*
+ * THIS CLASS IS FOR SETTING AND RETREIVING AND SENDING DATA, AND SIMPLE CALCULATIONS
+ */
 
 #include "../Config/ActiveCollection.h"
 #include "LoopChecks.h"

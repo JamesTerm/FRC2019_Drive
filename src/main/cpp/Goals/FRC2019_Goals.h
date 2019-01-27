@@ -7,6 +7,7 @@
  * This goal will also be used to track the time remaining during auton (besides 2019 sandstorm lol... this may be different)
  * This goal also requires active collection because all goals extending it will require it.
  */
+// TODO: Figure out the organization of the FRC2019_Goals; Integrate with our dashboad; Integrate with TeleOp for sandstorm; make everything that should be abstract is in fact abstract; Integrate vision overlay and drive cam to dashboard; 
 class Goal_Timer : public AtomicGoal
 {
   public:

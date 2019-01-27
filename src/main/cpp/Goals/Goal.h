@@ -53,9 +53,9 @@ class Goal
 class   AtomicGoal : public Goal
 {
 	protected:  //from Goal
-		virtual void Activate() {}
+		virtual void Activate()=0;
 		virtual Goal_Status Process(double dTime) {return eCompleted;}
-		virtual void Terminate() {}
+		virtual void Terminate()=0;
 		//bool HandleMessage()  //TODO get event equivalent
 
 };

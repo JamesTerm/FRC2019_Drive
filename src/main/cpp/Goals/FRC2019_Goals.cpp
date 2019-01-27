@@ -68,9 +68,10 @@ void Goal_DriveWithTimer::Terminate()
 void Goal_WaitThenDrive::Activate()
 {
     cout << "Goal_WaitThenDrive activate" << endl;
-    AddSubgoal(new Goal_DriveWithTimer(m_activeCollection, -m_leftSpeed, -m_rightSpeed, m_waitTime)); //was wait
-    AddSubgoal(new Goal_Timer(m_activeCollection, m_waitTime));
+   
+    //TODO dont be backwards
     AddSubgoal(new Goal_DriveWithTimer(m_activeCollection, m_leftSpeed, m_rightSpeed, m_driveTime));
+    AddSubgoal(new Goal_Timer(m_activeCollection, m_waitTime));
     m_Status = eActive;
 }
 
