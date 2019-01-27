@@ -42,6 +42,7 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 //Since the lambda cannot capture, we must give it access to the robot here
 RobotTester *s_pRobotTester = nullptr;  
 void BindRobot(RobotTester &_robot_tester);  //forward declare
+void SetupPreferences();
 Keyboard *s_Keyboard = nullptr;
 
 __inline void GetParentDirectory(std::wstring &path)
@@ -107,6 +108,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				//DebugBreak();
 				OutputDebugStringW(L"Start\n");
 				//printf("start");
+				SetupPreferences();
 				s_pRobotTester->StartStreaming();
 				CheckDlgButton(hWnd, IDC_Stop, BST_UNCHECKED);
 				CheckDlgButton(hWnd, IDC_Start, BM_SETCHECK);
@@ -246,6 +248,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 #include "../../main/cpp/Config/ActiveCollection.h"
 #include "../../main/cpp/AutonMain.h"
+#include "../../main/cpp/Common/SmartDashboard.h"
 AutonMain *s_RobotContainer=nullptr;
 Keyboard *s_StagedKeyboard = nullptr;
 
@@ -271,6 +274,23 @@ void BindKeyboard()
 
 }
 
+void SetupPreferences()
+{
+	bool DevMode = SmartDashboard::GetBoolean("DevMode", false);
+	if (DevMode)
+	{
+		//assert control defaults
+		SmartDashboard::SetDefaultBoolean("Show_Controls", false);
+		SmartDashboard::SetDefaultBoolean("Test_Samples", false);
+	}
+	const bool Test_Samples = SmartDashboard::GetBoolean("Test_Samples", false);
+	const bool Show_Controls = SmartDashboard::GetBoolean("Show_Controls", false);
+	assert(s_pRobotTester);
+	s_pRobotTester->ShowControls(Show_Controls);
+	if (s_RobotContainer) 
+		s_pRobotTester->HookSampleGoals(Test_Samples);
+}
+
 void BindRobot(RobotTester &_robot_tester)
 {
 	_robot_tester.RobotTester_SetParentBindCallback(
@@ -279,6 +299,7 @@ void BindRobot(RobotTester &_robot_tester)
 		s_RobotContainer = instance;
 		if (!PropertiesBound)
 		{
+			SetupPreferences();
 			s_StagedKeyboard = new Keyboard;
 			s_StagedKeyboard->Keyboard_init(nullptr);
 			using namespace Framework::UI;

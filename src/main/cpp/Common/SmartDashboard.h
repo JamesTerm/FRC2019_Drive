@@ -36,6 +36,21 @@ public:
 
 	static void PutBoolean(std::string keyName, bool value);
 	static bool GetBoolean(std::string keyName);
+	//Similar to SetDefaultBoolean except that it will safely get if it can without writing it return default value if it doesn't exist
+	static bool GetBoolean(std::string keyName, bool defaultValue)
+	{
+		bool ret = false;
+		try
+		{
+			ret=SmartDashboard::GetBoolean(keyName);
+		}
+		catch (...)
+		{
+			ret = defaultValue;   //* @return        False if the table key already exists with a different type
+		}
+		return ret;
+	}
+
 	static bool SetDefaultBoolean(std::string keyName, bool defaultValue)
 	{
 		bool ret = true;

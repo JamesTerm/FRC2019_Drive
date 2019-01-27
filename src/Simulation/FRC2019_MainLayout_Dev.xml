@@ -1,5 +1,11 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="Show_Controls" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.CheckBox">
+		<location x="531" y="352"/>
+	</widget>
+	<widget field="Test_Samples" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.CheckBox">
+		<location x="538" y="323"/>
+	</widget>
 	<widget field="armPot_Raw" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
 		<location x="45" y="66"/>
 		<width>251</width>
@@ -8,7 +14,7 @@
 		<property name="Maximum" value="1.0"/>
 	</widget>
 	<widget field="arm_Raw" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="-42" y="215"/>
+		<location x="41" y="174"/>
 		<width>86</width>
 	</widget>
 	<widget field="GameMode" type="String" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
