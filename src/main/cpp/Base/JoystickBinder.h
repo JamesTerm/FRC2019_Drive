@@ -1,22 +1,43 @@
 #pragma once
-
+#include <functional>
 namespace Framework
 {
 	namespace UI
 	{
 
-//Stubbed out since robots don't receive keyboard input from the driver station (yet)
+//By default set to nullptr since robots don't receive keyboard input from the driver station (yet)
 //It is possible to use the network tables to receive them if we want
+using KeyAdd_proto = std::function<bool(Framework::Base::Key key, const std::string eventName, bool useOnOff, bool ForceBindThisKey)>;
+extern KeyAdd_proto g_KeybaordSupport_Add;
+using KeyRemove_proto = std::function<void(Framework::Base::Key key, const std::string eventName, bool useOnOff)>;
+extern KeyRemove_proto g_KeybaordSupport_Remove;
+
 class KeyboardMouse_CB
 {
 public:
 	KeyboardMouse_CB() {}
-	bool AddKeyBinding(Framework::Base::Key key,const std::string eventName, bool useOnOff, bool ForceBindThisKey=false) {return false;}
-	void RemoveKeyBinding(Framework::Base::Key key, std::string eventName, bool useOnOff) {}
+	bool AddKeyBinding(Framework::Base::Key key, const std::string eventName, bool useOnOff, bool ForceBindThisKey = false)
+	{
+		bool ret = false;
+		if (g_KeybaordSupport_Add)
+			ret=g_KeybaordSupport_Add(key, eventName, useOnOff, ForceBindThisKey);
+		else
+			ret=false;
+		return ret;
+	}
+	void RemoveKeyBinding(Framework::Base::Key key, std::string eventName, bool useOnOff) 
+	{
+		if (g_KeybaordSupport_Remove)
+			g_KeybaordSupport_Remove(key, eventName, useOnOff);
+	}
 
 	/// This version of the function is just for easy porting from the old KB technique
 	void AddKeyBindingR(bool useOnOff, std::string eventName, Framework::Base::Key key)
 		{AddKeyBinding(key, eventName, useOnOff);}
+	static void SetKeyboardSupport_Add(KeyAdd_proto callback) 
+		{	g_KeybaordSupport_Add = callback; 
+		}
+	static void SetKeyboardSupport_Remove(KeyRemove_proto callback) { g_KeybaordSupport_Remove = callback; }
 };
 
 class JoyStick_Binder

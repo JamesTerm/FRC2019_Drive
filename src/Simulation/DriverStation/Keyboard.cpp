@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "Keyboard.h"
 //all binding magic defined here
 #include "../../main/cpp/Base/Base_Includes.h"
 #include "../../main/cpp/Base/Vec2d.h"
@@ -7,6 +6,7 @@
 #include "../../main/cpp/Base/Event.h"
 #include "../../main/cpp/Base/EventMap.h"
 #include "../../main/cpp/Base/Script.h"
+#include "Keyboard.h"
 
 using namespace Framework::Base;
 const double c_DoubleClickTime = 0.25;
@@ -18,7 +18,7 @@ private:
 	// Keep track of the buttons already pressed
 	std::set<int> m_pressedKeys;
 	int m_flags=0;
-	EventMap * const m_controlledEventMap;
+	EventMap *m_controlledEventMap=nullptr;
 	int m_lastReleasedKey;
 	double m_lastReleaseTime;
 	double m_eventTime;
@@ -89,6 +89,7 @@ private:
 	{
 		return useOnOff ? m_KeyBindings_OnOff[key] : m_KeyBindings[key];
 	}
+	public:
 	bool AddKeyBinding(Key key, const std::string eventName, bool useOnOff, bool ForceBindThisKey=false)
 	{
 		//we do not have multiple keyboard binding environments
@@ -172,7 +173,7 @@ private:
 			}
 		}
 	}
-
+	private:
 	/// This version of the function is just for easy porting from the old KB technique
 	void AddKeyBindingR(bool useOnOff, std::string eventName, Key key)
 	{
@@ -198,10 +199,10 @@ public:
 	//Client obtains the event map so the keyboard implementation can bind to it
 	Keyboard_Internal(EventMap *em) : m_controlledEventMap(em)
 	{
-		assert(m_controlledEventMap);  //must have, no exceptions
 		//setup set default keys
 		BindShipDefaults();
 	}
+	void SetEventMap(EventMap *em) { m_controlledEventMap = em; }
 	//Keypresses from dispatch go here
 	void KeyPressRelease(int key, bool press)
 	{
@@ -277,4 +278,19 @@ void Keyboard::Keyboard_init(EventMap *em)
 void Keyboard::KeyPressRelease(int key, bool press)
 {
 	m_p_Keyboard->KeyPressRelease(key, press);
+}
+
+bool Keyboard::AddKeyBinding(Key key, const std::string eventName, bool useOnOff, bool ForceBindThisKey)
+{
+	return m_p_Keyboard->AddKeyBinding(key, eventName, useOnOff, ForceBindThisKey);
+}
+
+void Keyboard::RemoveKeyBinding(Key key, std::string eventName, bool useOnOff)
+{
+	m_p_Keyboard->RemoveKeyBinding(key, eventName, useOnOff);
+}
+
+void Keyboard::SetEventMap(EventMap *em)
+{ 
+	m_p_Keyboard->SetEventMap(em);
 }

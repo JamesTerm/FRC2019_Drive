@@ -136,7 +136,7 @@ class COMMON_API UI_Controller
 		//Return if element was successfully created (be sure to check as some may not be present)
 		static const char *ExtractControllerElementProperties(Controller_Element_Properties &Element,const char *Eventname,Scripting::Script& script);
 		UI::JoyStick_Binder &GetJoyStickBinder();
-		void *GetKeyboardBinder();  //returns null if not supported
+		UI::KeyboardMouse_CB *GetKeyboardBinder();  //returns null if not supported
 	protected:
 		#ifdef Robot_TesterCode
 		friend Mouse_ShipDriver;
@@ -186,6 +186,7 @@ class COMMON_API UI_Controller
 		Mouse_ShipDriver *m_mouseDriver;
 		#else
 		UI::JoyStick_Binder *m_JoyStick_Binder;
+		UI::KeyboardMouse_CB m_Keyboard;
 		#endif
 
 		double m_LastSliderTime[2]; //Keep track of the slider to help it stay smooth;

@@ -5,9 +5,7 @@ class Ship_Tester;
 class AutonMain
 {
 public:
-	~AutonMain();
     //Setup path to load robot lua, must be a valid path and name
-    //TODO add active collection to hook into robot control
 	void AutonMain_init(const char *RobotLua, Configuration::ActiveCollection *Collection=nullptr);
 	//Provide updates from main loop
 	void Update(double dTime_s);

@@ -29,6 +29,14 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 #include <timeapi.h>
 #include <shlwapi.h>
 #include "../Robot_Tester.h"
+#include "../../main/cpp/Base/Base_Includes.h"
+#include "../../main/cpp/Base/Vec2d.h"
+#include "../../main/cpp/Base/Misc.h"
+#include "../../main/cpp/Base/Event.h"
+#include "../../main/cpp/Base/EventMap.h"
+#include "../../main/cpp/Base/Script.h"
+#include "../../main/cpp/Base/Joystick.h"
+#include "../../main/cpp/Base/JoystickBinder.h"
 #include "Keyboard.h"
 
 //Since the lambda cannot capture, we must give it access to the robot here
@@ -228,12 +236,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
 //To bind the keyboard we'll need to access AutonMain and Eventmap
-#include "../../main/cpp/Base/Base_Includes.h"
-#include "../../main/cpp/Base/Vec2d.h"
-#include "../../main/cpp/Base/Misc.h"
-#include "../../main/cpp/Base/Event.h"
-#include "../../main/cpp/Base/EventMap.h"
-#include "../../main/cpp/Base/Script.h"
 #include "../../main/cpp/Common/Entity_Properties.h"
 #include "../../main/cpp/Common/Physics_1D.h"
 #include "../../main/cpp/Common/Physics_2D.h"
@@ -245,6 +247,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 #include "../../main/cpp/Config/ActiveCollection.h"
 #include "../../main/cpp/AutonMain.h"
 AutonMain *s_RobotContainer=nullptr;
+Keyboard *s_StagedKeyboard = nullptr;
+
 void BindKeyboard()
 {
 	if (s_RobotContainer)
@@ -255,9 +259,9 @@ void BindKeyboard()
 			delete s_Keyboard;
 		}
 		Ship_Tester *_pRobot = s_RobotContainer->GetRobot();
-		Keyboard *_Keyboard = new Keyboard;
-		_Keyboard->Keyboard_init(_pRobot->GetEventMap());
-		s_Keyboard = _Keyboard;
+		s_StagedKeyboard->SetEventMap(_pRobot->GetEventMap());
+		s_Keyboard = s_StagedKeyboard;
+		s_StagedKeyboard = nullptr;
 	}
 	else
 	{
@@ -270,10 +274,30 @@ void BindKeyboard()
 void BindRobot(RobotTester &_robot_tester)
 {
 	_robot_tester.RobotTester_SetParentBindCallback(
-		[](AutonMain *instance)
+		[](AutonMain *instance, bool PropertiesBound)
 	{
 		s_RobotContainer = instance;
-		BindKeyboard();
+		if (!PropertiesBound)
+		{
+			s_StagedKeyboard = new Keyboard;
+			s_StagedKeyboard->Keyboard_init(nullptr);
+			using namespace Framework::UI;
+			//Now to bind the lua calls
+			KeyboardMouse_CB::SetKeyboardSupport_Add(
+				[](Framework::Base::Key key, const std::string eventName, bool useOnOff, bool ForceBindThisKey)
+			{
+				return s_StagedKeyboard->AddKeyBinding(key, eventName, useOnOff, ForceBindThisKey);
+			});
+			KeyboardMouse_CB::SetKeyboardSupport_Remove(
+				[](Framework::Base::Key key, const std::string eventName, bool useOnOff)
+			{
+				s_StagedKeyboard->RemoveKeyBinding(key, eventName, useOnOff);
+			});
+		}
+		else
+		{
+			BindKeyboard();
+		}
 	}
 	);
 }

@@ -233,6 +233,8 @@ MainRobot = {
 			--Arm_SetPos9feet = {type="joystick_button", key=4, on_off=false},
 			Arm_SetCurrentVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
 			Arm_Rist={type="joystick_button", key=5, on_off=true},
+			Arm_Advance={type="keyboard", key='k', on_off=true},
+			Arm_Retract={type="keyboard", key='j', on_off=true},
 			
 			--Claw_SetCurrentVelocity  --not used
 			Claw_Close =	 {type="joystick_button", key=6, on_off=true},

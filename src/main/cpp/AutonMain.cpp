@@ -44,13 +44,13 @@
 
 
 #ifdef _Win32
-void DefaultParentBind(AutonMain *)
+void DefaultParentBind(AutonMain *,bool)
 {
 }
 
-static std::function<void(AutonMain *)> s_ParentBind = DefaultParentBind;
+static std::function<void(AutonMain *,bool)> s_ParentBind = DefaultParentBind;
 
-void SetParentBindCallback(std::function<void(AutonMain *)> callback)
+void SetParentBindCallback(std::function<void(AutonMain *,bool)> callback)
 {
 	s_ParentBind = callback;
 }
@@ -97,6 +97,7 @@ public:
 class AutonMain_Internal
 {
 private:
+	AutonMain *m_pParent = nullptr;
 #if 0
 	//keep around for diagnostics //taking away control stress
 	FRC_2019_Control m_Control;
@@ -130,10 +131,17 @@ public:
 		//The script must be loaded before initializing control since the wiring assignments are set there
 		#if 1
 		m_Control.AsControlInterface().Initialize(&m_RobotProps);
-					//Bind the ship's eventmap to the joystick
+		//Bind the ship's eventmap to the joystick
 		m_JoyBinder.SetControlledEventMap(m_pRobot->GetEventMap());
 		#endif
+	}
 
+	void Init_BindProperties()
+	{
+		#ifdef _Win32
+		//establish the first parent bind, before setting up the UI controller, and after instantiation of the robot
+		s_ParentBind(m_pParent, false);
+		#endif
 		//To to bind the UI controller to the robot
 		AI_Base_Controller *controller = m_pRobot->GetController();
 		assert(controller);
@@ -154,8 +162,7 @@ public:
 		SmartDashboard::SetDefaultBoolean("Test_Auton", true);
 		SmartDashboard::SetDefaultNumber("AutonTest", 0.0);
 	}
-
-	AutonMain_Internal(const char *RobotLua, Configuration::ActiveCollection *Collection) :
+	AutonMain_Internal(AutonMain *parent,const char *RobotLua, Configuration::ActiveCollection *Collection) : m_pParent(parent),
 		m_Joystick(3,0),m_JoyBinder(m_Joystick), m_Collection(Collection)
 	{
 		m_LuaPath = RobotLua;
@@ -205,6 +212,11 @@ public:
 	}
 	~AutonMain_Internal()
 	{
+		//no longer binding... let parent know before destorying AutoMain
+		#ifdef _Win32
+		s_ParentBind(nullptr,true);
+		#endif
+
 		delete m_pRobot;  //checks for null implicitly 
 		m_pRobot = nullptr;
 	}
@@ -222,18 +234,11 @@ public:
 
 void AutonMain::AutonMain_init(const char *RobotLua, Configuration::ActiveCollection *Collection)
 {
-	m_p_AutonMain = std::make_shared<AutonMain_Internal>(RobotLua, Collection);
-	//establish the parent bind
+	m_p_AutonMain = std::make_shared<AutonMain_Internal>(this, RobotLua, Collection);
+	m_p_AutonMain->Init_BindProperties();
 	#ifdef _Win32
-	s_ParentBind(this);
-	#endif
-}
-
-AutonMain::~AutonMain()
-{
-	//no longer binding... let parent know before destorying AutoMain
-	#ifdef _Win32
-	s_ParentBind(nullptr);
+	//establish the second parent bind well after everything is set up
+	s_ParentBind(this, true);
 	#endif
 }
 
