@@ -1,3 +1,15 @@
+/****************************** Header ******************************\
+Class Name: CompositeGoal, MultitaskGoal
+File Name: Goal.cpp
+Summary: Standard goal files. These classes are usually extended from,
+but it rare cases MultitaskGoal and CompositeGoal may not
+Project: BroncBotzFRC2019
+Copyright (c) BroncBotz.
+All rights reserved.
+
+Author(s): James Killian, Chris Weeks
+Email: chrisrweeks@aol.com
+\********************************************************************/
 #include <stddef.h>
 #include <stdlib.h>
 #include <list>
@@ -8,51 +20,7 @@ using namespace std;
 /***************************************************************************************************************/
 /*												CompositeGoal													*/
 /***************************************************************************************************************/
-#if 0
-void CompositeGoal::RemoveAllSubgoals()
-{
-	for (SubgoalList::iterator it = m_SubGoals.begin(); it!=m_SubGoals.end(); ++it)
-	{
-		(*it)->Terminate();
-		delete *it;
-	}
-	m_SubGoals.clear();
-}
 
-CompositeGoal::~CompositeGoal()
-{
-	RemoveAllSubgoals();
-}
-
-Goal::Goal_Status CompositeGoal::ProcessSubgoals(double dTime_s)
-{
-	Goal_Status StatusOfSubGoals;
-	//Remove all completed and failed goals from the front of the subgoal list
-	while (!m_SubGoals.empty() && (m_SubGoals.front()->GetStatus()==eCompleted || m_SubGoals.front()->GetStatus()==eFailed))
-	{
-		cout << "i am here yeet" << endl;
-		m_SubGoals.front()->Terminate();
-		delete m_SubGoals.front();
-		m_SubGoals.pop_front();
-	}
-	//If any subgoals remain, process the one at the front of the list
-	if (!m_SubGoals.empty())
-	{
-		//grab the status of the front-most subgoal
-		m_SubGoals.front()->Activate();
-		StatusOfSubGoals = m_SubGoals.front()->Process(dTime_s);
-		cout << "Goal.cpp:43 " << m_SubGoals.size() << endl;
-		//we have to test for the special case where the front-most subgoal reports "completed" and the subgoal list contains additional goals.
-		//When this is the case, to ensure the parent keeps processing its subgoal list, the "active" status is returned.
-		if (StatusOfSubGoals == eCompleted && m_SubGoals.size() > 1)
-			StatusOfSubGoals=eActive;
-	}
-	else
-		StatusOfSubGoals=eCompleted;
-	cout << "Goal.cpp:51 " << StatusOfSubGoals << endl;
-	return StatusOfSubGoals;
-}
-#endif
 void CompositeGoal::Activate()
 {
 	m_Status = eActive;
