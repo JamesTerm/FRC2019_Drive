@@ -17,12 +17,12 @@ class Keyboard_Internal
 private:
 	// Keep track of the buttons already pressed
 	std::set<int> m_pressedKeys;
-	int m_flags;
+	int m_flags=0;
 	EventMap * const m_controlledEventMap;
 	int m_lastReleasedKey;
 	double m_lastReleaseTime;
 	double m_eventTime;
-	Key* m_dblPress;
+	Key* m_dblPress=nullptr;
 	std::map<Key, std::vector<std::string>*, std::greater<Key> > m_KeyBindings;
 	std::map<std::string, std::vector<Key>*, std::greater<std::string> > m_AssignedKeys;
 	std::map<Key, std::vector<std::string>*, std::greater<Key> > m_KeyBindings_OnOff;

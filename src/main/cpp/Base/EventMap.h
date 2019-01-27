@@ -116,8 +116,9 @@ namespace Framework
          {
             if (isShiftChar(key))
             {
+				//Note: pure key commands will appear shifted
                key = unShiftChar(key);
-               assert(false);  //ensure this is not called for robot code
+               //assert(false);  //ensure this is not called for robot code
                //flags |= osgGA::GUIEventAdapter::MODKEY_SHIFT;
             }
          }

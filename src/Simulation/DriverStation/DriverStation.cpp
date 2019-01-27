@@ -73,14 +73,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	LoadStringW(hInstance, IDC_DRIVERSTATION, szWindowClass, MAX_LOADSTRING);
 	//MyRegisterClass(hInstance);
 
-	#if 0
-	// Perform application initialization:
-	if (!InitInstance(hInstance, nCmdShow))
-	{
-		return FALSE;
-	}
-	#else
-
 	const HWND pParent = nullptr;  //just to show what the parameter is
 
 	// Display the main dialog box.  I've always wanted to put the callback in the same place!
@@ -158,6 +150,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//case WM_CLOSE:
 		//	DestroyWindow(hWnd);
 		//	break;
+		//Gah it never makes it this far... but keeping here for testing why
 		case WM_KEYUP:
 			OutputDebugStringW(L"KeyPressedUp\n");
 			if (s_Keyboard)
@@ -200,21 +193,35 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	ShowWindow(m_hDlg, nCmdShow);
 	UpdateWindow(m_hDlg);
 
-	#endif
-
-
-	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_DRIVERSTATION));
-	MSG msg;
+	//Note dealing with accelerator tables :P
+	//HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_DRIVERSTATION));
 
 	// Main message loop:
-	while (GetMessage(&msg, nullptr, 0, 0))
+	// Process any pending queue items
+	MSG msg;
+	BOOL bRet;
+	while ((bRet = ::GetMessage(&msg, nullptr, 0, 0)) != 0)
 	{
-		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+		if ((msg.message == WM_KEYDOWN)|| (msg.message == WM_KEYUP))
 		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			//OutputDebugStringW(L"KeyPressed\n");
+			if (s_Keyboard)
+				s_Keyboard->KeyPressRelease((int)msg.wParam, msg.message == WM_KEYDOWN);
+		}
+		else if (bRet == -1)
+		{	// Finished
+			assert(false);
+			break;
+		}
+		else
+		{	// Process the message
+			::TranslateMessage(&msg);
+			::DispatchMessage(&msg);
 		}
 	}
+
+
+
 
 	return (int)msg.wParam;
 }
