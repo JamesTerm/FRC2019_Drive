@@ -63,14 +63,14 @@ Goal::Goal_Status CompositeGoal::Process(double dTime)
 	{
 		Goal_Status newStatus = eFailed;
 		//remove finished goals
-		while (!m_SubGoals.empty() && (m_SubGoals.top()->GetStatus() == eCompleted || m_SubGoals.top()->GetStatus() == eFailed))
+		while (!m_SubGoals.empty() && (m_SubGoals.front()->GetStatus() == eCompleted || m_SubGoals.front()->GetStatus() == eFailed))
 		{
-			m_SubGoals.pop();
+			m_SubGoals.pop_front();
 		}
 		if (!m_SubGoals.empty())
 		{
-			//create pointer to next goal for simplicity
-			Goal* currentGoal = m_SubGoals.top();
+			//create pointer toks next goal for simplicity
+			Goal* currentGoal = m_SubGoals.front();
 			//active the next goal if it isnt already
 			if (currentGoal->GetStatus() == eInactive)
 			{
@@ -128,7 +128,6 @@ void MultitaskGoal::Activate()
 
 	for (GoalList::iterator it = m_GoalsToProcess.begin(); it != m_GoalsToProcess.end(); ++it)
 		(*it)->Activate();
-	cout << "multitask activate" << endl;
 	m_Status = eActive;
 }
 Goal::Goal_Status MultitaskGoal::Process(double dTime_s)
@@ -144,17 +143,14 @@ Goal::Goal_Status MultitaskGoal::Process(double dTime_s)
 	{
 
 		status = (*it)->Process(dTime_s);
-		cout << "Goal.cpp:100 " << status << endl;
 		if (status == eFailed)
 		{
-			cout << "mtg0: eFailed" << endl;
 			m_Status = eFailed;
 			return eFailed;
 		}
 
 		if (status != eActive)
 		{
-			//cout << "not active" << endl;
 			NonActiveCount++;
 			SuccessDetected |= (status == eCompleted);
 		}
@@ -176,7 +172,6 @@ Goal::Goal_Status MultitaskGoal::Process(double dTime_s)
 		}
 		m_Status = status;
 	}
-	//cout << "mtg: " << status << endl;
 	return status;
 }
 

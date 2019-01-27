@@ -88,10 +88,10 @@ class CompositeGoal : public Goal
 	virtual Goal_Status Process(double dTime);
 	virtual void Terminate();
 
-	virtual void AddSubgoal(Goal* g) {m_SubGoals.push(g);}
+	virtual void AddSubgoal(Goal* g) {m_SubGoals.push_back(g);}
 	private:
-	typedef std::stack<Goal*> SubgoalStack;
-	SubgoalStack m_SubGoals;
+	typedef std::list<Goal*> SubgoalList;
+	SubgoalList m_SubGoals;
 };
 
 //Similar to a Composite goal where it is composed of a list of goals, but this one will process all goals simultaneously

@@ -6,19 +6,15 @@ using namespace std;
 void Goal_Timer::Activate()
 {
     m_Status = eActive;
-    cout << "Goal_Timer activate" << endl;
 
 }
 Goal::Goal_Status Goal_Timer::Process(double dTime)
 {
-    cout << "i wish i were here" << endl;
     if (m_Status == eActive)
     {
         m_currentTime += dTime;
-        cout << "gt: " << m_currentTime << " " << dTime << endl;
         if (m_currentTime >= m_timeOut)
         {
-            //cout << "I am here" << endl;
             Terminate();
             return eCompleted;
         }
@@ -41,7 +37,6 @@ Goal::Goal_Status Goal_DriveWithTimer::Process(double dTime)
     if (m_Status == eActive)
     {
         m_currentTime += dTime;
-        cout << "process " << m_currentTime << endl;
         SetDrive(m_leftSpeed, m_rightSpeed, m_activeCollection);
         if (m_currentTime >= m_timeOut)
         {
@@ -63,11 +58,10 @@ void Goal_DriveWithTimer::Terminate()
     StopDrive(m_activeCollection);
     m_Status = eCompleted;
 }
-
+//TODO first thing tomorrow (1/26) check to see if code works in order
 /////////////////////////Goal_WaitThenDrive/////////////////////////
 void Goal_WaitThenDrive::Activate()
 {
-    cout << "Goal_WaitThenDrive activate" << endl;
    
     //TODO dont be backwards
     AddSubgoal(new Goal_DriveWithTimer(m_activeCollection, m_leftSpeed, m_rightSpeed, m_driveTime));

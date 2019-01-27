@@ -51,18 +51,12 @@ using namespace std;
 				string autoSelected = SmartDashboard::GetString("Auto Selector", m_driveStraight);
 		cout << autoSelected << endl;
 		//TODO another class that takes master goal as param and auton selection and adds correct goal
-		//m_masterGoal->AddGoal(new Goal_DriveWithTimer(m_activeCollection, .5, .5, 5.0));
-		//m_masterGoal->AddGoal(new Goal_DriveWithTimer(m_activeCollection,.5,.5,10.0));
 		m_masterGoal->AddGoal(new Goal_WaitThenDrive(m_activeCollection,.2,.2,5.0,5.0));
-		//m_masterGoal->AddGoal(new Goal_Timer(m_activeCollection,15.0));
 		cout << "test1" << endl;
 		m_masterGoal->Activate();
-		//cout << m_masterGoal->GetStatus() << endl;
-		//Pcout << m_masterGoal->listSize() << endl;
 		double dTime = 0.010;
 		while(m_masterGoal->GetStatus() == Goal::eActive)
 		{
-			//cout << "loop" << endl;
 			m_masterGoal->Process(dTime);
 			Wait(dTime);
 		}
