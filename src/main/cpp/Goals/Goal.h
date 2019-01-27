@@ -7,6 +7,7 @@
 #include "../Config/ActiveCollection.h"
 #include "../Util/UtilityFunctions.h"
 
+
 using namespace std;
 /// These classes reflect the design on page 385 in the "Programming Game AI by Example" book.  There are some minor changes/improvements from
 /// What is written, but perhaps the biggest design decision to consider is if they need to be templated with an entity type.  I am going to 

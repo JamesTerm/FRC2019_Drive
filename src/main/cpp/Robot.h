@@ -17,7 +17,7 @@
 #include "Controls/AxisControl.h"
 #include "Autonomi/Autons.h"
 #include "Goals/FRC2019_Goals.h"
-
+#include "Goals/GoalSelector.h"
 
 using namespace frc;
 using namespace System;

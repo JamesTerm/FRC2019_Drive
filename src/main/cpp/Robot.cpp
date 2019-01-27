@@ -50,9 +50,7 @@ using namespace std;
 		cout << "Autonomous Started." << endl;
 				string autoSelected = SmartDashboard::GetString("Auto Selector", m_driveStraight);
 		cout << autoSelected << endl;
-		//TODO another class that takes master goal as param and auton selection and adds correct goal
-		m_masterGoal->AddGoal(new Goal_WaitThenDrive(m_activeCollection,.2,.2,5.0,5.0));
-		cout << "test1" << endl;
+		SelectAuton(m_activeCollection,m_masterGoal,autoSelected);
 		m_masterGoal->Activate();
 		double dTime = 0.010;
 		while(m_masterGoal->GetStatus() == Goal::eActive)
