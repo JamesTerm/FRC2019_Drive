@@ -75,10 +75,9 @@ void Config::LoadValues(xml_document &doc){
 	#pragma region MetaData
 
 	//Config version retrieval 
-	xml_node Version = root.child("Version");
-	int version = Version.attribute("version").as_int();
+	xml_attribute version = root.child("Version").attribute("version");
 	if(version){
-		cout << "Version: " << version << endl;
+		cout << "Version: " << version.as_int() << endl;
 	}
 	else{
 		cout << "Version not found" << endl;
