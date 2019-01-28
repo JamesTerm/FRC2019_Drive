@@ -123,6 +123,15 @@ void FRC2019_Robot::Robot_Arm::Retract(bool on)
 	m_Retract=on;
 }
 
+void FRC2019_Robot::Robot_Arm::SetPosRest()
+{
+	SetIntendedPosition(1.0);  //inches from ground
+}
+void FRC2019_Robot::Robot_Arm::SetPosHatch()
+{
+	SetIntendedPosition(20.0);  //TODO pull from lua, as we need to calibrate on the field
+}
+
 void FRC2019_Robot::Robot_Arm::TimeChange(double dTime_s)
 {
 	const double Accel=m_Ship_1D_Props.ACCEL;
@@ -163,6 +172,10 @@ void FRC2019_Robot::Robot_Arm::SetRequestedVelocity_FromNormalized(double Veloci
 	__super::SetRequestedVelocity_FromNormalized(Velocity); 
 }
 
+//Declare event names for arm
+const char *csz_Arm_SetPosRest = "Arm_SetPosRest";
+const char *csz_Arm_SetPosHatch = "Arm_SetPoshatch";
+
 
 void FRC2019_Robot::Robot_Arm::BindAdditionalEventControls(bool Bind)
 {
@@ -171,6 +184,9 @@ void FRC2019_Robot::Robot_Arm::BindAdditionalEventControls(bool Bind)
 	{
 		em->EventValue_Map["Arm_SetCurrentVelocity"].Subscribe(ehl,*this, &FRC2019_Robot::Robot_Arm::SetRequestedVelocity_FromNormalized);
 		em->EventOnOff_Map["Arm_SetPotentiometerSafety"].Subscribe(ehl,*this, &FRC2019_Robot::Robot_Arm::SetPotentiometerSafety);
+
+		em->Event_Map[csz_Arm_SetPosRest].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Arm::SetPosRest);
+		em->Event_Map[csz_Arm_SetPosHatch].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Arm::SetPosHatch);
 
 		em->EventOnOff_Map["Arm_Advance"].Subscribe(ehl,*this, &FRC2019_Robot::Robot_Arm::Advance);
 		em->EventOnOff_Map["Arm_Retract"].Subscribe(ehl,*this, &FRC2019_Robot::Robot_Arm::Retract);
@@ -181,6 +197,9 @@ void FRC2019_Robot::Robot_Arm::BindAdditionalEventControls(bool Bind)
 	{
 		em->EventValue_Map["Arm_SetCurrentVelocity"].Remove(*this, &FRC2019_Robot::Robot_Arm::SetRequestedVelocity_FromNormalized);
 		em->EventOnOff_Map["Arm_SetPotentiometerSafety"].Remove(*this, &FRC2019_Robot::Robot_Arm::SetPotentiometerSafety);
+
+		em->Event_Map[csz_Arm_SetPosRest].Remove(*this, &FRC2019_Robot::Robot_Arm::SetPosRest);
+		em->Event_Map[csz_Arm_SetPosHatch].Remove(*this, &FRC2019_Robot::Robot_Arm::SetPosHatch);
 
 		em->EventOnOff_Map["Arm_Advance"].Remove(*this, &FRC2019_Robot::Robot_Arm::Advance);
 		em->EventOnOff_Map["Arm_Retract"].Remove(*this, &FRC2019_Robot::Robot_Arm::Retract);
@@ -391,8 +410,8 @@ const char * const g_FRC2019_Controls_Events[] =
 {
 	"Claw_SetCurrentVelocity","Claw_Close",
 	"Claw_Grip","Claw_Squirt",
-	"Arm_SetCurrentVelocity","Arm_SetPotentiometerSafety","Arm_SetPosRest",
-	"Arm_SetPos0feet","Arm_SetPos3feet","Arm_SetPos6feet","Arm_SetPos9feet",
+	"Arm_SetCurrentVelocity","Arm_SetPotentiometerSafety",
+	csz_Arm_SetPosRest,csz_Arm_SetPosHatch,
 	"Arm_Rist","Arm_Advance","Arm_Retract",
 	"Robot_CloseDoor",
 	"TestAuton","StopAuton"

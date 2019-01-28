@@ -153,6 +153,8 @@ class FRC2019_Robot : public Tank_Robot
 			protected:
 				//Intercept the time change to obtain current height as well as sending out the desired velocity
 				virtual void BindAdditionalEventControls(bool Bind);
+				void SetPosRest();
+				void SetPosHatch();
 				void Advance(bool on);
 				void Retract(bool on);
 				//events are a bit picky on what to subscribe so we'll just wrap from here... also great place for breakpoint
@@ -281,43 +283,9 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		KalmanFilter m_KalFilter_Arm;
 		Averager<double, 5> m_Averager;
 		#ifdef _Win32
-		Potentiometer_Tester3 m_Potentiometer; //simulate a real potentiometer for calibration testing
+		Potentiometer_Tester2 m_Potentiometer; //simulate a real potentiometer for calibration testing
 		#endif
 		bool m_FirstRun = false;
 };
-#endif
-
-#ifdef Robot_TesterCode
-
-///This is only for the simulation where we need not have client code instantiate a Robot_Control
-class FRC2019_Robot_UI : public FRC2019_Robot, public FRC2019_Robot_Control
-{
-	public:
-		FRC2019_Robot_UI(const char EntityName[]) : FRC2019_Robot(EntityName,this),FRC2019_Robot_Control(),
-			m_TankUI(this) {}
-	protected:
-		virtual void TimeChange(double dTime_s) 
-		{
-			__super::TimeChange(dTime_s);
-			m_TankUI.TimeChange(dTime_s);
-		}
-		virtual void Initialize(Entity2D::EventMap& em, const Entity_Properties *props=NULL)
-		{
-			__super::Initialize(em,props);
-			m_TankUI.Initialize(em,props);
-		}
-
-	protected:   //from EntityPropertiesInterface
-		virtual void UI_Init(Actor_Text *parent) {m_TankUI.UI_Init(parent);}
-		virtual void custom_update(osg::NodeVisitor *nv, osg::Drawable *draw,const osg::Vec3 &parent_pos) 
-			{m_TankUI.custom_update(nv,draw,parent_pos);}
-		virtual void Text_SizeToUse(double SizeToUse) {m_TankUI.Text_SizeToUse(SizeToUse);}
-		virtual void UpdateScene (osg::Geode *geode, bool AddOrRemove) {m_TankUI.UpdateScene(geode,AddOrRemove);}
-
-	private:
-		Tank_Robot_UI m_TankUI;
-
-};
-
 #endif
 
