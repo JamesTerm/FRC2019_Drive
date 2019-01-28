@@ -11,12 +11,50 @@ Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 \********************************************************************/
 
 #include "Config.h"
+#include "../Pugi/pugixml.h"
 
 using namespace std;
 using namespace System;
 using namespace Configuration;
+using namespace pugi;
+
+/**
+ * Load in the document
+ * Config Version and Comment (different from the Robot.cpp Version and Comment)
+ * MISSING: Verbose Output
+ * 	Probably Post-Season
+ * AutonEnabled??????????
+ * Secondary Camera Server
+ * Vision Initialization
+ * Allocate Components
+ * 	Encoders
+ * 	DI
+ * 	DO?
+ * 	AI?
+ * 	AO?
+ * 	Motors
+ * 		Drive class integration? Probably Post-Season
+ * 	Solenoids
+ * 	Relays?
+ * 	Potentiometers
+ * Allocate the Joysticks via the XML
+ * Allocate Controls (make another method for this)
+ * 
+**/ 
 
 Config::Config(ActiveCollection *_activeCollection, Drive *_drive) {
+	xml_document doc;
+	xml_parse_result result = doc.load_file("config.xml");
+	if (result)
+	{
+		std::cout << "XML Config parsed without errors\n" << endl;
+	}
+	else
+	{
+		std::cout << "XML Config parsed with errors" << endl;
+		std::cout << "Error description: " << result.description() << endl;
+		std::cout << "Error offset: " << result.offset << endl;;
+	}
 	m_driveJoy = new Joystick(0);
 	m_operatorJoy = new Joystick(1);
 	m_activeCollection = _activeCollection;

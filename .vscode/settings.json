@@ -29,5 +29,6 @@
     "xloctime": "cpp"
   },
   "C_Cpp.configurationWarnings": "Disabled",
-  "C_Cpp.default.configurationProvider": "vscode-wpilib"
+  "C_Cpp.default.configurationProvider": "vscode-wpilib",
+  "wpilib.autoStartRioLog": false
 }
