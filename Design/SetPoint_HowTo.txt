@@ -1,0 +1,23 @@
+Writing set point code is something that may be very difficult, as for me it's taken several years to get it working on some of the worst mechanical setups.
+
+Given this, I'd like to provide a high conceptual road mad of how to achieve it, and some pitfalls to watch out for.
+
+Step 1: Manual control, open loop
+The first step is manual control, it is pretty much what you would expect, where its a 1:1 of the pot applying to the voltage used on the speed controller.  From this you can get a feel of how much load is being applied in both directions.  For Arm's and elevators gravity will impact more voltage needed for one direction, also we'll run into potential backlash, and for some motors like denso, there is a breakpoint voltage that has to happen to break the locking mechanism.  All these things can be felt during this test, and finally hook up the potentiometer and observe its range.  This has to work reliably, and without slop.  In 2012 we had to stop at this level on the turret because the encoder solution had slop, and it reading never were consistent even when zero'ing the encoder each time.
+
+Step 2: Manual control, closed loop
+Manual control closed loop works on the idea that the pot controls are setting the current desired velocity, and the underlying code uses PID to achieve that velocity, this allows for some arm assist code to help shape what the voltage should be to help make this happen.  For example when moving in an up direction apply extra voltage to compensate for the gravity to the user applying the control... moving up should be as smooth as going down.  When going down it may be necessary to reduce voltage and in some cases apply reverse voltage to maintain the desired velocity.  The rotary system code provides this functionality, and the assist options are configurable in lua.
+
+Step 3: Setpoint control, teleop (open loop)
+In this step assign buttons (and/or keys in simulation) to a desired setpoint.  When testing open loop click the button and see how close it can get to achieving the set point.  At this point you can tweak the lua on the assist to make it closer to running properly (this is not PID yet).
+
+Step 4: Setpoint control, teleop (closed loop)
+In this step we must ensure the potentiometer readings are working (from step 1) and proper math is used to convert the readings.  They should be linear proportional, and straight forward.  It is possible to jump ahead to this step in the simulation, as I have a friendly potentiometer to use.  In the code its possible to work with a slower top speed and acceleration, to make sure everything is working, and there must be a safety mechanism ready to be pressed when things go wrong.  I've put a voltage safety control next to the voltage on the smartdashboard for this reason.  I've also made it possible to display all PID and assist controls to tune these settings while the code is still running.
+
+Step 5: Setpoint as a goal
+The same code used to manually set the point for teleop can also be used as a goal.  For the robot code all teleop controls are event driven, and so the goals can call those same events.  So really what you have is a goal that calls the same event, but with the added benefit of notifying the goal when it is completed.  This is already written as a goal so it's just a matter of setting that goal up to the appropriate instance.
+
+Step 6: Setpoint as a teleop goal
+This builds on step 5, where the goal is triggered on demand, with the ability to abort on demand because of some external override (more on this later)
+
+It should be noted that the simulation can do all of these steps, and then it is just a matter of having a simulation lua, and the actual robot lua... and its possible to have a lua for a different robot running the same code.  That is possible because the interfacing is all configurable within it as well as the physical properties and assist methods.
