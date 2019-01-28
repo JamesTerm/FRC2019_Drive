@@ -48,12 +48,8 @@ using namespace std;
 
         }
         /***********************Goal_TimeOut***********************/
-        void Goal_Wait::Activate()
-        {
-            m_Status = eActive;
 
-        }
-        Goal::Goal_Status Goal_Wait::Process(double dTime)
+        Goal::Goal_Status Goal_TimeOut::Process(double dTime)
         {
             if (m_Status == eActive)
             {
@@ -71,7 +67,7 @@ using namespace std;
                 return m_Status;
             }
         }
-        void Goal_Wait::Terminate()
+        void Goal_TimeOut::Terminate()
         {
 
         }

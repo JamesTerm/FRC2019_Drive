@@ -1,3 +1,16 @@
+/****************************** Header ******************************\
+Class Name: Distance and its subclasses
+File Name: Distances.h
+Summary: Distance objects for ease of use when using distances in
+program. Each object can be converted to any other object
+Project: BroncBotzFRC2019
+Copyright (c) BroncBotz.
+All rights reserved.
+
+Author(s): Ryan Cooper, Dylan Watson, Chris Weeks
+Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com, 
+chrisrweeks@aol.com
+\********************************************************************/
 #include "../Constants.h"
 using namespace Util;
 class Distance
@@ -7,6 +20,12 @@ class Distance
     const double toInches() {return m_value * inAnInch();}
     const double toFeet() {return m_value * inAFoot();}
     const double toYards() {return m_value * inAYard();}
+
+    //TODO make to{Distance}Object() work
+    // const EncoderTicks* toEncoderTicksObject() {return new EncoderTicks(toEncoderTicks());}
+    // const Inches* toInchesObject() {return new Inches(toInches());}
+    // const Feet* toFeetObject() {return new Feet(toFeet());}
+    // const Yards* toYardsObject() {return new Yards(toYards());}
 
     virtual double inATick() = 0;
 
