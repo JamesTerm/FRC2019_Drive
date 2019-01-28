@@ -36,13 +36,56 @@ public:
 
 	static void PutBoolean(std::string keyName, bool value);
 	static bool GetBoolean(std::string keyName);
+	//Similar to SetDefaultBoolean except that it will safely get if it can without writing it return default value if it doesn't exist
+	static bool GetBoolean(std::string keyName, bool defaultValue)
+	{
+		bool ret = false;
+		try
+		{
+			ret=SmartDashboard::GetBoolean(keyName);
+		}
+		catch (...)
+		{
+			ret = defaultValue;   //* @return        False if the table key already exists with a different type
+		}
+		return ret;
+	}
 
+	static bool SetDefaultBoolean(std::string keyName, bool defaultValue)
+	{
+		bool ret = true;
+		try
+		{
+			SmartDashboard::GetBoolean(keyName);
+			ret = false;   //* @return        False if the table key already exists with a different type
+		}
+		catch (...)
+		{
+			SmartDashboard::PutBoolean(keyName, defaultValue);
+		}
+		return ret;
+	}
 	static void PutNumber(std::string keyName, double value);
 	static double GetNumber(std::string keyName);
+	static bool SetDefaultNumber(std::string keyName, double defaultValue)
+	{
+		bool ret = true;
+		try
+		{
+			SmartDashboard::GetNumber(keyName);
+			ret = false;   //* @return        False if the table key already exists with a different type
+		}
+		catch (...)
+		{
+			SmartDashboard::PutNumber(keyName, defaultValue);
+		}
+		return ret;
+	}
 
 	static void PutString(std::string keyName, std::string value);
 	static int GetString(std::string keyName, char *value, unsigned int valueLen);
 	static std::string GetString(std::string keyName);
+	static std::string GetString(std::string keyName, std::string defaultValue);
 
 	//static void PutValue(std::string keyName, ComplexData& value);
 	//static void RetrieveValue(std::string keyName, ComplexData& value);

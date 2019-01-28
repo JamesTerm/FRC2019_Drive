@@ -440,12 +440,12 @@ UI::JoyStick_Binder &UI_Controller::GetJoyStickBinder()
 	#endif
 }
 
-void *UI_Controller::GetKeyboardBinder()
+KeyboardMouse_CB *UI_Controller::GetKeyboardBinder()
 {
 	#ifdef Robot_TesterCode
 	return &MainWindow::GetMainWindow()->GetKeyboard_Mouse();
 	#else
-	return NULL;
+	return &m_Keyboard;
 	#endif
 }
 

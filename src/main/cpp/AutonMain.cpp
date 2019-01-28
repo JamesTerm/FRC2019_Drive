@@ -26,10 +26,10 @@
 #include "Common/PIDController.h"
 #include "Base/Joystick.h"
 #include "Base/JoystickBinder.h"
-#ifndef _Win32
+
 #include <frc/WPILib.h>
 #include "Common/InOut_Interface.h"
-#else
+#ifdef _Win32
 #include "Common/Calibration_Testing.h"
 #endif
 #include "Common/Debug.h"
@@ -39,8 +39,23 @@
 #include "FRC2019_Robot.h"
 #include "Common/SmartDashboard.h"
 
-
+#include "Config/ActiveCollection.h"
 #include "AutonMain.h"
+
+
+#ifdef _Win32
+void DefaultParentBind(AutonMain *,bool)
+{
+}
+
+static std::function<void(AutonMain *,bool)> s_ParentBind = DefaultParentBind;
+
+void SetParentBindCallback(std::function<void(AutonMain *,bool)> callback)
+{
+	s_ParentBind = callback;
+}
+#endif
+
 
 //This is only for diagnostics... if there are problems with the robot control
 class FRC_2019_Control : public FRC2019_Control_Interface
@@ -82,6 +97,7 @@ public:
 class AutonMain_Internal
 {
 private:
+	AutonMain *m_pParent = nullptr;
 #if 0
 	//keep around for diagnostics //taking away control stress
 	FRC_2019_Control m_Control;
@@ -90,11 +106,14 @@ private:
 #endif
 	FRC2019_Robot_Properties m_RobotProps;
 	FRC2019_Robot *m_pRobot = nullptr;
-	//Framework::UI::JoyStick_Binder m_JoyBinder;
+	frc::Driver_Station_Joystick m_Joystick;
+	Framework::UI::JoyStick_Binder m_JoyBinder;
 	UI_Controller *m_pUI;
 
 	Framework::Base::EventMap m_EventMap;
 	std::string m_LuaPath;  //keep a copy of the lua path
+
+	Configuration::ActiveCollection *m_Collection=nullptr;
 public:
 	void InitRobot()
 	{
@@ -106,19 +125,28 @@ public:
 			script.NameMap["EXISTING_ENTITIES"] = "EXISTING_SHIPS";
 			m_RobotProps.SetUpGlobalTable(script);
 			m_RobotProps.LoadFromScript(script);
-			//m_Joystick.SetSlotList(m_RobotProps.Get_RobotControls());
+			m_Joystick.SetSlotList(m_RobotProps.Get_RobotControls());
 			m_pRobot->Initialize(m_EventMap, &m_RobotProps);
 		}
 		//The script must be loaded before initializing control since the wiring assignments are set there
-		//m_Control.AsControlInterface().Initialize(&m_RobotProps);
-					//Bind the ship's eventmap to the joystick
-		//m_JoyBinder.SetControlledEventMap(m_pRobot->GetEventMap());
+		#if 1
+		m_Control.AsControlInterface().Initialize(&m_RobotProps);
+		//Bind the ship's eventmap to the joystick
+		m_JoyBinder.SetControlledEventMap(m_pRobot->GetEventMap());
+		#endif
+	}
 
+	void Init_BindProperties()
+	{
+		#ifdef _Win32
+		//establish the first parent bind, before setting up the UI controller, and after instantiation of the robot
+		s_ParentBind(m_pParent, false);
+		#endif
 		//To to bind the UI controller to the robot
 		AI_Base_Controller *controller = m_pRobot->GetController();
 		assert(controller);
-		//m_pUI = new UI_Controller(m_JoyBinder, controller);
-		m_pUI = new UI_Controller(nullptr, controller);
+		m_pUI = new UI_Controller(&m_JoyBinder, controller);
+		//m_pUI = new UI_Controller(nullptr, controller);
 		if (controller->Try_SetUIController(m_pUI))
 		{
 			//Success... now to let the entity set things up
@@ -131,36 +159,64 @@ public:
 		}
 
 		//start in auton (can manage this later)
-		SmartDashboard::PutBoolean("Test_Auton", true);
-		SmartDashboard::PutNumber("AutonTest", 0.0);
+		SmartDashboard::SetDefaultBoolean("Test_Auton", true);
+		SmartDashboard::SetDefaultNumber("AutonTest", 0.0);
 	}
-
-	AutonMain_Internal(const char *RobotLua)
+	AutonMain_Internal(AutonMain *parent,const char *RobotLua, Configuration::ActiveCollection *Collection) : m_pParent(parent),
+		m_Joystick(3,0),m_JoyBinder(m_Joystick), m_Collection(Collection)
 	{
 		m_LuaPath = RobotLua;
-		//Hook in our own victor allocator here
-		m_Control.SetExternalVictorHook(
-		[&](size_t module, size_t Channel, const char *Name)
+		#if 1
+		//Hook in our own PWMSpeedController allocator here
+		m_Control.SetExternalPWMSpeedControllerHook(
+		[&](size_t module, size_t Channel, const char *Name, const char*Type,bool &DoNotCreate)
 		{
 			//TODO hook our active collection here
-			//printf("Robot: Get External Victor %s[%d,%d]\n",Name,module,Channel);
+			//printf("Robot: Get External PWMSpeedController %s[%d,%d]\n",Name,module,Channel);
 			return nullptr;
 		});
 		//Note: For Simulation, Tank_Robot_Control needs __Tank_TestControlAssignments__ defined; otherwise there are no hooks to set
 		//Swerve drive merged both techniques, and eventually Tank could do the same, for now, they are still separate
-		m_Control.SetDriveExternalVictorHook(
-			[&](size_t module, size_t Channel, const char *Name)
+		m_Control.SetDriveExternalPWMSpeedControllerHook(
+			[&](size_t module, size_t Channel, const char *Name, const char*Type, bool &DoNotCreate)
 		{
-			//TODO hook our active collection here
-			//printf("Drive: Get External Victor %s[%d,%d]\n", Name, module, Channel);
-			return nullptr;
-		});
+			if (!m_Collection) return (void *)nullptr;  //support if I'm not going to use a collection
+			void *ret = nullptr;
+			//printf("Drive: Get External PWMSpeedController %s[%d,%d]\n", Name, module, Channel);
+			Tank_Robot::SpeedControllerDevices motor = Tank_Robot::GetSpeedControllerDevices_Enum(Name);
+			//Translate our naming convention to the config naming convention
+			const char *ConfigNaming = nullptr;
+			switch (motor)
+			{
+			case Tank_Robot::eLeftDrive1:		ConfigNaming = "Left_0";		break;
+			case Tank_Robot::eLeftDrive2:		ConfigNaming = "Left_1";		break;
+			case Tank_Robot::eLeftDrive3:		ConfigNaming = "Left_2";		break;
+			case Tank_Robot::eRightDrive1:		ConfigNaming = "Right_0";		break;
+			case Tank_Robot::eRightDrive2:		ConfigNaming = "Right_1";		break;
+			case Tank_Robot::eRightDrive3:		ConfigNaming = "Right_2";		break;
+			}
+			if (ConfigNaming)
+			{
+				VictorSPItem *item = m_Collection->GetVictor(ConfigNaming);
+				if (item)
+					ret = (void *)item->AsVictorSP();
+			}
 
+			if (!ret)
+				DoNotCreate = true;   //Let caller know to not create this, since we do not have a resource for it
+			return ret;
+		});
+		#endif
 		//We can call init now:
 		InitRobot();
 	}
 	~AutonMain_Internal()
 	{
+		//no longer binding... let parent know before destorying AutoMain
+		#ifdef _Win32
+		s_ParentBind(nullptr,true);
+		#endif
+
 		delete m_pRobot;  //checks for null implicitly 
 		m_pRobot = nullptr;
 	}
@@ -168,25 +224,22 @@ public:
 	void Update(double dTime_s)
 	{
 		if (m_pRobot)
-			m_pRobot->TimeChange(dTime_s);
-	}
-
-	void Test(const char *test_command)
-	{
-		if (strcmp(test_command, "hook_samples") == 0)
 		{
-			m_pRobot->SetTestAutonCallbackGoal(
-			[](FRC2019_Robot *Robot)
-			{
-				return FRC2019_Goals::Get_Sample_Goal(Robot);
-			});
+			m_JoyBinder.UpdateJoyStick(dTime_s);
+			m_pRobot->TimeChange(dTime_s);
 		}
 	}
+	Ship_Tester *GetRobot() { return m_pRobot; }
 };
 
-void AutonMain::AutonMain_init(const char *RobotLua)
+void AutonMain::AutonMain_init(const char *RobotLua, Configuration::ActiveCollection *Collection)
 {
-	m_p_AutonMain = std::make_shared<AutonMain_Internal>(RobotLua);
+	m_p_AutonMain = std::make_shared<AutonMain_Internal>(this, RobotLua, Collection);
+	m_p_AutonMain->Init_BindProperties();
+	#ifdef _Win32
+	//establish the second parent bind well after everything is set up
+	s_ParentBind(this, true);
+	#endif
 }
 
 void AutonMain::Update(double dTime_s)
@@ -194,7 +247,9 @@ void AutonMain::Update(double dTime_s)
 	m_p_AutonMain->Update(dTime_s);
 }
 
-void AutonMain::Test(const char *test_command)
+#ifdef _Win32
+Ship_Tester *AutonMain::GetRobot()
 {
-	m_p_AutonMain->Test(test_command);
+	return m_p_AutonMain->GetRobot();
 }
+#endif

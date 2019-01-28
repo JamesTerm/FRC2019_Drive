@@ -36,6 +36,8 @@ public:
 	static void PutString(std::string keyName, std::string value);
 	static int GetString(std::string keyName, char *value, unsigned int valueLen);
 	static std::string GetString(std::string keyName);
+	static std::string GetString(std::string keyName,std::string defaultValue);
+
 	
 	static void PutValue(std::string keyName, ComplexData& value);
 	static void RetrieveValue(std::string keyName, ComplexData& value);

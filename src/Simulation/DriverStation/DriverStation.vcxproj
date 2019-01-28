@@ -18,89 +18,35 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\RobotLibraries\RobotLibraries.vcxproj">
-      <Project>{e56d8c47-da69-46f8-92ca-8f68b3e553b3}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\main\cpp\Components\DigitalInputItem.cpp" />
-    <ClCompile Include="..\..\main\cpp\Components\DoubleSolenoidItem.cpp" />
-    <ClCompile Include="..\..\main\cpp\Components\EncoderItem.cpp" />
-    <ClCompile Include="..\..\main\cpp\Components\PotentiometerItem.cpp" />
-    <ClCompile Include="..\..\main\cpp\Components\TalonSRXItem.cpp" />
-    <ClCompile Include="..\..\main\cpp\Components\VictorSPItem.cpp" />
-    <ClCompile Include="..\..\main\cpp\Components\VictorSPXItem.cpp" />
-    <ClCompile Include="..\..\main\cpp\Config\ActiveCollection.cpp" />
-    <ClCompile Include="..\..\main\cpp\Config\Config.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\main\cpp\Controls\AxisControl.cpp" />
-    <ClCompile Include="..\..\main\cpp\Controls\ButtonControl.cpp" />
-    <ClCompile Include="..\..\main\cpp\Controls\ControlItem.cpp" />
-    <ClCompile Include="..\..\main\cpp\Controls\ToggleButtonControl.cpp" />
-    <ClCompile Include="..\..\main\cpp\Robot.cpp" />
-    <ClCompile Include="..\..\main\cpp\Systems\Drive.cpp" />
-    <ClCompile Include="frc\DirectInput_Joystick.cpp" />
-    <ClCompile Include="frc\Joystick.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\main\cpp\Components\DigitalInputItem.h" />
-    <ClInclude Include="..\..\main\cpp\Components\DoubleSolenoidItem.h" />
-    <ClInclude Include="..\..\main\cpp\Components\EncoderItem.h" />
-    <ClInclude Include="..\..\main\cpp\Components\InputComponent.h" />
-    <ClInclude Include="..\..\main\cpp\Components\NativeComponent.h" />
-    <ClInclude Include="..\..\main\cpp\Components\NavX.h" />
-    <ClInclude Include="..\..\main\cpp\Components\OutputComponent.h" />
-    <ClInclude Include="..\..\main\cpp\Components\PotentiometerItem.h" />
-    <ClInclude Include="..\..\main\cpp\Components\TalonSRXItem.h" />
-    <ClInclude Include="..\..\main\cpp\Components\VictorSPItem.h" />
-    <ClInclude Include="..\..\main\cpp\Components\VictorSPXItem.h" />
-    <ClInclude Include="..\..\main\cpp\Config\ActiveCollection.h" />
-    <ClInclude Include="..\..\main\cpp\Config\Config.h" />
-    <ClInclude Include="..\..\main\cpp\Controls\AxisControl.h" />
-    <ClInclude Include="..\..\main\cpp\Controls\ButtonControl.h" />
-    <ClInclude Include="..\..\main\cpp\Controls\ControlItem.h" />
-    <ClInclude Include="..\..\main\cpp\Controls\ToggleButtonControl.h" />
-    <ClInclude Include="..\..\main\cpp\Robot.h" />
-    <ClInclude Include="..\..\main\cpp\Systems\Drive.h" />
-    <ClInclude Include="AHRS.h" />
-    <ClInclude Include="ctre\Phoenix.h" />
-    <ClInclude Include="frc\DirectInput_Joystick.h" />
-    <ClInclude Include="frc\Joystick.h" />
-    <ClInclude Include="frc\SampleRobot.h" />
-    <ClInclude Include="frc\WPILib.h" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{2AB6419F-E1AB-4C0F-9E30-B3732EFC683F}</ProjectGuid>
+    <ProjectGuid>{80908663-65CD-4F17-A924-C8B006AB9A88}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>TeleopLibraries</RootNamespace>
+    <RootNamespace>DriverStation</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -138,17 +84,17 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_Win32;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_Win32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(projectdir)../TeleopLibraries</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(projectdir)../</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -156,8 +102,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -172,8 +117,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -190,8 +134,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -201,6 +144,57 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Robot_Tester.h" />
+    <ClInclude Include="DriverStation.h" />
+    <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\main\cpp\AutonMain.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\FRC2019_Goals.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\FRC2019_Robot.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\SampleGoals.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\RobotTester_Internal.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="DriverStation.cpp" />
+    <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DriverStation.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="DriverStation.ico" />
+    <Image Include="small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RobotLibraries\RobotLibraries.vcxproj">
+      <Project>{e56d8c47-da69-46f8-92ca-8f68b3e553b3}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\SmartDashboard\SmartDashboard.vcxproj">
+      <Project>{556fc434-d0c3-4b96-bf29-e9cf5cd24f02}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\TeleopLibraries\TeleopLibraries.vcxproj">
+      <Project>{2ab6419f-e1ab-4c0f-9e30-b3732efc683f}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

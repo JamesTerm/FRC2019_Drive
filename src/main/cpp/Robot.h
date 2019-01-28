@@ -32,6 +32,7 @@ class Robot : public SampleRobot
 {   
     public:
         Robot();
+		~Robot();  //needed for simulation to close resources properly
 
         void RobotInit() override;
         void Autonomous() override;

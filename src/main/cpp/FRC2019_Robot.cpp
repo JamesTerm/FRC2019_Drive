@@ -156,6 +156,14 @@ void FRC2019_Robot::Robot_Arm::CloseRist(bool Close)
 	m_pParent->m_RobotControl->CloseSolenoid(eRist,Close);
 }
 
+void FRC2019_Robot::Robot_Arm::SetRequestedVelocity_FromNormalized(double Velocity)
+{ 
+	//An example of tracing variables when something isn't working
+	//SmartDashboard::PutNumber("TestArmPot", Velocity);
+	__super::SetRequestedVelocity_FromNormalized(Velocity); 
+}
+
+
 void FRC2019_Robot::Robot_Arm::BindAdditionalEventControls(bool Bind)
 {
 	Base::EventMap *em=GetEventMap(); //grrr had to explicitly specify which EventMap
@@ -498,7 +506,7 @@ void FRC2019_Robot_Control::UpdateVoltage(size_t index,double Voltage)
 		SmartDashboard::PutNumber(SmartLabel.c_str(),Voltage);
 		if (SafetyLock)
 			Voltage=0.0;
-		Victor_UpdateVoltage(index,Voltage);
+		PWMSpeedController_UpdateVoltage(index,Voltage);
 	}
 }
 

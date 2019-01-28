@@ -5,6 +5,7 @@ typedef	unsigned int	UINT32;
 
 namespace frc
 {
+#ifndef _Win32
 ///This class is an Encoder that provides a more accurate way to obtain the current rate
 class Encoder2 : public Encoder
 {
@@ -23,7 +24,7 @@ class Encoder2 : public Encoder
 	private:
 		double m_LastDistance;  //keep note of last distance
 };
-
+#endif
 
 class Driver_Station_Joystick : public Framework::Base::IJoystick
 {	

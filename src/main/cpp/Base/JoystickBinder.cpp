@@ -11,6 +11,9 @@ using namespace Framework;
 
 const double DOUBLE_CLICK_TIME = 0.25;
 
+KeyAdd_proto Framework::UI::g_KeybaordSupport_Add=nullptr;
+KeyRemove_proto Framework::UI::g_KeybaordSupport_Remove = nullptr;
+
   /***************************************************************************************************************/
  /*											JoyStick_Binder														*/
 /***************************************************************************************************************/

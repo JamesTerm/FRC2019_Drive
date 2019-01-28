@@ -1,5 +1,14 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="arm_Raw" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="87" y="161"/>
+		<width>105</width>
+	</widget>
+	<widget field="armPot_Raw" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
+		<location x="43" y="105"/>
+		<property name="Foreground" value="204.0.204.255"/>
+		<property name="Maximum" value="1.0"/>
+	</widget>
 	<widget field="TestRotate" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="738" y="326"/>
 		<width>96</width>
@@ -69,20 +78,11 @@
 		<property name="Maximum" value="1.0"/>
 		<property name="Minimum" value="-1.0"/>
 	</widget>
-	<widget field="Height" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="182" y="185"/>
-		<width>79</width>
-	</widget>
-	<widget field="ArmAngle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.SimpleDial">
-		<location x="21" y="23"/>
-		<property name="Upper Limit" value="220.0"/>
-		<property name="Lower Limit" value="-50.0"/>
-		<property name="Tick Interval" value="45.0"/>
-	</widget>
 	<widget field="LeftEncoder" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
 		<location x="281" y="265"/>
 		<width>107</width>
 		<height>30</height>
+		<property name="Foreground" value="0.153.204.255"/>
 		<property name="Background" value="0.0.102.255"/>
 		<property name="Maximum" value="3.844"/>
 		<property name="Minimum" value="-3.844"/>
@@ -90,6 +90,7 @@
 	<widget field="RightEncoder" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
 		<location x="512" y="260"/>
 		<width>115</width>
+		<property name="Foreground" value="0.153.255.255"/>
 		<property name="Background" value="0.0.102.255"/>
 		<property name="Maximum" value="3.844"/>
 		<property name="Minimum" value="-3.844"/>
@@ -142,6 +143,9 @@
 		<property name="Upper Limit" value="14.0"/>
 		<property name="Lower Limit" value="-14.0"/>
 		<property name="Tick Interval" value="2.8"/>
+	</widget>
+	<widget field="SafetyLock_Arm" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.CheckBox">
+		<location x="121" y="216"/>
 	</widget>
 </dashboard>
 <live-window>

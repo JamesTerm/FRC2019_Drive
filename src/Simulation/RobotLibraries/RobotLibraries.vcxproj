@@ -85,6 +85,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>_MBCS;_Win32;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(projectdir)../TeleopLibraries</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -141,11 +142,7 @@
     <ClCompile Include="..\..\main\cpp\Common\Ship_1D.cpp" />
     <ClCompile Include="..\..\main\cpp\Common\UI_Controller.cpp" />
     <ClCompile Include="..\..\main\cpp\Common\Vehicle_Drive.cpp" />
-    <ClCompile Include="..\..\main\cpp\TankDrive\Servo_Robot_Control.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\main\cpp\TankDrive\Tank_Robot.cpp" />
-    <ClCompile Include="..\..\main\cpp\TankDrive\Tank_Robot_Control.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main\cpp\Base\Base_Includes.h" />
@@ -178,9 +175,7 @@
     <ClInclude Include="..\..\main\cpp\Common\SmartDashboard.h" />
     <ClInclude Include="..\..\main\cpp\Common\UI_Controller.h" />
     <ClInclude Include="..\..\main\cpp\Common\Vehicle_Drive.h" />
-    <ClInclude Include="..\..\main\cpp\TankDrive\Servo_Robot_Control.h" />
     <ClInclude Include="..\..\main\cpp\TankDrive\Tank_Robot.h" />
-    <ClInclude Include="..\..\main\cpp\TankDrive\Tank_Robot_Control.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SmartDashboard\SmartDashboard.vcxproj">

@@ -1042,8 +1042,10 @@ void Tank_Robot_Control::Initialize(const Entity_Properties *props)
 	if (!m_RobotDrive)
 	{
 		RobotControlCommon_Initialize(robot_props->Get_ControlAssignmentProps());
-		 m_RobotDrive = new RobotDrive2(Victor_GetInstance(Tank_Robot::eLeftDrive1),Victor_GetInstance(Tank_Robot::eLeftDrive2),
-		 	Victor_GetInstance(Tank_Robot::eRightDrive1),Victor_GetInstance(Tank_Robot::eRightDrive2));
+		 m_RobotDrive = new RobotDrive2(
+			PWMSpeedController_GetInstance(Tank_Robot::eLeftDrive1),PWMSpeedController_GetInstance(Tank_Robot::eLeftDrive2),
+		 	PWMSpeedController_GetInstance(Tank_Robot::eRightDrive1),PWMSpeedController_GetInstance(Tank_Robot::eRightDrive2),
+			PWMSpeedController_GetInstance(Tank_Robot::eLeftDrive3), PWMSpeedController_GetInstance(Tank_Robot::eRightDrive3));
 		SetSafety(m_UseSafety);
 		const double EncoderPulseRate=(1.0/360.0);
 		Encoder_SetDistancePerPulse(Tank_Robot::eLeftDrive1,EncoderPulseRate),Encoder_SetDistancePerPulse(Tank_Robot::eRightDrive1,EncoderPulseRate);

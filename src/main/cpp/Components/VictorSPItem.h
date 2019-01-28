@@ -43,7 +43,9 @@ namespace Components
 			void Stop();
 			virtual void Set(double val) override;
 			virtual double Get() override;
-
+			//for reference
+			//operator VictorSP *() { return victor;}
+			VictorSP *AsVictorSP() { return victor; }
 		private:
 			VictorSP *victor;
 			bool Reversed;

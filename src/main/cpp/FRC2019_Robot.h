@@ -155,8 +155,8 @@ class FRC2019_Robot : public Tank_Robot
 				virtual void BindAdditionalEventControls(bool Bind);
 				void Advance(bool on);
 				void Retract(bool on);
-				//events are a bit picky on what to subscribe so we'll just wrap from here
-				void SetRequestedVelocity_FromNormalized(double Velocity) {__super::SetRequestedVelocity_FromNormalized(Velocity);}
+				//events are a bit picky on what to subscribe so we'll just wrap from here... also great place for breakpoint
+				void SetRequestedVelocity_FromNormalized(double Velocity);
 
 				void SetPotentiometerSafety(bool DisableFeedback) {__super::SetPotentiometerSafety(DisableFeedback);}
 				virtual void TimeChange(double dTime_s);
@@ -218,10 +218,10 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		FRC2019_Control_Interface &AsControlInterface() { return *this; }
 		const FRC2019_Robot_Properties &GetRobotProps() const { return m_RobotProps; }
 		//Give access to set hooks in the drive as well
-		void SetDriveExternalVictorHook(std::function<void *(size_t, size_t, const char *)> callback) 
+		void SetDriveExternalPWMSpeedControllerHook(std::function<void *(size_t, size_t, const char *, const char*,bool &)> callback) 
 		{
 			#if !defined _Win32 || defined __Tank_TestControlAssignments__
-			m_TankRobotControl.SetExternalVictorHook(callback);
+			m_TankRobotControl.SetExternalPWMSpeedControllerHook(callback);
 			#endif
 		}
 	protected: //from Robot_Control_Interface
@@ -244,7 +244,7 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		//virtual void CloseRist(bool Close) {CloseSolenoid(FRC2019_Robot::eRist,Close);}
 		//virtual void OpenRist(bool Close) {CloseSolenoid(FRC2019_Robot::eRist,!Close);}
 		protected: //from RobotControlCommon
-			virtual size_t RobotControlCommon_Get_Victor_EnumValue(const char *name) const
+			virtual size_t RobotControlCommon_Get_PWMSpeedController_EnumValue(const char *name) const
 			{	return FRC2019_Robot::GetSpeedControllerDevices_Enum(name);
 			}
 			virtual size_t RobotControlCommon_Get_DigitalInput_EnumValue(const char *name) const

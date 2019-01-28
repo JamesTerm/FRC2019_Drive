@@ -25,6 +25,14 @@ Robot::Robot()
 	m_activeCollection = new ActiveCollection();
 }
 
+Robot::~Robot()
+{
+	delete m_drive;
+	m_drive = nullptr;
+	delete m_activeCollection;
+	m_activeCollection = nullptr;
+}
+
 /**
  * Initialization method of the robot
  * This runs right after Robot() when the code is started
@@ -36,6 +44,8 @@ void Robot::RobotInit()
 	cout << "Program Version: " << VERSION << " Revision: " << REVISION << endl;
 	//CameraServer::GetInstance()->StartAutomaticCapture();
 	Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
+	//Must have this for smartdashboard to work properly
+	SmartDashboard::init();
 }
 
 /**
@@ -79,6 +89,31 @@ void Robot::OperatorControl()
 /**
  * Called when the Test period starts
 **/
-void Robot::Test() {}
+#include "AutonMain.h"
+
+void Robot::Test()
+{
+	//Fow now keep this detached from manual solution... can macro define it later
+	AutonMain m_Robot;
+	m_Robot.AutonMain_init("FRC2019Robot.lua",m_activeCollection);
+	
+	double LastTime = GetTime();
+	//We can test teleop auton goals here a bit later
+	while (IsTest() && !IsDisabled())
+	{
+		const double CurrentTime = GetTime();
+		const double DeltaTime = CurrentTime - LastTime;
+		LastTime = CurrentTime;
+		if (DeltaTime == 0.0) continue;  //never send 0 time
+		//printf("DeltaTime=%.2f\n",DeltaTime);
+		#ifndef _Win32
+		m_Robot.Update(DeltaTime);
+		#else
+		m_Robot.Update(0.01);  //It's best to use sythetic time for simulation to step through code
+		#endif
+		//using this from test runs from robo wranglers code
+		Wait(0.010);
+	}
+}
 
 START_ROBOT_CLASS(Robot) //!< This identifies Robot as the main Robot starting class
