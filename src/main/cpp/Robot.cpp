@@ -34,7 +34,7 @@ using namespace std;
 	{
 
 		cout << "Program Version: " << VERSION << " Revision: " << REVISION << endl;
-		//CameraServer::GetInstance()->StartAutomaticCapture();
+		CameraServer::GetInstance()->StartAutomaticCapture();
 		Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
 	}
 
@@ -64,7 +64,8 @@ using namespace std;
     * Called when teleop starts
     **/
 	void Robot::OperatorControl()
-	{auto inst = nt::NetworkTableInstance::GetDefault();
+	{
+		auto inst = nt::NetworkTableInstance::GetDefault();
 		auto table = inst.GetTable("VISION_2019");
 		bool var = false;
 		cout << "Teleoperation Started." << endl;
