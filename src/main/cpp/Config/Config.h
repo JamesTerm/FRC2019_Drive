@@ -21,14 +21,17 @@ Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 #include "../Controls/ButtonControl.h"
 #include "../Controls/AxisControl.h"
 #include "../Controls/ToggleButtonControl.h"
+#include "../Pugi/pugixml.h"
 
 using namespace System;
+using namespace pugi;
 namespace Configuration{
 
 class Config {
 public:
 	Config(ActiveCollection *_activeCollection, Drive *_drive);
 	//TODO: Make this a bool return
+	void LoadValues(xml_document &doc);
 	void AllocateComponents();
 	virtual ~Config();
 private:
@@ -36,6 +39,7 @@ private:
 	Joystick *m_operatorJoy;
 	ActiveCollection *m_activeCollection;
 	Drive *m_drive;
+	bool getAttribute(xml_node &node, const char_t* attr);
 };
 
 }

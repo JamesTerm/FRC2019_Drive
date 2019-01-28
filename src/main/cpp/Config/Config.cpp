@@ -11,7 +11,6 @@ Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 \********************************************************************/
 
 #include "Config.h"
-#include "../Pugi/pugixml.h"
 
 using namespace std;
 using namespace System;
@@ -19,13 +18,14 @@ using namespace Configuration;
 using namespace pugi;
 
 /**
+ * TODO: all of this stuff lol
  * Load in the document
  * Config Version and Comment (different from the Robot.cpp Version and Comment)
  * MISSING: Verbose Output
- * 	Probably Post-Season
- * AutonEnabled??????????
+ * Probably Post-Season
+ * ? AutonEnabled
  * Secondary Camera Server
- * Vision Initialization
+ * * Vision Initialization -> need vision working with that
  * Allocate Components
  * 	Encoders
  * 	DI
@@ -41,25 +41,52 @@ using namespace pugi;
  * Allocate Controls (make another method for this)
  * 
 **/ 
-
 Config::Config(ActiveCollection *_activeCollection, Drive *_drive) {
+//TODO: make doc a member variable?
 	xml_document doc;
 	xml_parse_result result = doc.load_file("config.xml");
+	m_activeCollection = _activeCollection;
+	m_drive = _drive;
 	if (result)
 	{
-		std::cout << "XML Config parsed without errors\n" << endl;
+		cout << "XML Config parsed without errors\n" << endl;
+		LoadValues(doc);
 	}
 	else
 	{
-		std::cout << "XML Config parsed with errors" << endl;
-		std::cout << "Error description: " << result.description() << endl;
-		std::cout << "Error offset: " << result.offset << endl;;
+		cout << "XML Config parsed with errors" << endl;
+		cout << "Error description: " << result.description() << endl;
+		cout << "Error offset: " << result.offset << endl;;
+		cout << "No config available, returning to Robot.cpp\nTHIS IS A BIG ERROR!" << endl;
 	}
-	m_driveJoy = new Joystick(0);
-	m_operatorJoy = new Joystick(1);
-	m_activeCollection = _activeCollection;
-	m_drive = _drive;
-	AllocateComponents();
+}
+
+void Config::LoadValues(xml_document &doc){
+	xml_node root = doc.child("Robot");
+	
+	if(root){
+		cout << "Config found" << endl;
+	}
+	else{
+		cout << "Robot was not found in Config! I hope you didn't intend to configure anything! Returning to Robot.cpp" << endl;
+		return;
+	}
+
+	#pragma region MetaData
+
+	//Config version retrieval 
+	xml_node Version = root.child("Version");
+	int version = Version.attribute("version").as_int();
+	if(version){
+		cout << "Version: " << version << endl;
+	}
+	else{
+		cout << "Version not found" << endl;
+	}
+
+	//TODO: Get the comment 
+
+	#pragma endregion MetaData
 }
 
 void Config::AllocateComponents(){
@@ -94,6 +121,4 @@ void Config::AllocateComponents(){
 
 }
 
-Config::~Config(){
-
-}
+Config::~Config(){}
