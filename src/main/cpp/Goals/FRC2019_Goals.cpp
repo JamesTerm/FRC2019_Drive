@@ -19,13 +19,13 @@ using namespace std;
 
 #pragma region AtomicGoals
     #pragma region TimerGoals
-        /////////////////////////Goal_Timer/////////////////////////
-        void Goal_Timer::Activate()
+        /***********************Goal_Wait***********************/
+        void Goal_Wait::Activate()
         {
             m_Status = eActive;
 
         }
-        Goal::Goal_Status Goal_Timer::Process(double dTime)
+        Goal::Goal_Status Goal_Wait::Process(double dTime)
         {
             if (m_Status == eActive)
             {
@@ -43,11 +43,39 @@ using namespace std;
                 return m_Status;
             }
         }
-        void Goal_Timer::Terminate()
+        void Goal_Wait::Terminate()
         {
 
         }
-        /////////////////////////Goal_DriveWithTimer/////////////////////////
+        /***********************Goal_TimeOut***********************/
+        void Goal_Wait::Activate()
+        {
+            m_Status = eActive;
+
+        }
+        Goal::Goal_Status Goal_Wait::Process(double dTime)
+        {
+            if (m_Status == eActive)
+            {
+                m_currentTime += dTime;
+                if (m_currentTime >= m_timeOut)
+                {
+                    Terminate();
+                    return m_Status = eFailed;
+                }
+                
+                return eActive;
+            }
+            else
+            {
+                return m_Status;
+            }
+        }
+        void Goal_Wait::Terminate()
+        {
+
+        }
+        /***********************Goal_DriveWithTimer***********************/
         Goal::Goal_Status Goal_DriveWithTimer::Process(double dTime)
         {
             if (m_Status == eActive)
@@ -76,10 +104,10 @@ using namespace std;
     #pragma endregion
 
     #pragma region FeedbackLoopGoals
-        /////////////////////////Goal_Turn/////////////////////////
+        /***********************Goal_Turn***********************/
         void Goal_Turn::Activate()
         {
-            Goal_Timer::Activate();
+            Goal_Wait::Activate();
             m_navx->Reset();
         }
 
@@ -125,10 +153,10 @@ using namespace std;
             StopDrive(m_activeCollection);
         }
 
-        /////////////////////////Goal_DriveStraight/////////////////////////
+        /***********************Goal_DriveStraight***********************/
         void Goal_DriveStraight::Activate()
         {
-            Goal_Timer::Activate();
+            Goal_Wait::Activate();
             m_encLeft->Reset();
             m_encRight->Reset();
         }
@@ -178,12 +206,12 @@ using namespace std;
 
 #pragma region CompositeGoals
     //TODO first thing tomorrow (1/27) check to see if code works in order
-    /////////////////////////Goal_WaitThenDrive/////////////////////////
+    /***********************Goal_WaitThenDrive***********************/
     void Goal_WaitThenDrive::Activate()
     {
     
         AddSubgoal(new Goal_DriveWithTimer(m_activeCollection, m_leftSpeed, m_rightSpeed, m_driveTime));
-        AddSubgoal(new Goal_Timer(m_activeCollection, m_waitTime));
+        AddSubgoal(new Goal_Wait(m_activeCollection, m_waitTime));
         m_Status = eActive;
     }
 #pragma endregion

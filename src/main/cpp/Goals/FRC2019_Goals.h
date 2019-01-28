@@ -24,15 +24,14 @@ Email: chrisrweeks@aol.com
 
   //Time based goals go in this region
   #pragma region TimerGoals
-    /* Goal_Timer
-    * Other goals should extend from this goal to implement time out features.
-    * This goal will also be used to track the time remaining during auton (besides 2019 sandstorm lol... this may be different)
-    * This goal also requires active collection because all goals extending it will require it.
+    /* Goal_Wait
+    * This goal will wait a specified amount of time then return eCompleted. Use it for delay features.
+    ! NOTE: This goal is different then Goal_TimeOut
     */
-    class Goal_Timer : public AtomicGoal
+    class Goal_Wait : public AtomicGoal
     {
     public:
-      Goal_Timer(ActiveCollection *activeCollection, double timeOut)
+      Goal_Wait(ActiveCollection *activeCollection, double timeOut)
       {
         m_Status = eInactive;
         m_timeOut = timeOut;
@@ -48,14 +47,24 @@ Email: chrisrweeks@aol.com
       double m_currentTime;
       double m_timeOut;
     };
-
+    /* Goal_TimeOut
+     * This goal will wait a specified amount of time then return eFailed. Use to time out a goal if it takes too long
+     ! NOTE: This goal is different than Goal_Wait
+     */
+    class Goal_TimeOut : public Goal_Wait
+    {
+      public:
+      Goal_TimeOut(ActiveCollection *activeCollection, double timeOut) : Goal_Wait(activeCollection, timeOut) {}
+      virtual Goal::Goal_Status Process(double dTime);
+      void Terminate();
+    };
     /* Goal_DriveWithTimer
-    * This goal implements Goal_Timer to drive at specified speed until time runs out.
+    * This goal implements Goal_Wait to drive at specified speed until time runs out.
     */
-    class Goal_DriveWithTimer : public Goal_Timer
+    class Goal_DriveWithTimer : public Goal_Wait
     {
     public:
-      Goal_DriveWithTimer(ActiveCollection *activeCollection, double leftSpeed, double rightSpeed, double timeOut) : Goal_Timer(activeCollection, timeOut)
+      Goal_DriveWithTimer(ActiveCollection *activeCollection, double leftSpeed, double rightSpeed, double timeOut) : Goal_Wait(activeCollection, timeOut)
       {
         m_leftSpeed = leftSpeed;
         m_rightSpeed = rightSpeed;
@@ -75,10 +84,10 @@ Email: chrisrweeks@aol.com
     * 
     */
     //TODO PID implemenation
-    class Goal_Turn : public Goal_Timer
+    class Goal_Turn : public Goal_Wait
     {
     public:
-      Goal_Turn(ActiveCollection *activeCollection, double angle, double timeOut) : Goal_Timer(activeCollection, timeOut)
+      Goal_Turn(ActiveCollection *activeCollection, double angle, double timeOut) : Goal_Wait(activeCollection, timeOut)
       {
         m_target = angle;
         m_navx = m_activeCollection->GetNavX();
@@ -103,11 +112,11 @@ Email: chrisrweeks@aol.com
     /* Goal_DriveStraight
     * This goal uses encoder to drive a specified amount forward and navx to stay straight
     */
-    class Goal_DriveStraight : public Goal_Timer
+    class Goal_DriveStraight : public Goal_Wait
     {
     public:
       //*standard constructor
-      Goal_DriveStraight(ActiveCollection *activeColelction, double dist, double power, double timeOut) : Goal_Timer(activeColelction, timeOut)
+      Goal_DriveStraight(ActiveCollection *activeColelction, double dist, double power, double timeOut) : Goal_Wait(activeColelction, timeOut)
       {
         m_distTarget = dist;
         m_encLeft = m_activeCollection->GetEncoder("enc0");
