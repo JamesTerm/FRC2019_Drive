@@ -28,6 +28,83 @@ Email: chrisrweeks@aol.com
     * This goal will wait a specified amount of time then return eCompleted. Use it for delay features.
     ! NOTE: This goal is different then Goal_TimeOut
     */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   //up for change
+   class Goal_OneHatch : public CompositeGoal
+   {
+     public: 
+      Goal_OneHatch(ActiveCollection *activeCollection, double timeOut)
+     {
+       m_timeOut = timeOut;
+     }
+
+     virtual void Activate();
+     private:
+       
+       ActiveCollection *m_activeCollection;
+             double m_timeOut;
+
+   };
+
+
+
+
+   class Goal_Hatch : public AtomicGoal
+   {
+     public:
+     Goal_Hatch(ActiveCollection *activeCollection, double timeOut)
+     {
+       m_Status = eActive;
+       m_timeOut = timeOut;
+       m_currentTime = 0;
+     }
+     virtual void Activate();
+     virtual Goal::Goal_Status Process(double dTime);
+     virtual void Terminate();
+     protected:
+      ActiveCollection *m_activeCollection;
+      double m_currentTime;
+      double m_timeOut;
+   };
+
+   
+  
+
+
+
+
+
+   //gabe stuff^^
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     class Goal_Wait : public AtomicGoal
     {
     public:

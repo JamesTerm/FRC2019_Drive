@@ -17,6 +17,43 @@ using namespace std;
 //?HINT ctrl+k then ctrl+0 will collapse all regions
 //?ctrl+k then ctrl+j will uncollapse all regions
 
+//more gabe stuff i guess
+
+
+
+
+
+
+
+
+
+void Goal_OneHatch::Activate()
+{
+    AddSubgoal(new Goal_DriveStraight(m_activeCollection, 100, 100));
+    AddSubgoal(new Goal_Turn(m_activeCollection, 90));
+    AddSubgoal(new Goal_DriveStraight(m_activeCollection, 100, 100));
+    AddSubgoal(new Goal_Hatch(m_activeCollection, m_timeOut));
+    m_Status = eActive;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #pragma region AtomicGoals
     #pragma region TimerGoals
         /***********************Goal_Wait***********************/
@@ -43,6 +80,7 @@ using namespace std;
                 return m_Status;
             }
         }
+
         void Goal_Wait::Terminate()
         {
 
