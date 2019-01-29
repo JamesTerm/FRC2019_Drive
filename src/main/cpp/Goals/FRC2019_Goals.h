@@ -177,10 +177,10 @@ Email: chrisrweeks@aol.com
     private:
       double m_target;
       double m_power;
-      const double m_freedom = 5; //code can be within +/- 5 degrees of target
+      const double m_freedom = 2; //code can be within +/- 5 degrees of target
       NavX *m_navx;
 
-      double kp = 0, ki = 0, kd = 0;
+      double kp = 1, ki = 0, kd = 0;
       double bias = 0; //bias is a constant that is added to the output. We most likely will not use it but it is here if needed.
       double propError, integ, deriv;
       double errorPrior;
