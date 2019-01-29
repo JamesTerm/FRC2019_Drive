@@ -78,6 +78,7 @@ enum AutonType
 	eJustRotate,
 	eSimpleMoveRotateSequence,
 	eTestBoxWayPoints,
+	eTestArm,
 	//autons for 2019
 	eOnePieceAuto, 
 	eTwoPieceAuto, 
@@ -316,6 +317,36 @@ class Sample_Goals_Impl : public AtomicGoal
 		// 		goal_arm=new Goal_Rotary_MoveToRelativePosition(Arm,DEG_2_RAD(position),PrecisionTolerance);
 		// 	return goal_arm;
 		// }
+		static Goal * Move_ArmPosition(Sample_Goals_Impl *Parent, double length_in)
+		{
+			FRC2019_Robot *Robot = &Parent->m_Robot;
+			FRC2019_Robot::Robot_Arm &Arm = Robot->GetArm();
+			const double PrecisionTolerance = Robot->GetRobotProps().GetArmProps().GetRotaryProps().PrecisionTolerance;
+			Goal_Rotary_MoveToPosition *goal_arm = NULL;
+			const double position = length_in;
+			goal_arm = new Goal_Rotary_MoveToPosition(Arm, position, PrecisionTolerance);
+			return goal_arm;
+		}
+
+		class SetArmWaypoint : public Generic_CompositeGoal, public SetUpProps
+		{
+		public:
+			SetArmWaypoint(Sample_Goals_Impl *Parent, bool AutoActivate = false) : Generic_CompositeGoal(AutoActivate), SetUpProps(Parent)
+			{
+				if (!AutoActivate)
+					m_Status = eActive;
+			}
+			virtual void Activate()
+			{
+				const char * const MoveSmartVar = "ArmHeight";
+				double height_in = Auton_Smart_GetSingleValue(MoveSmartVar, 6.0); //should be a safe default
+
+				AddSubgoal(new Goal_Wait(0.500));
+				AddSubgoal(Move_ArmPosition(m_Parent, height_in));
+				AddSubgoal(new Goal_Wait(0.500));  //allow time for mass to settle
+				m_Status = eActive;
+			}
+		};
 
 		class RobotQuickNotify : public AtomicGoal, public SetUpProps
 		{
@@ -715,6 +746,9 @@ class Sample_Goals_Impl : public AtomicGoal
 				break;
 			case eTestBoxWayPoints:
 				m_Primer.AddGoal(GiveRobotSquareWayPointGoal(this));
+				break;
+			case eTestArm:
+				m_Primer.AddGoal(new SetArmWaypoint(this));
 				break;
 			case eOnePieceAuto:
 				m_Primer.AddGoal(new OnePieceAuto(this, gamePiece));
