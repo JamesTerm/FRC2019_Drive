@@ -41,7 +41,16 @@ void Goal_OneHatch::Activate()
 
 
 
+void Goal_Hatch::Activate(){
+m_Status = eActive;
+}
 
+Goal::Goal_Status Goal_Hatch::Process(double dTime){
+    return eCompleted;
+}
+void Goal_Hatch::Terminate(){
+
+}
 
 
 
