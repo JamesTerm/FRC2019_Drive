@@ -53,6 +53,7 @@ void Robot::Autonomous()
 	string autoSelected = SmartDashboard::GetString("Auto Selector", m_driveStraight);
 	cout << autoSelected << endl;
 	SelectAuton(m_activeCollection, m_masterGoal, autoSelected);
+	//m_masterGoal->AddGoal(new Goal_WaitThenDrive(m_activeCollection, .5, .5, 3, 5));
 	m_masterGoal->Activate();
 	double dTime = 0.010;
 	while (m_masterGoal->GetStatus() == Goal::eActive)

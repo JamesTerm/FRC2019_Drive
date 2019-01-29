@@ -118,6 +118,7 @@ using namespace std;
                 double lowerBound = m_target - m_freedom;
                 double upperBound = m_target + m_freedom;
                 double currentAngle = m_navx->GetAngle();
+                cout << "ANGLE: " << currentAngle << endl;
 
                 propError = (m_target - currentAngle) / m_target; 
                 integ += propError * dTime; //Right Riemann Sum integral
@@ -205,9 +206,9 @@ using namespace std;
     /***********************Goal_WaitThenDrive***********************/
     void Goal_WaitThenDrive::Activate()
     {
-    
-        AddSubgoal(new Goal_DriveWithTimer(m_activeCollection, m_leftSpeed, m_rightSpeed, m_driveTime));
         AddSubgoal(new Goal_Wait(m_activeCollection, m_waitTime));
+        AddSubgoal(new Goal_DriveWithTimer(m_activeCollection, m_leftSpeed, m_rightSpeed, m_driveTime));
+        
         m_Status = eActive;
     }
 #pragma endregion
