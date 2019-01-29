@@ -32,7 +32,8 @@ public:
 	Config(ActiveCollection *_activeCollection, Drive *_drive);
 	//TODO: Make this a bool return
 	void LoadValues(xml_document &doc);
-	void AllocateComponents();
+	void AllocateComponents(xml_document &doc);
+	void AllocateComponentsDep();
 	virtual ~Config();
 private:
 	Joystick *m_driveJoy;

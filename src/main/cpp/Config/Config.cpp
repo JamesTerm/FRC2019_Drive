@@ -22,28 +22,27 @@ using namespace frc;
  * TODO: all of this stuff lol
  * Load in the document
  * Config Version and Comment (different from the Robot.cpp Version and Comment)
- * MISSING: Verbose Output
- * Probably Post-Season
+ * * Verbose Output: Need to give Ian the logging TODO first
  * ? AutonEnabled
  * Secondary Camera Server
  * * Vision Initialization -> need vision working with that
  * Allocate Components
- * 	Encoders
- * 	DI
- * 	DO?
- * 	AI?
- * 	AO?
- * 	Motors
- * 		Drive class integration? Probably Post-Season
- * 	Solenoids
- * 	Relays?
- * 	Potentiometers
- * Allocate the Joysticks via the XML
- * Allocate Controls (make another method folsr this)
+ * 	*Encoders
+ * 	*DI
+ *? DO
+ *?	AI
+ *?	AO
+ * 	*Motors
+ *?		Drive class integration? Probably Post-Season
+ * 	*Solenoids
+ *?	Relays
+ * 	*Potentiometers
+ * *Allocate the Joysticks via the XML
+ * *Allocate Controls (make another method for this, prolly one for each joystick)
  * 
 **/ 
 Config::Config(ActiveCollection *_activeCollection, Drive *_drive) {
-//TODO: make doc a member variable?
+//? make doc a member variable?
 	xml_document doc;
 	xml_parse_result result = doc.load_file("config.xml");
 	m_activeCollection = _activeCollection;
@@ -66,7 +65,7 @@ void Config::LoadValues(xml_document &doc){
 	xml_node root = doc.child("Robot");
 	
 	if(root){
-		cout << "Config found" << endl;
+		cout << "Config Root found" << endl;
 	}
 	else{
 		cout << "Robot was not found in Config! I hope you didn't intend to configure anything! Returning to Robot.cpp" << endl;
@@ -133,10 +132,53 @@ void Config::LoadValues(xml_document &doc){
 		cout << "EnableSecondaryCameraServer not found. Disabling by default" << endl;
 
 	#pragma endregion MetaData
+
+	AllocateComponents(doc);
+	//TODO: Controls
 }
 
-void Config::AllocateComponents(){
+void Config::AllocateComponents(xml_document &doc){
+	xml_node robot = doc.child("Robot").child("RobotConfig");
+	if(!robot){
+		cout << "RobotConfig was not found in Config! I hope you didn't intend to allocate any components! Returning to Config::LoadValues()" << endl;
+		return;
+	}
 
+	//TODO: When/if we create a drivetrain class, we will need drive/aux motors
+	//TODO: Look into setting encoders to motors like we used to do in the C# code
+
+#pragma region VictorSP
+	
+	xml_node VictorSP = robot.child("VictorSP");
+	if(VictorSP){
+		for(xml_node victorSp = VictorSP.first_child(); victorSp; victorSp = victorSp.next_sibling()){
+			string name = victorSp.name();
+			xml_attribute channel = victorSp.attribute("channel");
+			bool reversed = victorSp.attribute("reversed");
+			int pdbChannel = victorSp.attribute("pdbChannel") ? victorSp.attribute("pdbChannel").as_int() : -1;
+			if(channel){
+				VictorSPItem *tmp = new VictorSPItem(name, channel.as_int(), reversed);
+				cout << "Added Victor  " << name << ", Channel: " << channel << ", Reversed: " << reversed << "PDBChannel: " << pdbChannel << endl;
+				if(pdbChannel != -1)
+					tmp->SetPDBChannel(pdbChannel);
+			}
+			else{
+				cout << "Failed to load Victor " << name << ". This may cause a fatal runtime error!" << endl;
+			}
+
+
+		}
+	}
+	else{
+		cout << "VictorSP definitions not found in config, skipping..." << endl;
+	}
+
+#pragma endregion VictorSP
+
+}
+
+//! DEPRECATED: Here only for reference
+void Config::AllocateComponentsDep(){
 	VictorSPItem *left_0 = new VictorSPItem("Left_0", 2, true);
 	VictorSPItem *left_1 = new VictorSPItem("Left_1", 3, true);
 	VictorSPItem *right_0 = new VictorSPItem("Right_0", 0, false);
@@ -156,7 +198,6 @@ void Config::AllocateComponents(){
 	m_drive->AddControlDrive(leftDrive);
 	m_drive->AddControlDrive(rightDrive);
 	m_drive->AddControlDrive(ToggleTest);
-
 
 	leftDrive->AddComponent(left_0);
 	leftDrive->AddComponent(left_1);

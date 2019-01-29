@@ -12,9 +12,9 @@
     <EnableSecondaryCameraServer value="false" width="640" height="480" fps="30" autoExposure=""/>
     <!-- Contains assignments to ports and robot dimensions -->
     <RobotConfig>
-        <Victors>
+        <VictorSP>
             <left_0 />
-        </Victors>
+        </VictorSP>
     </RobotConfig>
 
 </Robot>

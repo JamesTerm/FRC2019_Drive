@@ -63,6 +63,10 @@ int VictorSPItem::GetPolarity()
 	return 1;
 }
 
+void VictorSPItem::SetPDBChannel(int val){
+	PDBChannel = val;
+}
+
 void VictorSPItem::DefaultSet()
 {
 	cout << "WHY DID YOU CALL THE DEFAULT SET FOR A MOTOR RETARD" << endl;
