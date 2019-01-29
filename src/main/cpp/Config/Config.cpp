@@ -16,6 +16,7 @@ using namespace std;
 using namespace System;
 using namespace Configuration;
 using namespace pugi;
+using namespace frc;
 
 /**
  * TODO: all of this stuff lol
@@ -38,7 +39,7 @@ using namespace pugi;
  * 	Relays?
  * 	Potentiometers
  * Allocate the Joysticks via the XML
- * Allocate Controls (make another method for this)
+ * Allocate Controls (make another method folsr this)
  * 
 **/ 
 Config::Config(ActiveCollection *_activeCollection, Drive *_drive) {
@@ -74,16 +75,62 @@ void Config::LoadValues(xml_document &doc){
 
 	#pragma region MetaData
 
-	//Config version retrieval 
 	xml_attribute version = root.child("Version").attribute("version");
-	if(version){
-		cout << "Version: " << version.as_int() << endl;
-	}
-	else{
+	if(version)
+		cout << "Config Version: " << version.as_int() << endl;
+	else
 		cout << "Version not found" << endl;
-	}
 
-	//TODO: Get the comment 
+	xml_attribute comment = root.child("Comment").attribute("comment");
+	if(comment)
+		cout << "Comment: " << comment.as_string() << endl;
+	else
+		cout << "Comment not found" << endl;
+
+	xml_attribute useNavX = root.child("UseNavX").attribute("value");
+	//TODO: Addition of other NavX ports
+	if(useNavX){
+		if(useNavX.as_bool()){
+			NavX *nav = new NavX();
+			//m_activeCollection->Add(new NavX());
+			cout << "NavX detected" << endl;
+		}
+		else
+			cout << "Failed to load the NavX: Disabling NavX by default" << endl;
+			
+	}
+	else
+		cout << "UseNavX not found. Disabling by default" << endl;
+
+	//TODO: make it so we can mess with the camera during the running of the robot: ie, switch which stream we are using 
+	xml_node enableSecondaryCamera = root.child("EnableSecondaryCameraServer");
+	if(enableSecondaryCamera){
+		xml_attribute cameraServerEnabled = enableSecondaryCamera.attribute("value");
+		if(cameraServerEnabled.as_bool()){
+			cs::UsbCamera cam = CameraServer::GetInstance()->StartAutomaticCapture();
+			if(enableSecondaryCamera.attribute("autoExposure").as_bool()){
+				cam.SetExposureAuto();
+				cout << "SecondaryCameraServer AutoExposure enabled" << endl;
+			}
+			if(enableSecondaryCamera.attribute("width") && enableSecondaryCamera.attribute("height")){
+				cam.SetResolution(enableSecondaryCamera.attribute("width").as_int(), enableSecondaryCamera.attribute("height").as_int());
+			}
+			else{
+				//TODO: Make stuff like this log-only (ie. not console) unless verbose output. Will assign to Ian.
+				cout << "No width/height for SecondaryCameraServer found!" << endl;
+			}
+			if(enableSecondaryCamera.attribute("fps"))
+				cam.SetFPS(enableSecondaryCamera.attribute("fps").as_int());
+			else
+				cout << "No FPS for SecondaryCameraServer found!" << endl;
+			cout << R"(Secondary camera server started, you can access the stream at http://10.34.81.2:1181)";
+		}
+		else{
+			cout << "EnableSecondaryCameraServer value not found. Disabling by default" << endl;
+		}
+	}
+	else
+		cout << "EnableSecondaryCameraServer not found. Disabling by default" << endl;
 
 	#pragma endregion MetaData
 }

@@ -20,7 +20,7 @@ Email: dylantrwatson@gmail.com
 namespace Components{
 class NavX : public AHRS, public NativeComponent{
 public:
-	NavX() : AHRS(SerialPort::Port::kMXP, SerialDataType::kProcessedData, 50), NativeComponent("NavX"){}
+	NavX() : AHRS(SerialPort::Port::kMXP), NativeComponent("NavX"){}
 	NavX(SPI::Port spiPortId, uint8_t updateRateHz) : AHRS(spiPortId, updateRateHz), NativeComponent("NavX"){}
 	NavX(SPI::Port spiPortId, int spiBitRate, uint8_t updateRateHz) : AHRS(spiPortId, spiBitRate, updateRateHz), NativeComponent("NavX"){}
 	NavX(I2C::Port i2CPortId, uint8_t updateRateHz): AHRS(i2CPortId, updateRateHz), NativeComponent("NavX"){}
