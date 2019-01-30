@@ -29,9 +29,10 @@ using namespace frc;
  * Allocate Components
  * 	*Encoders
  * 	*DI
- *? DO
- *?	AI
- *?	AO
+ *  *DO
+ *TODO:*AI-> Write the abstraction classes
+ *TODO:*AO-> Write the abstraction classes
+ *TODO: Lower and Upper Limit for DAI
  * 	*Motors
  *?		Drive class integration? Probably Post-Season
  * 	*Solenoids
@@ -174,6 +175,12 @@ void Config::AllocateComponents(xml_document &doc){
 	}
 
 #pragma endregion VictorSP
+
+#pragma region VictorSPX
+
+	
+
+#pragma endregion VictorSPX
 
 }
 
