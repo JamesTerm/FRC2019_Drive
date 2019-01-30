@@ -177,9 +177,9 @@ namespace Framework
 			// These are the events that get fired by the KBMCB when we are connected
 			UserInputEvents KBM_Events;
 
-			std::map<std::string,Event0,std::greater<std::string> > Event_Map;
-			std::map<std::string,Event1<bool>,std::greater<std::string> > EventOnOff_Map;
-			std::map<std::string,Event1<double>,std::greater<std::string> > EventValue_Map;
+			std::map<std::string,Event0bc,std::greater<std::string> > Event_Map;
+			std::map<std::string,Event1bc<bool>,std::greater<std::string> > EventOnOff_Map;
+			std::map<std::string,Event1bc<double>,std::greater<std::string> > EventValue_Map;
 
 			// Some things are interested in the TIME that an event is fired.  
 			// Usually, this TIME is the current time on whatever timer is being used, BUT

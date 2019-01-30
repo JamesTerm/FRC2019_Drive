@@ -150,7 +150,7 @@ MainRobot = {
 	{
 		arm =
 		{
-			is_closed=0,
+			is_closed=1,
 			show_pid_dump='n',
 			ds_display_row=-1,
 			use_pid_up_only='y',  --for now make the same, but this may change
@@ -170,7 +170,7 @@ MainRobot = {
 			max_accel_reverse=24,
 			predict_up=.200,
 			predict_down=.200,
-			using_range=0,					--Warning Only use range if we have a potentiometer!
+			using_range=1,					--Warning Only use range if we have a potentiometer!
 			--These min/max in inch units
 			max_range= 36,
 			--Note the sketch used -43.33, but tests on actual assembly show -46.12
@@ -227,10 +227,8 @@ MainRobot = {
 			POV_Turn =  {type="joystick_analog", key=8, is_flipped=false, multiplier=1.0, filter=0.0, curve_intensity=0.0},
 			Turn_180 = {type="joystick_button", key=7, on_off=false},
 			
-			Arm_SetPos0feet = {type="joystick_button", key=2, on_off=false},
-			Arm_SetPos3feet = {type="joystick_button", key=1, on_off=false},
-			Arm_SetPos6feet = {type="joystick_button", key=3, on_off=false},
-			--Arm_SetPos9feet = {type="joystick_button", key=4, on_off=false},
+			Arm_SetPosRest = {type="joystick_button", key=2, keyboard='l', on_off=false},
+			Arm_SetPoshatch = {type="joystick_button", key=1, keyboard=';', on_off=false},
 			Arm_SetCurrentVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
 			Arm_Rist={type="joystick_button", key=5, on_off=true},
 			Arm_Advance={type="keyboard", key='k', on_off=true},

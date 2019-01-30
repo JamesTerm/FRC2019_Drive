@@ -216,7 +216,8 @@ public:
 		#ifdef _Win32
 		s_ParentBind(nullptr,true);
 		#endif
-
+		delete m_pUI;
+		m_pUI = nullptr;
 		delete m_pRobot;  //checks for null implicitly 
 		m_pRobot = nullptr;
 	}

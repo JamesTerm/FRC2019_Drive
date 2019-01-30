@@ -214,9 +214,25 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		if ((msg.message == WM_KEYDOWN)|| (msg.message == WM_KEYUP))
 		{
+			bool ProcessKey = true;
+			WORD ascii = 0;
+			//Translate WM_Key messages to ascii
+			//https://stackoverflow.com/questions/44660035/how-to-extract-the-character-from-wm-keydown-in-pretranslatemessagemsgpmsg
+			{
+				const int wParam =(int) msg.wParam;
+				const int lParam = (int)msg.lParam;
+				const int keyboardScanCode = (lParam >> 16) & 0x00ff;
+				const int virtualKey = wParam;
+
+				BYTE keyboardState[256];
+				GetKeyboardState(keyboardState);
+
+				const int len = ToAscii(virtualKey, keyboardScanCode, keyboardState, &ascii, 0);
+				ProcessKey = (len == 1);  //only simple keys
+			}
 			//OutputDebugStringW(L"KeyPressed\n");
-			if (s_Keyboard)
-				s_Keyboard->KeyPressRelease((int)msg.wParam, msg.message == WM_KEYDOWN);
+			if ((ProcessKey)&&(s_Keyboard))
+				s_Keyboard->KeyPressRelease((int)ascii, msg.message == WM_KEYDOWN);
 		}
 		else if (bRet == -1)
 		{	// Finished

@@ -1,7 +1,87 @@
-#ifndef __Event_Included_
-#define __Event_Included_
+#pragma once 
 
+#include <assert.h>
 #include <list>
+#include <functional>
+#include <algorithm>
+
+//It is great to see how c++ has evolved as EventV2_0 has the same functionality as Event0, this version makes use of std::function and lambdas.
+class EventV2_0
+{
+public:
+	using function_signature = void();
+	using protocol = std::function<function_signature>;  //make this type available for client code
+private:
+	using EventHandlerList = std::list<protocol>;
+	EventHandlerList m_handlerList;
+public:
+	__inline void Fire()
+	{
+		for (auto &pos : m_handlerList)
+			pos();
+	}
+
+	__inline void Subscribe(protocol callback)
+	{
+		m_handlerList.emplace_back(callback);
+	}
+
+	__inline void Remove(protocol callback)
+	{
+		//EventHandlerList_iter pos;
+		auto pos = std::find_if(m_handlerList.begin(), m_handlerList.end(),
+			[callback](protocol &m) -> bool
+		{	return m.target<protocol>() == callback.target<protocol>();
+		});
+		if (pos != m_handlerList.end())
+			m_handlerList.erase(pos);
+		else
+			assert(false);  //what callback is this?
+		
+	}
+};
+
+
+
+template<class... Args>
+class EventV2_parms
+{
+public:
+	using function_signature = void(Args...);
+	using protocol = std::function<function_signature>;  //make this type available for client code
+private:
+	using EventHandlerList = std::list<protocol>;
+	EventHandlerList m_handlerList;
+public:
+	__inline void Fire(Args... args)
+	{
+		for (auto &pos : m_handlerList)
+			pos(args...);
+	}
+
+	__inline void Subscribe(protocol callback)
+	{
+		m_handlerList.emplace_back(callback);
+	}
+
+	__inline void Remove(protocol callback)
+	{
+		//TODO see how to get roboRIO to deal with accessing the target in a templated environment
+		//const bool test=callback.target<protocol>()==callback.target<protocol>();
+		#ifdef _Win32
+		//EventHandlerList_iter pos;
+		auto pos = std::find_if(m_handlerList.begin(), m_handlerList.end(),
+			[callback](protocol &m) -> bool
+			{	return m.target<protocol>() == callback.target<protocol>();
+			});
+		if (pos != m_handlerList.end())
+			m_handlerList.erase(pos);
+		else
+			assert(false);  //what callback is this?
+		#endif
+	}
+};
+
 
 class IEvent
 {
@@ -548,4 +628,79 @@ protected:
 
 
 
-#endif // __Event_Included_
+//-----------------------------------------------------------------------------------------------------
+//backward compatible (bc) composite events:
+//These may be desirable to use for transitional code, or code that may want to use the legacy methods for less overhead
+
+
+class Event0bc
+{
+private:
+	Event0 m_Event0;
+	using function_signature = void();
+	EventV2_0 m_EventV2_0;
+public:
+	using protocol = std::function<function_signature>;  //allow client to access
+
+	__inline void Fire()
+	{	m_Event0.Fire(), m_EventV2_0.Fire();
+	}
+
+	//Pick which subscribe your prefer... older version may have better performance in debug mode, but shouldn't be significant for typical use
+	__inline void Subscribe(protocol delegate)
+	{	m_EventV2_0.Subscribe(delegate);
+	}
+
+	template<class T>
+	void Subscribe(IEvent::HandlerList& ehl, T& client, void (T::*delegate)())
+	{	m_Event0.Subscribe(ehl, client, delegate);
+	}
+
+	//Pick which remove, which correpsonds to which was used for subscribe
+	__inline void Remove(protocol delegate)
+	{	m_EventV2_0.Remove(delegate);
+	}
+	template<class T>
+	void Remove(T& client, void (T::*delegate)())
+	{	m_Event0.Remove(client, delegate);
+	}
+};
+
+template<class P1>
+class Event1bc
+{
+private:
+	Event1<P1> m_Event1;
+	using function_signature = void(P1);
+	EventV2_parms<P1> m_EventV2_1;
+public:
+	using protocol = std::function<function_signature>;  //allow client to access
+
+	__inline void Fire(P1 p1)
+	{
+		m_Event1.Fire(p1), m_EventV2_1.Fire(p1);
+	}
+
+	//Pick which subscribe your prefer... older version may have better performance in debug mode, but shouldn't be significant for typical use
+	__inline void Subscribe(protocol delegate)
+	{
+		m_EventV2_1.Subscribe(delegate);
+	}
+
+	template<class T>
+	void Subscribe(IEvent::HandlerList& ehl, T& client, void (T::*delegate)(P1 p1))
+	{
+		m_Event1.Subscribe(ehl, client, delegate);
+	}
+
+	//Pick which remove, which correpsonds to which was used for subscribe
+	__inline void Remove(protocol delegate)
+	{
+		m_EventV2_1.Remove(delegate);
+	}
+	template<class T>
+	void Remove(T& client, void (T::*delegate)(P1 p1))
+	{
+		m_Event1.Remove(client, delegate);
+	}
+};

@@ -1,20 +1,63 @@
-The simulation is a console app that loads up the robot and gives it time slices.  In it's first iteration type test to start loading the robot and running auton (the auton it does depends on the number that is currnetly set, or 0 by default).
+The simulation is a driver station window that works like the driver station and actually will run robot code... all the frc calls have been addressed by various solutions:
+
+1.  For some of the important speed controllers they are stubbed out but can be displayed using the Show_Controls checkbox (use the _Dev.xml layout to have this checkbox).  
+2. For controller input this uses DirectInput() so it works pretty well, but there are some things that may not be exactly the same, such as axis assignment and advance features not supported in direct input.
+3. The simulation allows ability to use keyboard input, which can be used in conjunction with joystick buttons.  Note the driver station window must have focus for keyboard to work.  This makes it more developer friendly as the workflow is to always run in visual studio, using break points, and test code.
+
+The simulation has a sister project which has the same code base but runs on a console app.  Everything here is command driven, the Show_Controls and Test_Samples check boxes do not work in this version, because those are command driven as well.  Also keyboard support is not supported (that is why there is the window version).
 
 First make sure to run SmartDashboard set to local like so:
 java -jar C:\Users\JamesK\wpilib\tools\SmartDashboard.jar ip localhost
 java -jar C:\Users\weeks\wpilib\tools\SmartDashboard.jar ip localhost
 
 Next load 
-.\FRC2019\src\Simulation\FRC2019_MainLayout.xml within SmartDashboard this is only a one-time load and newer controls may be populated when trying some of the later goals.  Some of the controls shown may be depreciated, but the most important ones are Test_Auton checkbox, and AutonTest control... unfortunately its a float number but treat it like an integer.  1.0 2.0 3.0 etc to pick which auton to do.
+.\FRC2019\src\Simulation\FRC2019_MainLayout_Dev.xml within SmartDashboard this is only a one-time load and newer controls may be populated when trying some of the later goals.  Some of the controls shown may be depreciated, but the most important ones are Test_Auton checkbox, and AutonTest control... unfortunately its a float number but treat it like an integer.  1.0 2.0 3.0 etc to pick which auton to do.
 
-Note:
-Currently in this build the Encoders are not yet hooked up, as I changed stuff around... so when testing the actual motion profiling may not be quite correct, and currently all the systems are in open loop so it should work fine for now.
 
-Now run the console app.
+Now run the driver station app.
 Run VS 2017 load the FRC2019/src/Simulation/Robot_Tester.sln build it in Debug x64... run from this (e.g. f5).
-Currently, it only builds in x64 as I need to transfer some project setting over to release, but I am not really needing to do this yet as I prefer to always run this in debug given the nature of its use-case.  Also the code runs with the working directory set to FRC2019/src/Simulation/ so if you wish to run the .exe by itself it will need to be placed there as it uses a relative path to load the lua file.  Alternatively, you can hard code an absolute path to the .lua file, or set an environment variable and run it from anywhere. 
-It currently doesn't really have any commands, but type test
-The Test_Auton box should be checked and AutonTest defaults to zero (doesn't do anything except to update a countdown time starting with 1800 seconds.
+Currently, it only builds in x64 as I need to transfer some project setting over to release, but I am not really needing to do this yet as I prefer to always run this in debug given the nature of its use-case.  
+
+The driver station app needs to stay where it is to find the lua file, but it is possible to move it if the .lua remains relative to where it is... just don't move it.  :)
+For the console version, the code runs with the working directory set to FRC2019/src/Simulation/ so if you wish to run the .exe by itself it will need to be placed there as it uses a relative path to load the lua file.  Alternatively, you can hard code an absolute path to the .lua file, or set an environment variable and run it from anywhere. 
+
+The driver station does pretty much what the real one does and defaults to teleop, if you enable here you will not see anything happen because there are no SmartDashboard calls currently written in this code; however, if you check Show_Controls, you will see the victors and solenoid (whatever the active collection is) being displayed, and then you can move them around by enabling the edit mode.  I tend to only test these during development of assignments and then never need to see them again once I've confirmed they are working, and instead use friendly names on the calls applying the voltage, so that we can see them work on the actual robot.
+
+I have not done any work in the autonomous loop, so whatever is written there will be up to Chris.
+
+Test()
+For test... it is a full blown robot solution, because to really do autonomous there is a process for setpoint controls where the dependency iterations need teleop manual and manual setpoint to work on PID and calibration (more on this in a separate document).  By default it will enable test_auton with a timer, but once this is managed it can be disabled and then ran for manual operation.
+
+Current key assignments:
+space reset everything (the actual underlying code works on the actual robot)
+
+Testing the drive:
+'w' will make bot drive forward
+'s' will make bot drive in reverse
+'a' will make bot turn right
+'d' will make bot turn left
+
+Testing the arm (configurable in lua)
+'j' move elevator down
+'k' move elevator up
+'l' move elevator to setpoint rest position
+';' move elevator to setpoint hatch height
+
+Note all the controls (except the the drive keyboard keys) are configured in the lua, as well as the motor assignments
+In addition, the kind of drive you want is also configurable:
+1. Tank Steering
+2. FPS 
+3. Field centric
+I have left the other drive modes selectable and commented out.  It should be noted that the tank steering here basically interprets the controls and tells the ship how to move, this then gets delegated down, so for closed loop driver assistance would just work.
+
+To see the drive in actual use the RobotViewer.exe and type test tankrobot.  At some point I'll want a simulator that works similar but properly so that teleop can use it.
+
+
+Testing the Goals:
+
+The goals are ran be selecting test in the driver station and then enable... if no one has written to Test_Auton it will be automatically checked, and AutonTest will automatically run 0.0 which simply runs a timer.
+
+There is a Test_Samples checkbox that runs the samples goals, this has to be set prior to enabling the driver station
 
 Click the Test_Auton to turn off the auton.
 Next try setting AutonTest to 1.0
