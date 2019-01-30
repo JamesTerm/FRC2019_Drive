@@ -180,15 +180,27 @@ const char *csz_Arm_SetPosHatch = "Arm_SetPoshatch";
 void FRC2019_Robot::Robot_Arm::BindAdditionalEventControls(bool Bind)
 {
 	Base::EventMap *em=GetEventMap(); //grrr had to explicitly specify which EventMap
+
+	Event0bc::protocol SetPosRest = [&]()
+		{	SetIntendedPosition(1.0);  //inches from ground
+		};
+
+	Event1bc<bool>::protocol Advance = [&](bool on)
+		{	m_Advance = on;
+		};
+
 	if (Bind)
 	{
 		em->EventValue_Map["Arm_SetCurrentVelocity"].Subscribe(ehl,*this, &FRC2019_Robot::Robot_Arm::SetRequestedVelocity_FromNormalized);
 		em->EventOnOff_Map["Arm_SetPotentiometerSafety"].Subscribe(ehl,*this, &FRC2019_Robot::Robot_Arm::SetPotentiometerSafety);
 
-		em->Event_Map[csz_Arm_SetPosRest].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Arm::SetPosRest);
+		//em->Event_Map[csz_Arm_SetPosRest].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Arm::SetPosRest);
+		em->Event_Map[csz_Arm_SetPosRest].Subscribe(SetPosRest);
 		em->Event_Map[csz_Arm_SetPosHatch].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Arm::SetPosHatch);
 
-		em->EventOnOff_Map["Arm_Advance"].Subscribe(ehl,*this, &FRC2019_Robot::Robot_Arm::Advance);
+
+		//em->EventOnOff_Map["Arm_Advance"].Subscribe(ehl,*this, &FRC2019_Robot::Robot_Arm::Advance);
+		em->EventOnOff_Map["Arm_Advance"].Subscribe(Advance);
 		em->EventOnOff_Map["Arm_Retract"].Subscribe(ehl,*this, &FRC2019_Robot::Robot_Arm::Retract);
 
 		em->EventOnOff_Map["Arm_Rist"].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Arm::CloseRist);
@@ -198,10 +210,12 @@ void FRC2019_Robot::Robot_Arm::BindAdditionalEventControls(bool Bind)
 		em->EventValue_Map["Arm_SetCurrentVelocity"].Remove(*this, &FRC2019_Robot::Robot_Arm::SetRequestedVelocity_FromNormalized);
 		em->EventOnOff_Map["Arm_SetPotentiometerSafety"].Remove(*this, &FRC2019_Robot::Robot_Arm::SetPotentiometerSafety);
 
-		em->Event_Map[csz_Arm_SetPosRest].Remove(*this, &FRC2019_Robot::Robot_Arm::SetPosRest);
+		//em->Event_Map[csz_Arm_SetPosRest].Remove(*this, &FRC2019_Robot::Robot_Arm::SetPosRest);
+		em->Event_Map[csz_Arm_SetPosRest].Remove(SetPosRest);
 		em->Event_Map[csz_Arm_SetPosHatch].Remove(*this, &FRC2019_Robot::Robot_Arm::SetPosHatch);
 
-		em->EventOnOff_Map["Arm_Advance"].Remove(*this, &FRC2019_Robot::Robot_Arm::Advance);
+		em->EventOnOff_Map["Arm_Advance"].Remove(Advance);
+		//em->EventOnOff_Map["Arm_Advance"].Remove(*this, &FRC2019_Robot::Robot_Arm::Advance);
 		em->EventOnOff_Map["Arm_Retract"].Remove(*this, &FRC2019_Robot::Robot_Arm::Retract);
 
 		em->EventOnOff_Map["Arm_Rist"]  .Remove(*this, &FRC2019_Robot::Robot_Arm::CloseRist);
