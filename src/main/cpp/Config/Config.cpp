@@ -38,6 +38,9 @@ void Config::AllocateComponents(){
 	m_activeCollection->Add(right_1);
 	m_activeCollection->Add(SolenoidTest);
 
+	NavX *navx = new NavX();
+	m_activeCollection->Add(navx);
+
 	AxisControl *leftDrive = new AxisControl(m_driveJoy, "LeftDrive", 1, 0.07, true, 0.70);
 	AxisControl *rightDrive = new AxisControl(m_driveJoy, "RightDrive", 5, 0.07, true, 0.70);
 	ToggleButtonControl *ToggleTest = new ToggleButtonControl(m_driveJoy, "ToggleTest", 3, true, false, 0.3, true);

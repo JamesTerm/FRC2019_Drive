@@ -19,6 +19,9 @@
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableEntry.h"
 #include "networktables/NetworkTableInstance.h"
+#include "Goals/FRC2019_Goals.h"
+#include "Goals/GoalSelector.h"
+#include "Util/VisionTarget.h"
 
 using namespace frc;
 using namespace System;
@@ -26,13 +29,12 @@ using namespace Controls;
 using namespace Configuration;
 using namespace Autonomi;
 
-#define VERSION 1 //!< Defines the program version for the entire program.
+#define VERSION 1    //!< Defines the program version for the entire program.
 #define REVISION "A" //!< Defines the revision of this version of the program.
 
-
-class Robot : public SampleRobot 
-{   
-    public:
+class Robot : public SampleRobot
+{
+      public:
         Robot();
 
         void RobotInit() override;
@@ -40,8 +42,12 @@ class Robot : public SampleRobot
         void OperatorControl() override;
         void Test() override;
 
-    private:
-	    Drive *m_drive;
-	    ActiveCollection *m_activeCollection; //!< Pointer to the only instantiation of the ActiveCollection Class in the program
-	    const string m_driveStraight = "drive";
+      private:
+        Drive *m_drive;
+        ActiveCollection *m_activeCollection; //!< Pointer to the only instantiation of the ActiveCollection Class in the program
+        const string m_driveStraight = "drive";
+        MultitaskGoal *m_masterGoal;
+        nt::NetworkTableInstance m_inst; //!Network tables
+        shared_ptr<NetworkTable> m_visionTable; //!Vision table
+        VisionTarget *m_visionTarget; //!Vision target object
 };
