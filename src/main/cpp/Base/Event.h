@@ -70,6 +70,7 @@ public:
 	{
 		//a word about using template on target:
 		//https://stackoverflow.com/questions/48185015/using-stdfunctiontarget-correctly
+		//https://en.cppreference.com/w/cpp/language/dependent_name
 		//EventHandlerList_iter pos;
 		auto pos = std::find_if(m_handlerList.begin(), m_handlerList.end(),
 			[callback](protocol &m) -> bool
@@ -263,6 +264,7 @@ public:
 
 	void ClearAllHandlers()
 	{
+		//https://en.cppreference.com/w/cpp/language/dependent_name
 		typename std::list<IEventHandler1*>::iterator pos;
 		for (pos = _handlerList.begin(); pos != _handlerList.end(); ++pos)
 		{
