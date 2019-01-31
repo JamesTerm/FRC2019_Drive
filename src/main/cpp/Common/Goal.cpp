@@ -94,9 +94,18 @@ MultitaskGoal::~MultitaskGoal()
 
 void MultitaskGoal::Activate()
 {
-	for (GoalList::iterator it = m_GoalsToProcess.begin(); it!=m_GoalsToProcess.end(); ++it)
-		(*it)->Activate();
+	for (auto &it : m_GoalsToProcess)
+	{
+		(it)->Activate();
+		//Make sure it didn't fail already
+		if ((it)->GetStatus() == Goal::eFailed)
+		{
+			m_Status = eFailed;
+			break;
+		}
+	}
 }
+
 Goal::Goal_Status MultitaskGoal::Process(double dTime_s)
 {
 	ActivateIfInactive();

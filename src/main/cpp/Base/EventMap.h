@@ -108,7 +108,7 @@ namespace Framework
 		};
 		//////////////////////////////////////////////////////////////////////////
 
-      class  Key
+		class  Key
       {
          public:
             int key, flags;
@@ -149,7 +149,7 @@ namespace Framework
          bool operator == (const Key& rhs) const { return (key == rhs.key) && (flags == rhs.flags); }
       };
 
-      struct  UserInputEvents
+		struct  UserInputEvents
 		{
 			Event2<Key, bool> KBCB_KeyDnUp;
 			Event1<Key> KBCB_KeyDn;
@@ -198,7 +198,15 @@ namespace Framework
 			bool m_KB_Controlled;
 		};	// EventMap
 		//////////////////////////////////////////////////////////////////////////
-
+		//Here is a much lighter weight eventmap which offers the same functionality from the predecessor
+		//It will be much easier to have newer types as needed, but at that point you may as well just make a new
+		//event variable for that use-case
+		struct EventMap2
+		{
+			std::map<std::string, EventV2_0, std::greater<std::string> > Event_Map;
+			std::map<std::string, EventV2_parms<bool>, std::greater<std::string> > EventOnOff_Map;
+			std::map<std::string, EventV2_parms<double>, std::greater<std::string> > EventValue_Map;
+		};
 	}
 }
 

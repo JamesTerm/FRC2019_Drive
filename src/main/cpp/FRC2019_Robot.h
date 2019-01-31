@@ -153,10 +153,6 @@ class FRC2019_Robot : public Tank_Robot
 			protected:
 				//Intercept the time change to obtain current height as well as sending out the desired velocity
 				virtual void BindAdditionalEventControls(bool Bind);
-				void SetPosRest();
-				void SetPosHatch();
-				void Advance(bool on);
-				void Retract(bool on);
 				//events are a bit picky on what to subscribe so we'll just wrap from here... also great place for breakpoint
 				void SetRequestedVelocity_FromNormalized(double Velocity);
 

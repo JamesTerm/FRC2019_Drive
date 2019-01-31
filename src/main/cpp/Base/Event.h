@@ -26,6 +26,8 @@ public:
 		m_handlerList.emplace_back(callback);
 	}
 
+	//It should be noted that using Remove is optional, because nothing is allocated cleanup will happen automatically
+	//Remove should be used if the event is still active while a particular listening client is unsubscribing
 	__inline void Remove(protocol callback)
 	{
 		//EventHandlerList_iter pos;
@@ -66,19 +68,17 @@ public:
 
 	__inline void Remove(protocol callback)
 	{
-		//TODO see how to get roboRIO to deal with accessing the target in a templated environment
-		//const bool test=callback.target<protocol>()==callback.target<protocol>();
-		#ifdef _Win32
+		//a word about using template on target:
+		//https://stackoverflow.com/questions/48185015/using-stdfunctiontarget-correctly
 		//EventHandlerList_iter pos;
 		auto pos = std::find_if(m_handlerList.begin(), m_handlerList.end(),
 			[callback](protocol &m) -> bool
-			{	return m.target<protocol>() == callback.target<protocol>();
+			{	return m.template target<protocol>() == callback.template target<protocol>();
 			});
 		if (pos != m_handlerList.end())
 			m_handlerList.erase(pos);
 		else
 			assert(false);  //what callback is this?
-		#endif
 	}
 };
 
