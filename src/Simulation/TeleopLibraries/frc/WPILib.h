@@ -1,4 +1,6 @@
 #pragma once
+#include <thread>
+#include <chrono>
 
 //as a start we'll include the same controls used in the robot libraries
 #define COMMON_API
@@ -178,96 +180,19 @@ namespace frc
 
 //TODO implement
 namespace frc {
-	#if 0
-	//class DriverStation : public ErrorBase {
-	class DriverStation {
-	public:
-		DriverStation() {}
-		enum Alliance { kRed, kBlue, kInvalid };
-		enum MatchType { kNone, kPractice, kQualification, kElimination };
+	__inline void Wait(double seconds)
+	{
+		std::this_thread::sleep_for(std::chrono::duration<double>(seconds));
+	}
 
-		~DriverStation() {}
+	__inline double GetTime() {
+		using std::chrono::duration;
+		using std::chrono::duration_cast;
+		using std::chrono::system_clock;
 
-		DriverStation(const DriverStation&) = delete;
-		DriverStation& operator=(const DriverStation&) = delete;
+		return duration_cast<duration<double>>(system_clock::now().time_since_epoch())
+			.count();
+	}
 
-		static DriverStation& GetInstance();
-		//static void ReportError(const wpi::Twine& error);
-		//static void ReportWarning(const wpi::Twine& error);
-		//static void ReportError(bool isError, int code, const wpi::Twine& error,const wpi::Twine& location, const wpi::Twine& stack);
-		static constexpr int kJoystickPorts = 6;
-		bool GetStickButton(int stick, int button) { return false; }
-		bool GetStickButtonPressed(int stick, int button) { return false; }
-		bool GetStickButtonReleased(int stick, int button) { return false; }
-		double GetStickAxis(int stick, int axis) { return 0.0; }
-		int GetStickPOV(int stick, int pov) { return 0; }
-		int GetStickButtons(int stick) const { return 0; }
-		int GetStickAxisCount(int stick) const { return 0; }
-		int GetStickPOVCount(int stick) const { return 0; }
-		int GetStickButtonCount(int stick) const { return 0; }
-		bool GetJoystickIsXbox(int stick) const { return false; }
-		int GetJoystickType(int stick) const { return 0; }
-		std::string GetJoystickName(int stick) const { return "todo"; }
-		int GetJoystickAxisType(int stick, int axis) const { return 0; }
-		bool IsEnabled() const { return true; }
-		bool IsDisabled() const { return false; }
-		bool IsAutonomous() const { return false; }
-		bool IsOperatorControl() const { return false; }
-		bool IsTest() const { return false; }
-		bool IsDSAttached() const { return false; }
-		bool IsNewControlData() const { return false; }
-		bool IsFMSAttached() const { return false; }
-		bool IsSysActive() const { return false; }
-		bool IsBrownedOut() const { return false; }
-		std::string GetGameSpecificMessage() const { return "todo"; }
-		std::string GetEventName() const { return "todo"; }
-		MatchType GetMatchType() const { return kNone; }
-		int GetMatchNumber() const { return 0; }
-		int GetReplayNumber() const { return 0; }
-		Alliance GetAlliance() const { return kBlue; }
-		int GetLocation() const { return 0; }
-		void WaitForData() {}
-		bool WaitForData(double timeout) { return false; }
-		double GetMatchTime() const { return 0.0; }
-		double GetBatteryVoltage() const { return 0.0; }
-		void InDisabled(bool entering) { m_userInDisabled = entering; }
-		void InAutonomous(bool entering) { m_userInAutonomous = entering; }
-		void InOperatorControl(bool entering) { m_userInTeleop = entering; }
-		void InTest(bool entering) { m_userInTest = entering; }
-	protected:
-		//void GetData();
-	private:
-		//DriverStation();
-		//void ReportJoystickUnpluggedError(const wpi::Twine& message);
-		//void ReportJoystickUnpluggedWarning(const wpi::Twine& message);
-		//void Run();
-		//void SendMatchData();
-
-		//std::unique_ptr<MatchDataSender> m_matchDataSender;
-
-		// Joystick button rising/falling edge flags
-		//wpi::mutex m_buttonEdgeMutex;
-		//std::array<HAL_JoystickButtons, kJoystickPorts> m_previousButtonStates;
-		//std::array<uint32_t, kJoystickPorts> m_joystickButtonsPressed;
-		//std::array<uint32_t, kJoystickPorts> m_joystickButtonsReleased;
-
-		// Internal Driver Station thread
-		//std::thread m_dsThread;
-		//std::atomic<bool> m_isRunning{ false };
-
-		//wpi::mutex m_waitForDataMutex;
-		//wpi::condition_variable m_waitForDataCond;
-		//int m_waitForDataCounter;
-
-		// Robot state status variables
-		bool m_userInDisabled = false;
-		bool m_userInAutonomous = false;
-		bool m_userInTeleop = false;
-		bool m_userInTest = false;
-
-		//double m_nextMessageTime = 0;
-	};
-	#endif
 	int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs, int32_t leftRumble, int32_t rightRumble);
-
 }

@@ -7,19 +7,6 @@
 
 namespace frc {
 
-	__inline void Wait(double seconds) 
-	{	std::this_thread::sleep_for(std::chrono::duration<double>(seconds));
-	}
-
-	__inline double GetTime() {
-		using std::chrono::duration;
-		using std::chrono::duration_cast;
-		using std::chrono::system_clock;
-
-		return duration_cast<duration<double>>(system_clock::now().time_since_epoch())
-			.count();
-	}
-
 	class RobotBase {
 	private:
 		enum GameMode
