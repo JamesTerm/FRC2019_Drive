@@ -49,4 +49,8 @@ class Robot : public SampleRobot
         MultitaskGoal *m_masterGoal;
         nt::NetworkTableInstance m_inst; //!Network tables
         shared_ptr<NetworkTable> m_visionTable; //!Vision table
+        shared_ptr<NetworkTable> m_dashboardTable;
+
+        string m_autonOptions[3] = {"DriveStraight","OnePieceAuto","TwoPieceAuto"};
+        string m_positionOptions[5] = {"Level 1 Left", "Level 1 Center", "Level 1 Right", "Level 2 Left", "Level 2 Right"};
 };

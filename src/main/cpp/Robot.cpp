@@ -24,6 +24,8 @@ Robot::Robot()
 {
 	m_drive = new Drive();
 	m_activeCollection = new ActiveCollection();
+
+
 }
 
 /*
@@ -39,7 +41,9 @@ void Robot::RobotInit()
 	Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
 	m_inst = nt::NetworkTableInstance::GetDefault(); //!Network tables
 	m_visionTable = m_inst.GetTable("VISION_2019"); //!Vision network table
-
+	m_dashboardTable = m_inst.GetTable("DASHBOARD_TABLE");
+	m_dashboardTable->PutStringArray("AUTON_OPTIONS",m_autonOptions);
+	m_dashboardTable->PutStringArray("POSITION_OPTIONS",m_positionOptions);
 }
 
 /*
@@ -53,9 +57,14 @@ void Robot::Autonomous()
 	m_masterGoal = new MultitaskGoal(m_activeCollection, false);
 
 	cout << "Autonomous Started." << endl;
-	string autoSelected = SmartDashboard::GetString("Auto Selector", m_driveStraight);
+	//string autoSelected = SmartDashboard::GetString("Auto Selector", m_driveStraight);
+	string autoSelected = m_dashboardTable->GetString("AUTON_SELECTION",m_driveStraight);
+	string positionSelected = m_dashboardTable->GetString("POSITION_SELECTION","NONE"); //if it is none, then just drive straight
 	cout << autoSelected << endl;
-	SelectAuton(m_activeCollection, m_masterGoal, autoSelected);
+	if(!SelectAuton(m_activeCollection, m_masterGoal, autoSelected, positionSelected))
+	{
+		m_dashboardTable->PutString("AUTON_FOUND","UNDEFINED AUTON OR POSITION SELECTED");
+	}
 	m_masterGoal->AddGoal(new Goal_TimeOut(m_activeCollection, 15.0));
 	//m_masterGoal->AddGoal(new Goal_WaitThenDrive(m_activeCollection, .5, .5, 3, 5));
 	m_masterGoal->Activate();
