@@ -114,7 +114,10 @@ Goal::Goal_Status Goal_Turn::Process(double dTime)
     {
         m_currentTime += dTime;
         if (m_currentTime > m_timeOut)
+        {
+            Terminate();
             return m_Status = eFailed; //set m_Status to failed and return m_Status in one line
+        }
 
         double lowerBound = m_target - m_freedom;
         double upperBound = m_target + m_freedom;
@@ -213,7 +216,33 @@ Goal::Goal_Status Goal_VisionAlign::Process(double dTime)
         return m_Status = eFailed;
     }
     updateVision();
-    
+    if(!HasTarget) return m_Status = eFailed;
+    if(X < m_target->getLowerBound())
+    {
+        //SetDrive()
+    }
+    else if(X > m_target->getUpperBound())
+    {
+        //SetDrive()
+    }
+    else
+    {
+        if(Radius < m_target->getRadius())
+        {
+            //SetDrive()
+        }
+        else if(Radius > m_target->getRadius())
+        {
+            //SetDrive()
+        }
+        else
+        {
+            Terminate();
+            return m_Status = eCompleted;
+        }
+        
+    }
+    return m_Status = eActive;
 
 }
 

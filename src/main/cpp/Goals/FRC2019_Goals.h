@@ -147,7 +147,7 @@ private:
 };
 
 //TODO vision aligment:
-/* if x is out of bounds, drive forward with skewed speed to turn and move closer
+/* if x is out of bounds, dturn and move closer
  * then, if radius (distance) out of bounds, drive straight towards target
  * use proportion of offset to decide turning speed. 
  * SetDrive() not turn goal
@@ -155,10 +155,11 @@ private:
 class Goal_VisionAlign : public Goal_TimeOut
 {
 public:
-  Goal_VisionAlign(ActiveCollection *activeCollection, VisionTarget target, double timeOut = 7.0) : Goal_TimeOut(activeCollection, timeOut)
+  Goal_VisionAlign(ActiveCollection *activeCollection, VisionTarget *target, double timeOut = 7.0) : Goal_TimeOut(activeCollection, timeOut)
   {
     m_inst = nt::NetworkTableInstance::GetDefault(); //!Network tables
     m_visionTable = m_inst.GetTable("VISION_2019");  //!Vision network table
+    m_target = target;
   }
 
   virtual void Activate();
@@ -176,12 +177,20 @@ private:
     Width = m_visionTable->GetNumber("WIDTH", 0);
     HasTarget = m_visionTable->GetBoolean("HASTARGET", false);
   }
+  int getXOffset()
+  {
+    return X - m_target->getX();
+  }
   int X, Y, Radius, Area, Height, Width;
   bool HasTarget;
 
+  //constants for motor speeds. These are multiplied by vision error
+  const int TURN_KP = 0.005; //guess for right now
+  const int STRAIGHT_KP = 0.01; //guess for right now
+
   nt::NetworkTableInstance m_inst;        //!Network tables
   shared_ptr<NetworkTable> m_visionTable; //!Vision table
-  VisionTarget m_target;
+  VisionTarget *m_target;
 };
 #pragma endregion
 

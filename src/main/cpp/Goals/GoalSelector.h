@@ -15,6 +15,11 @@ static bool SelectAuton(ActiveCollection *activeCollection, MultitaskGoal *goal,
         goal->AddGoal(new Goal_Turn(activeCollection, 45));
         cout << "Debug 1" << endl;
     }
+    else if(autonSelected.compare("VISIONTEST") == 0)
+    {
+        goal->AddGoal(new Goal_VisionAlign(activeCollection, new VisionTarget(240, 50)));
+        cout << "Vision test" << endl;
+    }
 
     //TODO remaining selections
     else

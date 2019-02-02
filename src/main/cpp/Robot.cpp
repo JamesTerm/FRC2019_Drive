@@ -39,7 +39,6 @@ void Robot::RobotInit()
 	Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
 	m_inst = nt::NetworkTableInstance::GetDefault(); //!Network tables
 	m_visionTable = m_inst.GetTable("VISION_2019"); //!Vision network table
-	m_visionTarget = new VisionTarget(m_visionTable);
 
 }
 

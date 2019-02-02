@@ -49,5 +49,4 @@ class Robot : public SampleRobot
         MultitaskGoal *m_masterGoal;
         nt::NetworkTableInstance m_inst; //!Network tables
         shared_ptr<NetworkTable> m_visionTable; //!Vision table
-        VisionTarget *m_visionTarget; //!Vision target object
 };
