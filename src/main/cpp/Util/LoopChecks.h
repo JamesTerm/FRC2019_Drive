@@ -28,6 +28,11 @@ namespace Util
 	{
 		return DriverStation::GetInstance().IsOperatorControl() && DriverStation::GetInstance().IsEnabled();
 	}
+
+	inline static bool _IsAutonOrTeleop() //for sandstorm 2019
+	{
+		return _IsAutononomous() || _IsTeleoporated();
+	}
 }
 
 

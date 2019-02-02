@@ -11,6 +11,7 @@
 #include <frc/WPILib.h>
 #include <frc/SampleRobot.h>
 
+
 #include "Config/Config.h"
 #include "Config/ActiveCollection.h"
 #include "Systems/Drive.h"
@@ -50,7 +51,7 @@ class Robot : public SampleRobot
         nt::NetworkTableInstance m_inst; //!Network tables
         shared_ptr<NetworkTable> m_visionTable; //!Vision table
         shared_ptr<NetworkTable> m_dashboardTable;
-
-        string m_autonOptions[3] = {"DriveStraight","OnePieceAuto","TwoPieceAuto"};
+        cs::UsbCamera camera;
+        string m_autonOptions[4] = {"DriveStraight","OnePieceAuto","TwoPieceAuto","DEBUG"};
         string m_positionOptions[5] = {"Level 1 Left", "Level 1 Center", "Level 1 Right", "Level 2 Left", "Level 2 Right"};
 };

@@ -62,7 +62,7 @@ Goal::Goal_Status Goal_TimeOut::Process(double dTime)
             Terminate();
             return m_Status = eFailed;
         }
-        cout << m_activeCollection->GetNavX()->GetAngle() << endl; //DEBUG
+        //cout << m_activeCollection->GetNavX()->GetAngle() << endl; //DEBUG
         return eActive;
     }
     else

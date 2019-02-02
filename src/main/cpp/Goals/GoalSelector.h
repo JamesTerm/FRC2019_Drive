@@ -5,6 +5,10 @@
 static bool SelectAuton(ActiveCollection *activeCollection, MultitaskGoal *goal, string autonSelected, string positionSelected)
 {
     bool isFound = true;
+    if(autonSelected == "DEBUG")
+    {
+        return true;
+    }
     if(positionSelected == "Level 1 Left")
     {
         if(autonSelected == "DriveStraight")
