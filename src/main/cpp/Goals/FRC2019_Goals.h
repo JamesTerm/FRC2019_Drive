@@ -195,6 +195,10 @@ private:
 #pragma endregion
 
 #pragma region UtilGoals
+
+/* Goal_Hatch
+    This goal is meant to manipulate the mechanisms that would result in outtaking the hatch (this will need adjusting)
+    */
 class Goal_Hatch : public AtomicGoal
 {
 public:
@@ -226,7 +230,10 @@ protected:
 
 //auton goals and other complex goals go here
 #pragma region complex
-//up for change
+
+/* Goal_OneHatch
+    This goal is meant to score one hatch on the cargo during autonomous
+    */
 class Goal_OneHatch : public CompositeGoal
 {
 public:
