@@ -41,7 +41,7 @@ Robot::~Robot()
 void Robot::RobotInit()
 {
 	cout << "Program Version: " << VERSION << " Revision: " << REVISION << endl;
-	//CameraServer::GetInstance()->StartAutomaticCapture();
+	CameraServer::GetInstance()->StartAutomaticCapture(0);
 	Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
 	//Must have this for smartdashboard to work properly
 	SmartDashboard::init();
