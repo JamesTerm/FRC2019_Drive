@@ -36,8 +36,6 @@ void Robot::RobotInit()
 
 	cout << "Program Version: " << VERSION << " Revision: " << REVISION << endl;
 	camera = CameraServer::GetInstance()->StartAutomaticCapture(0);
-	camera.SetExposureAuto();
-	cs::SetTelemetryPeriod(0.010);
 	Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
 	m_inst = nt::NetworkTableInstance::GetDefault();		  //!Network tables
 	m_visionTable = m_inst.GetTable("VISION_2019");			  //!Vision network table
