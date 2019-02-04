@@ -147,6 +147,7 @@ void Config::AllocateComponents(xml_document &doc){
 
 	//TODO: When/if we create a drivetrain class, we will need drive/aux motors
 	//TODO: Look into setting encoders to motors like we used to do in the C# code
+	//TODO: Upper and lower limits that can be either AI or DI
 
 #pragma region VictorSP
 	
@@ -211,8 +212,6 @@ void Config::AllocateComponentsDep(){
 	rightDrive->AddComponent(right_0);
 	rightDrive->AddComponent(right_1);
 	ToggleTest->AddComponent(SolenoidTest);
-	
-
 }
 
 Config::~Config(){}
