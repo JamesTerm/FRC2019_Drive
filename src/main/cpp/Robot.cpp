@@ -35,13 +35,25 @@ void Robot::RobotInit()
 {
 
 	cout << "Program Version: " << VERSION << " Revision: " << REVISION << endl;
-	camera = CameraServer::GetInstance()->StartAutomaticCapture(0);
+	//camera = CameraServer::GetInstance()->StartAutomaticCapture(0);
 	Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
 	m_inst = nt::NetworkTableInstance::GetDefault();		  //!Network tables
 	m_visionTable = m_inst.GetTable("VISION_2019");			  //!Vision network table
 	m_dashboardTable = m_inst.GetTable("DASHBOARD_TABLE");
 	m_dashboardTable->PutStringArray("AUTON_OPTIONS", m_autonOptions);
 	m_dashboardTable->PutStringArray("POSITION_OPTIONS", m_positionOptions);
+
+
+	//TODO: put this in some sort of config
+	m_visionTable->PutNumber("LS",112);
+	m_visionTable->PutNumber("US",212);
+	m_visionTable->PutNumber("LH",63);
+	m_visionTable->PutNumber("UH",255);
+	m_visionTable->PutNumber("LV",245);
+	m_visionTable->PutNumber("UV",255);
+	m_visionTable->PutNumber("MinA",0);
+	m_visionTable->PutNumber("MaxA",8000);
+	m_visionTable->PutNumber("MaxO",100);
 }
 
 /*
@@ -52,6 +64,8 @@ void Robot::RobotInit()
 
 void Robot::Autonomous()
 {
+
+
 	m_masterGoal = new MultitaskGoal(m_activeCollection, false);
 
 	cout << "Autonomous Started." << endl;
@@ -63,14 +77,13 @@ void Robot::Autonomous()
 	{
 		m_dashboardTable->PutString("AUTON_FOUND", "UNDEFINED AUTON OR POSITION SELECTED");
 	}
-	m_masterGoal->AddGoal(new Goal_TimeOut(m_activeCollection, 15.0));
+	//m_masterGoal->AddGoal(new Goal_TimeOut(m_activeCollection, 15.0)); //!Disabled for testing!!
 	//m_masterGoal->AddGoal(new Goal_WaitThenDrive(m_activeCollection, .5, .5, 3, 5));
 	m_masterGoal->Activate();
 	double dTime = 0.010;
-	while (m_masterGoal->GetStatus() == Goal::eActive && _IsAutononomous())
+	while (m_masterGoal->GetStatus() == Goal::eActive && _IsAutononomous() && !IsDisabled())
 	{
 		m_masterGoal->Process(dTime);
-		cout << "FPS: " << camera.GetActualFPS() << endl;
 		Wait(dTime);
 	}
 	m_masterGoal->~MultitaskGoal();

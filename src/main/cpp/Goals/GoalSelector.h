@@ -7,6 +7,7 @@ static bool SelectAuton(ActiveCollection *activeCollection, MultitaskGoal *goal,
     bool isFound = true;
     if(autonSelected == "DEBUG")
     {
+        goal->AddGoal(new Goal_VisionAlign(activeCollection,new VisionTarget(300,50),120.0)); //!120 sec timeout for DEBUG only
         return true;
     }
     if(positionSelected == "Level 1 Left")

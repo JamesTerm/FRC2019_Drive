@@ -216,24 +216,25 @@ Goal::Goal_Status Goal_VisionAlign::Process(double dTime)
         return m_Status = eFailed;
     }
     updateVision();
+    cout << X << " " << Y << " " << Radius << " " << Area << " " << Height << " " << Width << endl;
     if(!HasTarget) return m_Status = eFailed;
     if(X < m_target->getLowerBound())
     {
-        //SetDrive()
+        SetDrive(getXOffset() * TURN_KP,-(getXOffset() * TURN_KP),m_activeCollection);
     }
     else if(X > m_target->getUpperBound())
     {
-        //SetDrive()
+        SetDrive(getXOffset() * TURN_KP,-(getXOffset() * TURN_KP),m_activeCollection);
     }
     else
     {
         if(Radius < m_target->getRadius())
         {
-            //SetDrive()
+            SetDrive(getXOffset() * STRAIGHT_KP,-(getXOffset() * STRAIGHT_KP),m_activeCollection);
         }
         else if(Radius > m_target->getRadius())
         {
-            //SetDrive()
+            SetDrive(getXOffset() * STRAIGHT_KP,-(getXOffset() * STRAIGHT_KP),m_activeCollection);
         }
         else
         {

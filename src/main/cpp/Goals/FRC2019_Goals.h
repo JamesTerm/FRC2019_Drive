@@ -147,9 +147,8 @@ private:
 };
 
 //TODO vision aligment:
-/* if x is out of bounds, dturn and move closer
- * then, if radius (distance) out of bounds, drive straight towards target
- * use proportion of offset to decide turning speed. 
+/* if x is out of bounds, turn towards target
+ * then, if radius (distance) out of bounds, drive straight towards target 
  * SetDrive() not turn goal
  */
 class Goal_VisionAlign : public Goal_TimeOut
@@ -181,12 +180,16 @@ private:
   {
     return X - m_target->getX();
   }
+  int getRadOffset()
+  {
+    return Radius - m_target->getRadius();
+  }
   int X, Y, Radius, Area, Height, Width;
   bool HasTarget;
 
   //constants for motor speeds. These are multiplied by vision error
-  const int TURN_KP = 0.005; //guess for right now
-  const int STRAIGHT_KP = 0.01; //guess for right now
+  const int TURN_KP = 0.005; //?guess for right now
+  const int STRAIGHT_KP = 0.01; //?guess for right now
 
   nt::NetworkTableInstance m_inst;        //!Network tables
   shared_ptr<NetworkTable> m_visionTable; //!Vision table
