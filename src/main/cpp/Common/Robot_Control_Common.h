@@ -71,7 +71,7 @@ public:
 	Control_2C_Element_UI(uint8_t moduleNumber, uint32_t forward_channel, uint32_t reverse_channel,const char *name);
 	void display_bool(bool value);
 	void display_number(double value);
-	bool get_bool() const;
+	bool get_bool(bool defaultvalue=false) const;
 	double get_number() const;
 protected:
 	std::string m_Name;
@@ -195,7 +195,7 @@ public:
 		m_ModuleNumber(0), m_forwardChannel(forwardChannel), m_reverseChannel(reverseChannel) {}
 
 	virtual void Set(Value value) {m_CurrentValue=value; display_bool(value==kForward);}
-	virtual Value Get() {return m_CurrentValue=get_bool()?kForward:kReverse;}
+	virtual Value Get() {return m_CurrentValue=get_bool(m_CurrentValue==kForward)?kForward:kReverse;}
 private:
 	uint8_t m_ModuleNumber;
 	uint32_t m_forwardChannel; ///< The forward channel on the module to control.

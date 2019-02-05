@@ -740,9 +740,9 @@ void Control_2C_Element_UI::display_number(double value)
 		SmartDashboard::PutNumber(m_Name,value);
 }
 
-bool Control_2C_Element_UI::get_bool() const
+bool Control_2C_Element_UI::get_bool(bool defaultvalue) const
 {
-	bool ret = false;
+	bool ret = defaultvalue;
 	if (s_ShowControlsCallback())
 		ret=SmartDashboard::GetBoolean(m_Name);
 	return ret;

@@ -156,7 +156,8 @@ class FRC2019_Robot : public Tank_Robot
 			public:
 				Robot_Arm(FRC2019_Robot *parent,Rotary_Control_Interface *robot_control);
 				IEvent::HandlerList ehl;
-			protected:
+				virtual void ResetPos();
+		protected:
 				//Intercept the time change to obtain current height as well as sending out the desired velocity
 				virtual void BindAdditionalEventControls(bool Bind);
 				//events are a bit picky on what to subscribe so we'll just wrap from here... also great place for breakpoint
@@ -164,7 +165,6 @@ class FRC2019_Robot : public Tank_Robot
 
 				void SetPotentiometerSafety(bool DisableFeedback) {__super::SetPotentiometerSafety(DisableFeedback);}
 				virtual void TimeChange(double dTime_s);
-
 			private:
 				#ifndef _Win32
 				typedef Rotary_Position_Control __super;
@@ -234,6 +234,8 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		virtual void UpdateVoltage(size_t index, double Voltage);
 		virtual void CloseSolenoid(size_t index,bool Close);
 		virtual void OpenSolenoid(size_t index,bool Open) {CloseSolenoid(index,!Open);}
+		virtual bool GetIsSolenoidOpen(size_t index) const;
+
 	protected: //from Tank_Drive_Control_Interface
 		virtual void Reset_Encoders() {m_pTankRobotControl->Reset_Encoders();}
 		virtual void GetLeftRightVelocity(double &LeftVelocity,double &RightVelocity) {m_pTankRobotControl->GetLeftRightVelocity(LeftVelocity,RightVelocity);}
