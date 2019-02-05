@@ -124,7 +124,10 @@ private:
 	bool m_IsIntakeDeployed=false;
 	bool m_IsHatchDeployed=false;
 	bool m_IsHatchGrabExpanded = false;
-
+	//This is a short scope cache from activate to process... to monitor the desired change
+	bool m_IntendedIntakeDeployed = false;
+	bool m_IntendedHatchDeployed = false;
+	bool m_IntendedHatchGrabExpanded = false;
 	//Goals--- literally able to copy these as-is
 
 	FRC2019_Robot &m_Robot;
@@ -179,7 +182,7 @@ private:
 				else
 					Terminate();
 			}
-			m_Parent->m_IsIntakeDeployed = !IsStowed;
+			m_Parent->m_IntendedIntakeDeployed = !IsStowed;
 			//for the automated hatch grip... any other input will override it
 			#ifndef __UseSimpleHatchGrip__
 			if (m_Parent->m_GoalActive[eHatchGrab])
@@ -198,7 +201,7 @@ private:
 			{
 				//so the logic here... we can always stow, but to deploy the hatch must be stowed
 				bool can_process = true;
-				if (m_Parent->m_IsIntakeDeployed)
+				if (m_Parent->m_IntendedIntakeDeployed)
 				{
 					if ((m_Parent->m_IsHatchDeployed) || (m_Parent->m_GoalActive[eHatch]))
 						can_process = false;
@@ -215,7 +218,7 @@ private:
 		{
 			m_Parent->m_GoalActive[eIntake] = false;
 			//since we are interrupted ensure the cached vars reflect the current state
-			m_Parent->m_IsIntakeDeployed=m_Robot.m_RobotControl->GetIsSolenoidClosed(eIntakeDeploy);
+			//m_Parent->m_IsIntakeDeployed=m_Robot.m_RobotControl->GetIsSolenoidClosed(eIntakeDeploy);
 			Generic_CompositeGoal::Terminate();
 		}
 	};
@@ -237,7 +240,7 @@ private:
 				else
 					Terminate();
 			}
-			m_Parent->m_IsHatchDeployed = !IsStowed;
+			m_Parent->m_IntendedHatchDeployed = !IsStowed;
 			//for the automated hatch grip... any other input will override it
 			#ifndef __UseSimpleHatchGrip__
 			if (m_Parent->m_GoalActive[eHatchGrab])
@@ -256,7 +259,7 @@ private:
 			{
 				//so the logic here... we can always stow, but to deploy the intake must be stowed
 				bool can_process = true;
-				if (m_Parent->m_IsHatchDeployed)
+				if (m_Parent->m_IntendedHatchDeployed)
 				{
 					if ((m_Parent->m_IsIntakeDeployed) || (m_Parent->m_GoalActive[eIntake]))
 						can_process = false;
@@ -273,7 +276,7 @@ private:
 		{
 			m_Parent->m_GoalActive[eHatch] = false;
 			//since we are interrupted ensure the cached vars reflect the current state
-			m_Parent->m_IsHatchDeployed = m_Robot.m_RobotControl->GetIsSolenoidClosed(eHatchDeploy);
+			//m_Parent->m_IsHatchDeployed = m_Robot.m_RobotControl->GetIsSolenoidClosed(eHatchDeploy);
 			Generic_CompositeGoal::Terminate();
 		}
 	};
@@ -299,7 +302,7 @@ private:
 					Terminate();
 			}
 
-			m_Parent->m_IsHatchGrabExpanded = !IsStowed;
+			m_Parent->m_IntendedHatchGrabExpanded = !IsStowed;
 
 			//We'll override the other goals if using the automated version, note it's easier to trace code if we handle this before adding any new goals
 			#ifndef __UseSimpleHatchGrip__
@@ -383,11 +386,13 @@ private:
 		virtual void Terminate()
 		{
 			m_Parent->m_GoalActive[eHatchGrab] = false;
+			#if 0
 			//since we are interrupted ensure the cached vars reflect the current state
 			//we've taken control of all of them so we'll need to update all of them
 			m_Parent->m_IsHatchGrabExpanded = m_Robot.m_RobotControl->GetIsSolenoidClosed(eHatchGrabDeploy);
 			m_Parent->m_IsHatchDeployed = m_Robot.m_RobotControl->GetIsSolenoidClosed(eHatchDeploy);
 			m_Parent->m_IsIntakeDeployed = m_Robot.m_RobotControl->GetIsSolenoidClosed(eIntakeDeploy);
+			#endif
 			Generic_CompositeGoal::Terminate();
 		}
 	};
@@ -439,14 +444,17 @@ public:
 	void CloseIntake_manual(bool Close)
 	{
 		m_pParent->m_pParent->m_RobotControl->CloseSolenoid(eIntakeDeploy, Close);
+		m_IsIntakeDeployed = Close;
 	}
 	void CloseHatchDeploy_manual(bool Close)
 	{
 		m_pParent->m_pParent->m_RobotControl->CloseSolenoid(eHatchDeploy, Close);
+		m_IsHatchDeployed = Close;
 	}
 	void CloseHatchGrabDeploy_manual(bool Close)
 	{
 		m_pParent->m_pParent->m_RobotControl->CloseSolenoid(eHatchGrabDeploy, Close);
+		m_IsHatchGrabExpanded = Close;
 	}
 	void CloseIntake(bool Close)
 	{
