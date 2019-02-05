@@ -116,7 +116,8 @@ Goal::Goal_Status Goal_Turn::Process(double dTime)
         if (m_currentTime > m_timeOut)
         {
             Terminate();
-            return m_Status = eFailed; //set m_Status to failed and return m_Status in one line
+            cout << "no target" << endl;
+            //return m_Status = eFailed; //set m_Status to failed and return m_Status in one line
         }
 
         double lowerBound = m_target - m_freedom;
@@ -203,6 +204,7 @@ void Goal_DriveStraight::Terminate()
 /***********************Goal_VisionAlign***********************/
 void Goal_VisionAlign::Activate()
 {
+    cout << "goal active" << endl;
     m_Status = eActive;
     updateVision();
 }
@@ -212,12 +214,13 @@ Goal::Goal_Status Goal_VisionAlign::Process(double dTime)
     m_currentTime += dTime;
     if(m_currentTime > m_timeOut)
     {
+        cout << "time out" << endl;
         Terminate();
         return m_Status = eFailed;
     }
     updateVision();
     cout << X << " " << Y << " " << Radius << " " << Area << " " << Height << " " << Width << endl;
-    if(!HasTarget) return m_Status = eFailed;
+    //if(!HasTarget) return m_Status = eFailed;
     if(X < m_target->getLowerBound())
     {
         SetDrive(getXOffset() * TURN_KP,-(getXOffset() * TURN_KP),m_activeCollection);
@@ -238,11 +241,13 @@ Goal::Goal_Status Goal_VisionAlign::Process(double dTime)
         }
         else
         {
+            cout << "aligned" << endl;
             Terminate();
             return m_Status = eCompleted;
         }
         
     }
+    cout << "nothing" << endl;
     return m_Status = eActive;
 
 }
