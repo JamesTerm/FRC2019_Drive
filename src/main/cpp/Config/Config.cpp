@@ -26,9 +26,9 @@ using namespace frc;
  * Secondary Camera Server
  * * Vision Initialization -> need vision working with that
  * Allocate Components
- * Encoders
+ *TODO: Encoders-> Add encoders to motors
  * DI
- *TODO *DO-> Write the abstraction classes
+ *TODO: *DO-> Write the abstraction classes
  *TODO:*AI-> Write the abstraction classes
  *TODO:*AO-> Write the abstraction classes
  *TODO: Lower and Upper Limit for DAI
@@ -73,12 +73,18 @@ void Config::LoadValues(xml_document &doc){
 	}
 
 	#pragma region MetaData
-//TODO: Make subregions in here
+
+	#pragma region Version
+
 	xml_attribute version = root.child("Version").attribute("version");
 	if(version)
 		cout << "Config Version: " << version.as_int() << endl;
 	else
 		cout << "Version not found" << endl;
+
+	#pragma endregion Version
+
+	#pragma region Comment
 
 	xml_attribute comment = root.child("Comment").attribute("comment");
 	if(comment)
@@ -86,11 +92,14 @@ void Config::LoadValues(xml_document &doc){
 	else
 		cout << "Comment not found" << endl;
 
+	#pragma endregion Comment
+
+	#pragma region NavX
+
 	xml_attribute useNavX = root.child("UseNavX").attribute("value");
 	//TODO: Addition of other NavX ports
 	if(useNavX){
 		if(useNavX.as_bool()){
-			NavX *nav = new NavX();
 			m_activeCollection->Add(new NavX());
 			cout << "NavX detected" << endl;
 		}
@@ -100,6 +109,10 @@ void Config::LoadValues(xml_document &doc){
 	}
 	else
 		cout << "UseNavX not found. Disabling by default" << endl;
+
+	#pragma endregion NavX
+
+	#pragma region SecondaryCameraServer
 
 	//TODO: make it so we can mess with the camera during the running of the robot: ie, switch which stream we are using 
 	xml_node enableSecondaryCamera = root.child("EnableSecondaryCameraServer");
@@ -131,14 +144,17 @@ void Config::LoadValues(xml_document &doc){
 	else
 		cout << "EnableSecondaryCameraServer not found. Disabling by default" << endl;
 
+	#pragma endregion SecondaryCameraServer
+
 	#pragma endregion MetaData
 
-	AllocateComponents(doc);
+	AllocateComponents(root);
+	AllocateDriverControls(root);
 	//TODO: Controls
 }
 
-void Config::AllocateComponents(xml_document &doc){
-	xml_node robot = doc.child("Robot").child("RobotConfig");
+void Config::AllocateComponents(xml_node &root){
+	xml_node robot = root.child("RobotConfig");
 	if(!robot){
 		cout << "RobotConfig was not found in Config! I hope you didn't intend to allocate any components! Returning to Config::LoadValues()" << endl;
 		return;
@@ -148,7 +164,7 @@ void Config::AllocateComponents(xml_document &doc){
 	//TODO: Look into setting encoders to motors like we used to do in the C# code
 	//TODO: Upper and lower limits that can be either AI or DI
 
-#pragma region VictorSP
+	#pragma region VictorSP
 	
 	xml_node VictorSP = robot.child("VictorSP");
 	if(VictorSP){
@@ -179,7 +195,7 @@ void Config::AllocateComponents(xml_document &doc){
 
 #pragma endregion VictorSP
 
-#pragma region VictorSPX
+	#pragma region VictorSPX
 
 	xml_node VictorSPX = robot.child("VictorSPX");
 	if(VictorSPX){
@@ -210,7 +226,7 @@ void Config::AllocateComponents(xml_document &doc){
 
 #pragma endregion VictorSPX
 
-#pragma region TalonSRX
+	#pragma region TalonSRX
 
 	xml_node TalonSRX = robot.child("TalonSRX");
 	if(TalonSRX){
@@ -242,7 +258,7 @@ void Config::AllocateComponents(xml_document &doc){
 
 #pragma endregion TalonSRX
 
-#pragma region Potentiometer
+	#pragma region Potentiometer
 
 	xml_node Pot = robot.child("Potentiometer");
 	if(Pot){
@@ -265,7 +281,7 @@ void Config::AllocateComponents(xml_document &doc){
 
 #pragma endregion Potentiometer
 
-#pragma region Encoder
+	#pragma region Encoder
 
 	xml_node Encoder = robot.child("Encoder");
 	if(Encoder){
@@ -290,7 +306,7 @@ void Config::AllocateComponents(xml_document &doc){
 
 #pragma endregion Encoder
 
-#pragma region DoubleSolenoid
+	#pragma region DoubleSolenoid
 
 	xml_node Solenoid = robot.child("DoubleSolenoid");
 	if(Solenoid){
@@ -320,7 +336,7 @@ void Config::AllocateComponents(xml_document &doc){
 
 #pragma endregion DoubleSolenoid
 
-#pragma region DigitalInput
+	#pragma region DigitalInput
 
 	xml_node DI = robot.child("DI");
 	if(DI){
@@ -343,7 +359,9 @@ void Config::AllocateComponents(xml_document &doc){
 
 #pragma endregion DigitalInput
 
-//TODO: Support for VictorSPXPWM and TalonSRXPWM
+}
+
+void Config::AllocateDriverControls(xml_node &root){
 
 }
 

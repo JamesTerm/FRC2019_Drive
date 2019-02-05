@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!-- Root of the Config -->
 <Robot>
     <!-- Version of the current config to be printed on the console -->
@@ -7,14 +6,41 @@
     <!-- Comment on this particular config to be printed on the console -->
     <Comment comment="A" />
     <!-- Sets whether or not to initialize the NavX -->
-    <UseNavX value="true" port=""/>
+    <UseNavX value="true" />
     <!-- Sets whether or not to initialize the camera to send back to the driver station -->
-    <EnableSecondaryCameraServer value="false" width="640" height="480" fps="30" autoExposure=""/>
     <!-- Contains assignments to ports and robot dimensions -->
     <RobotConfig>
+        <!-- Region for defining VictorSP Items -->
         <VictorSP>
-            <left_0 />
+            <motor_0 channel="0" reversed="false" pdbChannel="0" />
         </VictorSP>
+        <!-- Region for VictorSPX CAN Items -->
+        <VictorSPX>
+            <motor_1 channel="0" reversed="false" pdbChannel="0" />
+        </VictorSPX>
+        <!-- Region for TalonSRX CAN Items -->
+        <TalonSRX>
+            <motor_2 channel="0" reversed="false" pdbChannel="0" enableEncoder="false" />
+        </TalonSRX>
+        <!-- Region for Potentiometers -->
+        <Potentiometer>
+            <pot_0 channel="0" />
+        </Potentiometer>
+        <!-- Region for Encoders -->
+        <Encoder>
+            <enc_0 aChannel="0" bChannel="1" reversed="false" />
+        </Encoder>
+        <!-- Region for DoubleSolenoids -->
+        <DoubleSolenoid>
+            <solenoid_0 fChannel="0" rChannel="1" reversed="false" default="forward" />
+        </DoubleSolenoid>
+        <!-- Region for DigitalInputs -->
+        <DigitalInput>
+            <DI_0 channel="0" />
+        </DigitalInput>
     </RobotConfig>
 
+    <Controls>
+        
+    </Controls>
 </Robot>

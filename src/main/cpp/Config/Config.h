@@ -32,7 +32,8 @@ public:
 	Config(ActiveCollection *_activeCollection, Drive *_drive);
 	//TODO: Make this a bool return
 	void LoadValues(xml_document &doc);
-	void AllocateComponents(xml_document &doc);
+	void AllocateComponents(xml_node &root);
+	void AllocateDriverControls(xml_node &root);
 	void AllocateComponentsDep();
 	virtual ~Config();
 private:
