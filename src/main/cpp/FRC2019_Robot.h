@@ -79,6 +79,11 @@ const char * const csz_FRC2019_Robot_AnalogInputs_Enum[] =
 	"arm_pot"
 };
 
+const char * const csz_FRC2019_Robot_Solenoid_Enum[] =
+{
+	"wedge","intake","hatch","hatch_grab"
+};
+
 ///This is a specific robot that is a robot tank and is composed of an arm, it provides addition methods to control the arm, and applies updates to
 ///the Robot_Control_Interface
 class FRC2019_Robot : public Tank_Robot
@@ -108,6 +113,10 @@ class FRC2019_Robot : public Tank_Robot
 			return Enum_GetValue<AnalogInputs>(value, csz_FRC2019_Robot_AnalogInputs_Enum, _countof(csz_FRC2019_Robot_AnalogInputs_Enum));
 		}
 
+		static SolenoidDevices GetSolenoidDevices_Enum(const char *value)
+		{
+			return Enum_GetValue<SolenoidDevices>(value, csz_FRC2019_Robot_Solenoid_Enum, _countof(csz_FRC2019_Robot_Solenoid_Enum));
+		}
 
 		FRC2019_Robot(const char EntityName[],FRC2019_Control_Interface *robot_control,bool UseEncoders=false);
 		IEvent::HandlerList ehl;
@@ -252,8 +261,7 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 			{	return FRC2019_Robot::GetAnalogInputs_Enum(name);
 			}
 			virtual size_t RobotControlCommon_Get_DoubleSolenoid_EnumValue(const char *name) const
-			{	//return Curivator_Robot::GetSolenoidDevices_Enum(name);
-				return 0;
+			{	return FRC2019_Robot::GetSolenoidDevices_Enum(name);
 			}
 
 	protected: //from FRC2019_Control_Interface

@@ -101,29 +101,227 @@ void FRC2019_Robot::Robot_Claw::BindAdditionalEventControls(bool Bind)
  /*													FRC2019_Robot::Robot_Arm_Manager												*/
 /***********************************************************************************************************************************/
 
+//#define __UseArmManual__
+const char *csz_Arm_IntakeDeploy_manual = "Arm_IntakeDeploy_manual";
+const char *csz_Arm_HatchDeploy_manual = "Arm_HatchDeploy_manual";
+const char *csz_Arm_HatchGrabDeploy_manual = "Arm_HatchGrabDeploy_manual";
+
 class FRC2019_Robot::Robot_Arm_Manager
 {
 private:
 	Robot_Arm *m_pParent;
+	enum GoalList
+	{
+		eOpenIntake, eCloseIntake,
+		eOpenHatch, eCloseHatch,
+		eOpenHatchGrab, eCloseHatchGrab,
+		eNoGoals
+	};
+	bool GoalActive[eNoGoals];
+
+	//Goals--- literally able to copy these as-is
+
+	FRC2019_Robot &m_Robot;
+	class SetUpProps
+	{
+	protected:
+		Robot_Arm_Manager *m_Parent;
+		FRC2019_Robot &m_Robot;
+		Entity2D_Kind::EventMap &m_EventMap;
+	public:
+		SetUpProps(Robot_Arm_Manager *Parent) : m_Parent(Parent), m_Robot(Parent->m_Robot), m_EventMap(*m_Robot.GetEventMap())
+		{
+		}
+	};
+	//This makes it easy to notify by name
+	class RobotQuickNotify : public AtomicGoal, public SetUpProps
+	{
+	private:
+		std::string m_EventName;
+		bool m_IsOn;
+	public:
+		RobotQuickNotify(Robot_Arm_Manager *Parent, const char *EventName, bool On) : SetUpProps(Parent), m_EventName(EventName), m_IsOn(On)
+		{
+			m_Status = eInactive;
+		}
+		virtual void Activate() { m_Status = eActive; }
+		virtual Goal_Status Process(double dTime_s)
+		{
+			ActivateIfInactive();
+			m_EventMap.EventOnOff_Map[m_EventName.c_str()].Fire(m_IsOn);
+			m_Status = eCompleted;
+			return m_Status;
+		}
+	};
+
+	class GoalOpenIntake : public Generic_CompositeGoal, public SetUpProps
+	{
+	public:
+		GoalOpenIntake(Robot_Arm_Manager *Parent) : Generic_CompositeGoal(false), SetUpProps(Parent) { m_Status = eInactive; }
+		virtual void Activate()
+		{
+			m_Parent->mutual_exlude_other_goals(eOpenIntake);
+			AddSubgoal(new Goal_Wait(1.0));
+			AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_IntakeDeploy_manual, false));
+			m_Status = eActive;
+			m_Parent->GoalActive[eOpenIntake] = true;
+		}
+		virtual Goal_Status Process(double dTime_s)
+		{
+			//Just monitor the status
+			m_Status = Generic_CompositeGoal::Process(dTime_s);
+			m_Parent->GoalActive[eOpenIntake] = m_Status== eActive;
+			return m_Status;
+		}
+	};
+
+	class GoalCloseIntake : public Generic_CompositeGoal, public SetUpProps
+	{
+	public:
+		GoalCloseIntake(Robot_Arm_Manager *Parent) : Generic_CompositeGoal(false), SetUpProps(Parent) { m_Status = eInactive; }
+		virtual void Activate()
+		{
+			m_Parent->mutual_exlude_other_goals(eCloseIntake);
+			AddSubgoal(new Goal_Wait(1.0));
+			AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_IntakeDeploy_manual, true));
+			m_Status = eActive;
+			m_Parent->GoalActive[eCloseIntake] = true;
+		}
+		virtual Goal_Status Process(double dTime_s)
+		{
+			//Just monitor the status
+			m_Status = Generic_CompositeGoal::Process(dTime_s);
+			m_Parent->GoalActive[eCloseIntake] = m_Status == eActive;
+			return m_Status;
+		}
+	};
+
+
+	class GoalOpenHatch : public Generic_CompositeGoal, public SetUpProps
+	{
+	public:
+		GoalOpenHatch(Robot_Arm_Manager *Parent) : Generic_CompositeGoal(false), SetUpProps(Parent) { m_Status = eInactive; }
+		virtual void Activate()
+		{
+			m_Parent->mutual_exlude_other_goals(eOpenHatch);
+			AddSubgoal(new Goal_Wait(1.0));
+			AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_HatchDeploy_manual, false));
+			m_Status = eActive;
+			m_Parent->GoalActive[eOpenHatch] = true;
+		}
+		virtual Goal_Status Process(double dTime_s)
+		{
+			//Just monitor the status
+			m_Status = Generic_CompositeGoal::Process(dTime_s);
+			m_Parent->GoalActive[eOpenHatch] = m_Status == eActive;
+			return m_Status;
+		}
+	};
+
+	class GoalCloseHatch : public Generic_CompositeGoal, public SetUpProps
+	{
+	public:
+		GoalCloseHatch(Robot_Arm_Manager *Parent) : Generic_CompositeGoal(false), SetUpProps(Parent) { m_Status = eInactive; }
+		virtual void Activate()
+		{
+			m_Parent->mutual_exlude_other_goals(eCloseHatch);
+			AddSubgoal(new Goal_Wait(1.0));
+			AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_HatchDeploy_manual, true));
+			m_Status = eActive;
+			m_Parent->GoalActive[eCloseHatch] = true;
+		}
+		virtual Goal_Status Process(double dTime_s)
+		{
+			//Just monitor the status
+			m_Status = Generic_CompositeGoal::Process(dTime_s);
+			m_Parent->GoalActive[eCloseHatch] = m_Status == eActive;
+			return m_Status;
+		}
+	};
+
+
+	GoalOpenIntake m_GoalOpenIntake=this;
+	GoalCloseIntake m_GoalCloseIntake=this;
+	GoalOpenHatch m_GoalOpenHatch = this;
+	GoalCloseHatch m_GoalCloseHatch = this;
+	void mutual_exlude_other_goals(GoalList active_goal)
+	{
+		for (size_t i=0;i< eNoGoals;i++)
+		{
+			if (i == active_goal) continue;
+			else
+			{
+				switch (i)
+				{
+				case eOpenIntake:
+					m_GoalOpenIntake.Terminate();
+					break;
+				case eCloseIntake:
+					m_GoalCloseIntake.Terminate();
+					break;
+				case eOpenHatch:
+					m_GoalOpenHatch.Terminate();
+					break;
+				case eCloseHatch:
+					m_GoalCloseHatch.Terminate();
+					break;
+				}
+			}
+		}
+	}
+
 public: 
-	Robot_Arm_Manager(Robot_Arm *parent) : m_pParent(parent)
+	Robot_Arm_Manager(Robot_Arm *parent) : m_pParent(parent),m_Robot(*m_pParent->m_pParent)
 	{
 	}
 	void TimeChange(double dTime_s)
 	{
+		m_GoalOpenIntake.Process(dTime_s);
+		m_GoalCloseIntake.Process(dTime_s);
+		m_GoalOpenHatch.Process(dTime_s);
+		m_GoalCloseHatch.Process(dTime_s);
 	}
-	//Currently these are all manual, but I'll convert into goals, and we can macro flip them
-	void CloseIntake(bool Close)
+	void CloseIntake_manual(bool Close)
 	{
 		m_pParent->m_pParent->m_RobotControl->CloseSolenoid(eIntakeDeploy, Close);
 	}
-	void CloseHatchDeploy(bool Close)
+	void CloseHatchDeploy_manual(bool Close)
 	{
 		m_pParent->m_pParent->m_RobotControl->CloseSolenoid(eHatchDeploy, Close);
 	}
-	void CloseHatchGrabDeploy(bool Close)
+	void CloseHatchGrabDeploy_manual(bool Close)
 	{
 		m_pParent->m_pParent->m_RobotControl->CloseSolenoid(eHatchGrabDeploy, Close);
+	}
+	void CloseIntake(bool Close)
+	{
+		#ifdef __UseArmManual__
+		CloseIntake_manual(Close);
+		#else
+		if (Close)
+			m_GoalCloseIntake.Activate();
+		else
+			m_GoalOpenIntake.Activate();
+		#endif
+	}
+	void CloseHatchDeploy(bool Close)
+	{
+		#ifdef __UseArmManual__
+		CloseHatchDeploy_manual(Close);
+		#else
+		if (Close)
+			m_GoalCloseHatch.Activate();
+		else
+			m_GoalOpenHatch.Activate();
+		#endif
+	}
+	void CloseHatchGrabDeploy(bool Close)
+	{
+		#ifdef __UseArmManual__
+		CloseHatchGrabDeploy_manual(Close);
+		#else
+		CloseHatchGrabDeploy_manual(Close);
+		#endif
 	}
 };
 
@@ -196,6 +394,15 @@ void FRC2019_Robot::Robot_Arm::BindAdditionalEventControls(bool Bind)
 		em->EventOnOff_Map[csz_Arm_HatchGrabDeploy].Subscribe([&](bool on)
 			{	m_RobotArmManager->CloseHatchGrabDeploy(on);
 			});
+		em->EventOnOff_Map[csz_Arm_IntakeDeploy_manual].Subscribe([&](bool on)
+		{	m_RobotArmManager->CloseIntake_manual(on);
+		});
+		em->EventOnOff_Map[csz_Arm_HatchDeploy_manual].Subscribe([&](bool on)
+		{	m_RobotArmManager->CloseHatchDeploy_manual(on);
+		});
+		em->EventOnOff_Map[csz_Arm_HatchGrabDeploy_manual].Subscribe([&](bool on)
+		{	m_RobotArmManager->CloseHatchGrabDeploy_manual(on);
+		});
 	}
 	else
 	{
@@ -522,6 +729,7 @@ void FRC2019_Robot_Control::UpdateVoltage(size_t index,double Voltage)
 		SmartDashboard::PutNumber(SmartLabel.c_str(),Voltage);
 		if (SafetyLock)
 			Voltage=0.0;
+		//Do the real work
 		PWMSpeedController_UpdateVoltage(index,Voltage);
 	}
 }
@@ -543,6 +751,8 @@ void FRC2019_Robot_Control::CloseSolenoid(size_t index,bool Close)
 			SmartDashboard::PutBoolean("Intake", Close);
 			break;
 	}
+	//do the real work
+	Solenoid_Close(index, Close);
 }
 
 
