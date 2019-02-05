@@ -17,8 +17,10 @@ Email: cooper.ryan@centaurisoftware.co
 #include <utility>
 
 #include "../Components/VictorSPItem.h"
+#include "../Components/VictorSPXItem.h"
 #include "../Components/TalonSRXItem.h"
 #include "../Components/EncoderItem.h"
+#include "../Components/PotentiometerItem.h"
 #include "../Components/DoubleSolenoidItem.h"
 #include "../Components/NavX.h"
 

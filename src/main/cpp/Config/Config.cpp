@@ -27,17 +27,17 @@ using namespace frc;
  * Secondary Camera Server
  * * Vision Initialization -> need vision working with that
  * Allocate Components
- * 	*Encoders
+ * Encoders
  * 	*DI
- *  *DO
+ *TODO *DO-> Write the abstraction classes
  *TODO:*AI-> Write the abstraction classes
  *TODO:*AO-> Write the abstraction classes
  *TODO: Lower and Upper Limit for DAI
- * 	*Motors
+ * Motors
  *?		Drive class integration? Probably Post-Season
  * 	*Solenoids
  *?	Relays
- * 	*Potentiometers
+ * Potentiometers
  * *Allocate the Joysticks via the XML
  * *Allocate Controls (make another method for this, prolly one for each joystick)
  * 
@@ -74,7 +74,7 @@ void Config::LoadValues(xml_document &doc){
 	}
 
 	#pragma region MetaData
-
+//TODO: Make subregions in here
 	xml_attribute version = root.child("Version").attribute("version");
 	if(version)
 		cout << "Config Version: " << version.as_int() << endl;
@@ -92,7 +92,7 @@ void Config::LoadValues(xml_document &doc){
 	if(useNavX){
 		if(useNavX.as_bool()){
 			NavX *nav = new NavX();
-			//m_activeCollection->Add(new NavX());
+			m_activeCollection->Add(new NavX());
 			cout << "NavX detected" << endl;
 		}
 		else
@@ -160,12 +160,15 @@ void Config::AllocateComponents(xml_document &doc){
 			int pdbChannel = victorSp.attribute("pdbChannel") ? victorSp.attribute("pdbChannel").as_int() : -1;
 			if(channel){
 				VictorSPItem *tmp = new VictorSPItem(name, channel.as_int(), reversed);
-				cout << "Added Victor  " << name << ", Channel: " << channel << ", Reversed: " << reversed << "PDBChannel: " << pdbChannel << endl;
-				if(pdbChannel != -1)
+				m_activeCollection->Add(tmp);
+				cout << "Added VictorSP " << name << ", Channel: " << channel << ", Reversed: " << reversed << endl;
+				if(pdbChannel != -1){
+					cout << "Allocated PDBChannel " << pdbChannel << " for VictorSP " << name << endl;
 					tmp->SetPDBChannel(pdbChannel);
+				}
 			}
 			else{
-				cout << "Failed to load Victor " << name << ". This may cause a fatal runtime error!" << endl;
+				cout << "Failed to load VictorSP " << name << ". This may cause a fatal runtime error!" << endl;
 			}
 
 
@@ -177,11 +180,150 @@ void Config::AllocateComponents(xml_document &doc){
 
 #pragma endregion VictorSP
 
+//TODO: Support for VictorSPXPWM and TalonSRXPWM
+
 #pragma region VictorSPX
 
-	
+	xml_node VictorSPX = robot.child("VictorSPX");
+	if(VictorSPX){
+		for(xml_node victorSpx = VictorSPX.first_child(); victorSpx; victorSpx = victorSpx.next_sibling()){
+			string name = victorSpx.name();
+			xml_attribute channel = victorSpx.attribute("channel");
+			bool reversed = victorSpx.attribute("reversed");
+			int pdbChannel = victorSpx.attribute("pdbChannel") ? victorSpx.attribute("pdbChannel").as_int() : -1;
+			if(channel){
+				VictorSPXItem *tmp = new VictorSPXItem(channel.as_int(), name, reversed);
+				m_activeCollection->Add(tmp);
+				cout << "Added VictorSPX " << name << ", Channel: " << channel << ", Reversed: " << reversed << endl;
+				if(pdbChannel != -1){
+					cout << "Allocated PDBChannel " << pdbChannel << " for VictorSPX " << name << endl;
+					tmp->SetPDBChannel(pdbChannel);
+				}
+			}
+			else{
+				cout << "Failed to load VictorSPX " << name << ". This may cause a fatal runtime error!" << endl;
+			}
+
+
+		}
+	}
+	else{
+		cout << "VictorSPX definitions not found in config, skipping..." << endl;
+	}
 
 #pragma endregion VictorSPX
+
+#pragma region TalonSRX
+
+	xml_node TalonSRX = robot.child("TalonSRX");
+	if(TalonSRX){
+		for(xml_node talonSrx = TalonSRX.first_child(); talonSrx; talonSrx = talonSrx.next_sibling()){
+			string name = talonSrx.name();
+			xml_attribute channel = talonSrx.attribute("channel");
+			bool reversed = talonSrx.attribute("reversed");
+			bool enableEncoder = talonSrx.attribute("enableEncoder");
+			int pdbChannel = talonSrx.attribute("pdbChannel") ? talonSrx.attribute("pdbChannel").as_int() : -1;
+			if(channel){
+				TalonSRXItem *tmp = new TalonSRXItem(channel.as_int(), name, reversed, enableEncoder);
+				m_activeCollection->Add(tmp);
+				cout << "Added TalonSRX " << name << ", Channel: " << channel << ", Reversed: " << reversed << ", EnableEncoder: " << enableEncoder << endl;
+				if(pdbChannel != -1){
+					cout << "Allocated PDBChannel " << pdbChannel << " for TalonSRX " << name << endl;
+					tmp->SetPDBChannel(pdbChannel);
+				}
+			}
+			else{
+				cout << "Failed to load TalonSRX " << name << ". This may cause a fatal runtime error!" << endl;
+			}
+
+
+		}
+	}
+	else{
+		cout << "TalonSRX definitions not found in config, skipping..." << endl;
+	}
+
+#pragma endregion TalonSRX
+
+#pragma region Potentiometer
+
+	xml_node Pot = robot.child("Potentiometer");
+	if(Pot){
+		for(xml_node pot = Pot.first_child(); pot; pot = pot.next_sibling()){
+			string name = pot.name();
+			xml_attribute channel = pot.attribute("channel");
+			if(channel){
+				PotentiometerItem *tmp = new PotentiometerItem(channel.as_int(), name);
+				m_activeCollection->Add(tmp);
+				cout << "Added Potentiometer " << name << ", Channel: " << channel << endl;
+			}
+			else{
+				cout << "Failed to load Potentiometer " << name << ". This may cause a fatal runtime error!" << endl;
+			}
+		}
+	}
+	else{
+		cout << "Potentiometer definitions not found in config, skipping..." << endl;
+	}
+
+#pragma endregion Potentiometer
+
+#pragma region Encoder
+
+	xml_node Encoder = robot.child("Encoder");
+	if(Encoder){
+		for(xml_node encoder = Encoder.first_child(); encoder; encoder = encoder.next_sibling()){
+			string name = encoder.name();
+			xml_attribute aChannel = encoder.attribute("aChannel");
+			xml_attribute bChannel = encoder.attribute("bChannel");
+			bool reversed = encoder.attribute("reversed").as_bool();
+			if(aChannel && bChannel){
+				EncoderItem *tmp = new EncoderItem(name, aChannel.as_int(), bChannel.as_int(), reversed);
+				m_activeCollection->Add(tmp);
+				cout << "Added Encoder " << name << ", A-Channel: " << aChannel << ", B-Channel: " << bChannel << ", Reversed: " << reversed << endl;
+			}
+			else{
+				cout << "Failed to load Encoder " << name << ". This may cause a fatal runtime error!" << endl;
+			}
+		}
+	}
+	else{
+		cout << "Encoder definitions not found in config, skipping..." << endl;
+	}
+
+#pragma endregion Encoder
+
+#pragma region DoubleSolenoid
+
+	xml_node Solenoid = robot.child("DoubleSolenoid");
+	if(Solenoid){
+		for(xml_node solenoid = Solenoid.first_child(); solenoid; solenoid = solenoid.next_sibling()){
+			string name = solenoid.name();
+			xml_attribute fChannel = solenoid.attribute("fChannel");
+			xml_attribute rChannel = solenoid.attribute("rChannel");
+			bool reversed = solenoid.attribute("reversed");
+			xml_attribute _default = solenoid.attribute("default");
+			DoubleSolenoid::Value _def = _default ? _default.as_string() == "reverse" ? DoubleSolenoid::Value::kReverse : _default.as_string() == "forward" ? DoubleSolenoid::Value::kForward : DoubleSolenoid::Value::kOff : DoubleSolenoid::Value::kOff;
+
+			if(fChannel && rChannel){
+				DoubleSolenoidItem *tmp = new DoubleSolenoidItem(name , fChannel.as_int(), rChannel.as_int(), _def, reversed);
+				m_activeCollection->Add(tmp);
+				cout << "Added DoubleSolenoid " << name << ", F-Channel: " << fChannel << ", R-Channel: " << rChannel << ", Default: " << _def << ", Reversed: " << reversed << endl;
+			}
+			else{
+				cout << "Failed to load DoubleSolenoid " << name << ". This may cause a fatal runtime error!" << endl;
+			}
+
+
+		}
+	}
+	else{
+		cout << "DoubleSolenoid definitions not found in config, skipping..." << endl;
+	}
+
+#pragma endregion DoubleSolenoid
+
+//TODO: DI
 
 }
 

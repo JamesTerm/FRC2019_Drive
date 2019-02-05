@@ -32,6 +32,8 @@ public:
 	virtual double Get() override;
 	virtual void Set(double val) override;
 	virtual void Set(DoubleSolenoid::Value value) override;
+	void SetPDBChannel(int val);
+	int PDBChannel;
 	virtual void DefaultSet() override;
 	virtual ~VictorSPXItem();
 };

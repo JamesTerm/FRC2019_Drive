@@ -32,7 +32,6 @@ namespace Components
 
 			int GetPolarity();
 			string GetName();
-			int PDBChannel;
 			void Stop();
 			void SetPDBChannel(int val);
 			virtual void Set(double val) override;
@@ -41,6 +40,7 @@ namespace Components
 		private:
 			VictorSP *victor;
 			bool Reversed;
+			int PDBChannel;
 			virtual void DefaultSet() override;
 			virtual void Set(DoubleSolenoid::Value value) override;
 	};

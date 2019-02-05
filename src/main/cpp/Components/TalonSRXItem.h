@@ -26,12 +26,15 @@ private:
 	TalonSRX *talon;
 	int channel;
 	bool reversed;
+	bool encoderEnabled;
 
 public:
 	TalonSRXItem();
-	TalonSRXItem(int channel, string name, bool reversed);
+	TalonSRXItem(int channel, string name, bool reversed, bool enableEncoder);
 	int GetQuadraturePosition();
 	void SetQuadraturePosition(int val);
+	void SetPDBChannel(int val);
+	int PDBChannel;
 	virtual double Get() override;
 	virtual void Set(double val) override;
 	virtual void Set(DoubleSolenoid::Value value) override;
