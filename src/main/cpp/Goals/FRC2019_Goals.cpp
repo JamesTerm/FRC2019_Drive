@@ -216,25 +216,25 @@ Goal::Goal_Status Goal_VisionAlign::Process(double dTime)
         return m_Status = eFailed;
     }
     updateVision();
-    cout << X << " " << Y << " " << Radius << " " << Area << " " << Height << " " << Width << endl;
+    cout << m_currentTarget->getX() << " " << m_currentTarget->getY() << " " << m_currentTarget->getRadius() << " " << Height << " " << Width << endl;
     if(!HasTarget) return m_Status = eFailed;
-    if(X < m_target->getLowerBound())
+    if(m_target->compareX(m_currentTarget) < -20) 
     {
-        SetDrive(getXOffset() * TURN_KP,-(getXOffset() * TURN_KP),m_activeCollection);
+        SetDrive(m_target->compareX(m_currentTarget) * TURN_KP,-(m_target->compareX(m_currentTarget) * TURN_KP),m_activeCollection);
     }
-    else if(X > m_target->getUpperBound())
+    else if(m_target->compareX(m_currentTarget) > 20)
     {
-        SetDrive(getXOffset() * TURN_KP,-(getXOffset() * TURN_KP),m_activeCollection);
+        SetDrive(m_target->compareX(m_currentTarget) * TURN_KP,-(m_target->compareX(m_currentTarget) * TURN_KP),m_activeCollection);
     }
     else
     {
-        if(Radius < m_target->getRadius())
+        if(m_target->compareRadius(m_currentTarget) < -20)
         {
-            SetDrive(getXOffset() * STRAIGHT_KP,-(getXOffset() * STRAIGHT_KP),m_activeCollection);
+            SetDrive(m_target->compareRadius(m_currentTarget) * STRAIGHT_KP,-(m_target->compareRadius(m_currentTarget) * STRAIGHT_KP),m_activeCollection);
         }
-        else if(Radius > m_target->getRadius())
+        else if(m_target->compareRadius(m_currentTarget) < -20)
         {
-            SetDrive(getXOffset() * STRAIGHT_KP,-(getXOffset() * STRAIGHT_KP),m_activeCollection);
+            SetDrive(m_target->compareRadius(m_currentTarget) * STRAIGHT_KP,-(m_target->compareRadius(m_currentTarget) * STRAIGHT_KP),m_activeCollection);
         }
         else
         {

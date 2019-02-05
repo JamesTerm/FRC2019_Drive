@@ -159,6 +159,7 @@ public:
     m_inst = nt::NetworkTableInstance::GetDefault(); //!Network tables
     m_visionTable = m_inst.GetTable("VISION_2019");  //!Vision network table
     m_target = target;
+    m_currentTarget = new VisionTarget();
   }
 
   virtual void Activate();
@@ -168,23 +169,15 @@ public:
 private:
   void updateVision()
   {
-    X = m_visionTable->GetNumber("X", 0);
-    Y = m_visionTable->GetNumber("Y", 0);
-    Radius = m_visionTable->GetNumber("RADIUS", 0);
-    Area = m_visionTable->GetNumber("AREA", 0);
+    m_currentTarget->setX(m_visionTable->GetNumber("X", 0));
+    m_currentTarget->setY(m_visionTable->GetNumber("Y", 0));
+    m_currentTarget->setRadius(m_visionTable->GetNumber("RADIUS", 0));
+    //Area = m_visionTable->GetNumber("AREA", 0);
     Height = m_visionTable->GetNumber("HEIGHT", 0);
     Width = m_visionTable->GetNumber("WIDTH", 0);
     HasTarget = m_visionTable->GetBoolean("HASTARGET", false);
   }
-  int getXOffset()
-  {
-    return X - m_target->getX();
-  }
-  int getRadOffset()
-  {
-    return Radius - m_target->getRadius();
-  }
-  int X, Y, Radius, Area, Height, Width;
+  int Height, Width;
   bool HasTarget;
 
   //constants for motor speeds. These are multiplied by vision error
@@ -194,6 +187,7 @@ private:
   nt::NetworkTableInstance m_inst;        //!Network tables
   shared_ptr<NetworkTable> m_visionTable; //!Vision table
   VisionTarget *m_target;
+  VisionTarget *m_currentTarget;
 };
 #pragma endregion
 
