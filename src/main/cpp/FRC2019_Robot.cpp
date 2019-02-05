@@ -117,7 +117,7 @@ private:
 		eHatchGrab,
 		eNoGoals
 	};
-	bool GoalActive[eNoGoals];
+	bool m_GoalActive[eNoGoals];
 	bool m_IsIntakeDeployed=false;
 	bool m_IsHatchDeployed=false;
 	//bool m_IsHatchGrabExpanded = false;  //TODO
@@ -165,18 +165,37 @@ private:
 			}
 		virtual void Activate(bool IsStowed)
 		{
+			//Check to see if we are already active... then check the direction... if we are in the same direction then its merely flood control
+			//otherwise we have to terminate and refresh with these new goals going in the other direction
+			if (m_Status == eActive)
+			{
+				if (m_Parent->m_IsIntakeDeployed == !IsStowed) 
+					return;  //no work to do
+				else
+					Terminate();
+			}
 			m_Parent->m_IsIntakeDeployed = !IsStowed;
-			m_Parent->mutual_exlude_other_goals(eIntake);
+			//Keep this around for test purposes
+			//m_Parent->mutual_exlude_other_goals(eIntake);
 			AddSubgoal(new Goal_Wait(1.0));
 			AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_IntakeDeploy_manual, !IsStowed));
 			m_Status = eActive;
-			m_Parent->GoalActive[eIntake] = true;
+			m_Parent->m_GoalActive[eIntake] = true;
 		}
 		virtual Goal_Status Process(double dTime_s)
 		{
-			//Just monitor the status
-			m_Status = Generic_CompositeGoal::Process(dTime_s);
-			m_Parent->GoalActive[eIntake] = m_Status== eActive;
+			//so the logic here... we can always stow, but to deploy the hatch must be stowed
+			bool can_process = true;
+			if (m_Parent->m_IsIntakeDeployed)
+			{
+				if ((m_Parent->m_IsHatchDeployed) || (m_Parent->m_GoalActive[eHatch]))
+					can_process = false;
+			}
+			if (can_process)
+			{
+				m_Status = Generic_CompositeGoal::Process(dTime_s);
+				m_Parent->m_GoalActive[eIntake] = m_Status == eActive;
+			}
 			return m_Status;
 		}
 	};
@@ -189,18 +208,37 @@ private:
 			}
 		virtual void Activate(bool IsStowed)
 		{
+			//Check to see if we are already active... then check the direction... if we are in the same direction then its merely flood control
+			//otherwise we have to terminate and refresh with these new goals going in the other direction
+			if (m_Status == eActive)
+			{
+				if (m_Parent->m_IsHatchDeployed == !IsStowed) 
+					return;  //no work to do
+				else
+					Terminate();
+			}
 			m_Parent->m_IsHatchDeployed = !IsStowed;
-			m_Parent->mutual_exlude_other_goals(eHatch);
+			//Keep this around for test purposes
+			//m_Parent->mutual_exlude_other_goals(eHatch);
 			AddSubgoal(new Goal_Wait(1.0));
 			AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_HatchDeploy_manual, !IsStowed));
 			m_Status = eActive;
-			m_Parent->GoalActive[eHatch] = true;
+			m_Parent->m_GoalActive[eHatch] = true;
 		}
 		virtual Goal_Status Process(double dTime_s)
 		{
-			//Just monitor the status
-			m_Status = Generic_CompositeGoal::Process(dTime_s);
-			m_Parent->GoalActive[eHatch] = m_Status == eActive;
+			//so the logic here... we can always stow, but to deploy the intake must be stowed
+			bool can_process = true;
+			if (m_Parent->m_IsHatchDeployed)
+			{
+				if ((m_Parent->m_IsIntakeDeployed) || (m_Parent->m_GoalActive[eIntake]))
+					can_process = false;
+			}
+			if (can_process)
+			{
+				m_Status = Generic_CompositeGoal::Process(dTime_s);
+				m_Parent->m_GoalActive[eHatch] = m_Status == eActive;
+			}
 			return m_Status;
 		}
 	};
@@ -208,6 +246,7 @@ private:
 
 	GoalIntake m_GoalIntake=this;
 	GoalHatch m_GoalHatch=this;
+	//There should never be a reason to terminate, but I'm keeping around in case we run into a situation where it becomes necessary
 	void mutual_exlude_other_goals(GoalList active_goal)
 	{
 		for (size_t i=0;i< eNoGoals;i++)
