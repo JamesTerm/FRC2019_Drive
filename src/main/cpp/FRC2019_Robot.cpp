@@ -112,12 +112,15 @@ private:
 	Robot_Arm *m_pParent;
 	enum GoalList
 	{
-		eOpenIntake, eCloseIntake,
-		eOpenHatch, eCloseHatch,
-		eOpenHatchGrab, eCloseHatchGrab,
+		eIntake,
+		eHatch,
+		eHatchGrab,
 		eNoGoals
 	};
 	bool GoalActive[eNoGoals];
+	bool m_IsIntakeDeployed=false;
+	bool m_IsHatchDeployed=false;
+	//bool m_IsHatchGrabExpanded = false;  //TODO
 
 	//Goals--- literally able to copy these as-is
 
@@ -154,96 +157,57 @@ private:
 		}
 	};
 
-	class GoalOpenIntake : public Generic_CompositeGoal, public SetUpProps
+	class GoalIntake : public Generic_CompositeGoal, public SetUpProps
 	{
 	public:
-		GoalOpenIntake(Robot_Arm_Manager *Parent) : Generic_CompositeGoal(false), SetUpProps(Parent) { m_Status = eInactive; }
-		virtual void Activate()
+		GoalIntake(Robot_Arm_Manager *Parent) : Generic_CompositeGoal(false), SetUpProps(Parent) 
+			{ 	m_Status = eInactive; 
+			}
+		virtual void Activate(bool IsStowed)
 		{
-			m_Parent->mutual_exlude_other_goals(eOpenIntake);
+			m_Parent->m_IsIntakeDeployed = !IsStowed;
+			m_Parent->mutual_exlude_other_goals(eIntake);
 			AddSubgoal(new Goal_Wait(1.0));
-			AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_IntakeDeploy_manual, false));
+			AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_IntakeDeploy_manual, !IsStowed));
 			m_Status = eActive;
-			m_Parent->GoalActive[eOpenIntake] = true;
+			m_Parent->GoalActive[eIntake] = true;
 		}
 		virtual Goal_Status Process(double dTime_s)
 		{
 			//Just monitor the status
 			m_Status = Generic_CompositeGoal::Process(dTime_s);
-			m_Parent->GoalActive[eOpenIntake] = m_Status== eActive;
+			m_Parent->GoalActive[eIntake] = m_Status== eActive;
 			return m_Status;
 		}
 	};
 
-	class GoalCloseIntake : public Generic_CompositeGoal, public SetUpProps
+	class GoalHatch : public Generic_CompositeGoal, public SetUpProps
 	{
 	public:
-		GoalCloseIntake(Robot_Arm_Manager *Parent) : Generic_CompositeGoal(false), SetUpProps(Parent) { m_Status = eInactive; }
-		virtual void Activate()
+		GoalHatch(Robot_Arm_Manager *Parent) : Generic_CompositeGoal(false), SetUpProps(Parent) 
+			{	m_Status = eInactive; 
+			}
+		virtual void Activate(bool IsStowed)
 		{
-			m_Parent->mutual_exlude_other_goals(eCloseIntake);
+			m_Parent->m_IsHatchDeployed = !IsStowed;
+			m_Parent->mutual_exlude_other_goals(eHatch);
 			AddSubgoal(new Goal_Wait(1.0));
-			AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_IntakeDeploy_manual, true));
+			AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_HatchDeploy_manual, !IsStowed));
 			m_Status = eActive;
-			m_Parent->GoalActive[eCloseIntake] = true;
+			m_Parent->GoalActive[eHatch] = true;
 		}
 		virtual Goal_Status Process(double dTime_s)
 		{
 			//Just monitor the status
 			m_Status = Generic_CompositeGoal::Process(dTime_s);
-			m_Parent->GoalActive[eCloseIntake] = m_Status == eActive;
+			m_Parent->GoalActive[eHatch] = m_Status == eActive;
 			return m_Status;
 		}
 	};
 
 
-	class GoalOpenHatch : public Generic_CompositeGoal, public SetUpProps
-	{
-	public:
-		GoalOpenHatch(Robot_Arm_Manager *Parent) : Generic_CompositeGoal(false), SetUpProps(Parent) { m_Status = eInactive; }
-		virtual void Activate()
-		{
-			m_Parent->mutual_exlude_other_goals(eOpenHatch);
-			AddSubgoal(new Goal_Wait(1.0));
-			AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_HatchDeploy_manual, false));
-			m_Status = eActive;
-			m_Parent->GoalActive[eOpenHatch] = true;
-		}
-		virtual Goal_Status Process(double dTime_s)
-		{
-			//Just monitor the status
-			m_Status = Generic_CompositeGoal::Process(dTime_s);
-			m_Parent->GoalActive[eOpenHatch] = m_Status == eActive;
-			return m_Status;
-		}
-	};
-
-	class GoalCloseHatch : public Generic_CompositeGoal, public SetUpProps
-	{
-	public:
-		GoalCloseHatch(Robot_Arm_Manager *Parent) : Generic_CompositeGoal(false), SetUpProps(Parent) { m_Status = eInactive; }
-		virtual void Activate()
-		{
-			m_Parent->mutual_exlude_other_goals(eCloseHatch);
-			AddSubgoal(new Goal_Wait(1.0));
-			AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_HatchDeploy_manual, true));
-			m_Status = eActive;
-			m_Parent->GoalActive[eCloseHatch] = true;
-		}
-		virtual Goal_Status Process(double dTime_s)
-		{
-			//Just monitor the status
-			m_Status = Generic_CompositeGoal::Process(dTime_s);
-			m_Parent->GoalActive[eCloseHatch] = m_Status == eActive;
-			return m_Status;
-		}
-	};
-
-
-	GoalOpenIntake m_GoalOpenIntake=this;
-	GoalCloseIntake m_GoalCloseIntake=this;
-	GoalOpenHatch m_GoalOpenHatch = this;
-	GoalCloseHatch m_GoalCloseHatch = this;
+	GoalIntake m_GoalIntake=this;
+	GoalHatch m_GoalHatch=this;
 	void mutual_exlude_other_goals(GoalList active_goal)
 	{
 		for (size_t i=0;i< eNoGoals;i++)
@@ -253,17 +217,11 @@ private:
 			{
 				switch (i)
 				{
-				case eOpenIntake:
-					m_GoalOpenIntake.Terminate();
+				case eIntake:
+					m_GoalIntake.Terminate();
 					break;
-				case eCloseIntake:
-					m_GoalCloseIntake.Terminate();
-					break;
-				case eOpenHatch:
-					m_GoalOpenHatch.Terminate();
-					break;
-				case eCloseHatch:
-					m_GoalCloseHatch.Terminate();
+				case eHatch:
+					m_GoalHatch.Terminate();
 					break;
 				}
 			}
@@ -276,10 +234,8 @@ public:
 	}
 	void TimeChange(double dTime_s)
 	{
-		m_GoalOpenIntake.Process(dTime_s);
-		m_GoalCloseIntake.Process(dTime_s);
-		m_GoalOpenHatch.Process(dTime_s);
-		m_GoalCloseHatch.Process(dTime_s);
+		m_GoalIntake.Process(dTime_s);
+		m_GoalHatch.Process(dTime_s);
 	}
 	void CloseIntake_manual(bool Close)
 	{
@@ -298,10 +254,7 @@ public:
 		#ifdef __UseArmManual__
 		CloseIntake_manual(Close);
 		#else
-		if (Close)
-			m_GoalCloseIntake.Activate();
-		else
-			m_GoalOpenIntake.Activate();
+		m_GoalIntake.Activate(!Close);
 		#endif
 	}
 	void CloseHatchDeploy(bool Close)
@@ -309,10 +262,7 @@ public:
 		#ifdef __UseArmManual__
 		CloseHatchDeploy_manual(Close);
 		#else
-		if (Close)
-			m_GoalCloseHatch.Activate();
-		else
-			m_GoalOpenHatch.Activate();
+		m_GoalHatch.Activate(!Close);
 		#endif
 	}
 	void CloseHatchGrabDeploy(bool Close)
