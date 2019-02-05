@@ -230,15 +230,16 @@ MainRobot = {
 			Arm_SetPosRest = {type="joystick_button", key=2, keyboard='l', on_off=false},
 			Arm_SetPoshatch = {type="joystick_button", key=1, keyboard=';', on_off=false},
 			Arm_SetCurrentVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
-			Arm_Rist={type="joystick_button", key=5, on_off=true},
+			Arm_IntakeDeploy={type="joystick_button", key=5, keyboard='i', on_off=true},
 			Arm_Advance={type="keyboard", key='k', on_off=true},
 			Arm_Retract={type="keyboard", key='j', on_off=true},
 			
 			--Claw_SetCurrentVelocity  --not used
-			Claw_Close =	 {type="joystick_button", key=6, on_off=true},
+			Arm_HatchDeploy =	 {type="joystick_button", key=6, keyboard='h', on_off=true},
+			Arm_HatchGrabDeploy={type="keyboard", key='o', on_off=true},
 			Claw_Grip =		 {type="joystick_button", key=8, on_off=true},
 			--Claw_Squirt =	 {type="joystick_button", key=7, on_off=true},
-			Robot_CloseDoor= {type="joystick_button", key=9, on_off=true}
+			Robot_CloseDoor= {type="joystick_button", key=9, keyboard='u', on_off=true}
 		},
 		
 		Joystick_2 =

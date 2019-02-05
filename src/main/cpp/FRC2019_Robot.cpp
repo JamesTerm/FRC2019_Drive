@@ -70,11 +70,6 @@ void FRC2019_Robot::Robot_Claw::TimeChange(double dTime_s)
 	__super::TimeChange(dTime_s);
 }
 
-void FRC2019_Robot::Robot_Claw::CloseClaw(bool Close)
-{
-	m_pParent->m_RobotControl->CloseSolenoid(eClaw,Close);
-}
-
 void FRC2019_Robot::Robot_Claw::Grip(bool on)
 {
 	m_Grip=on;
@@ -91,18 +86,46 @@ void FRC2019_Robot::Robot_Claw::BindAdditionalEventControls(bool Bind)
 	if (Bind)
 	{
 		em->EventValue_Map["Claw_SetCurrentVelocity"].Subscribe(ehl,*this, &FRC2019_Robot::Robot_Claw::SetRequestedVelocity_FromNormalized);
-		em->EventOnOff_Map["Claw_Close"].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Claw::CloseClaw);
 		em->EventOnOff_Map["Claw_Grip"].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Claw::Grip);
 		em->EventOnOff_Map["Claw_Squirt"].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Claw::Squirt);
 	}
 	else
 	{
 		em->EventValue_Map["Claw_SetCurrentVelocity"].Remove(*this, &FRC2019_Robot::Robot_Claw::SetRequestedVelocity_FromNormalized);
-		em->EventOnOff_Map["Claw_Close"]  .Remove(*this, &FRC2019_Robot::Robot_Claw::CloseClaw);
 		em->EventOnOff_Map["Claw_Grip"]  .Remove(*this, &FRC2019_Robot::Robot_Claw::Grip);
 		em->EventOnOff_Map["Claw_Squirt"]  .Remove(*this, &FRC2019_Robot::Robot_Claw::Squirt);
 	}
 }
+
+  /***********************************************************************************************************************************/
+ /*													FRC2019_Robot::Robot_Arm_Manager												*/
+/***********************************************************************************************************************************/
+
+class FRC2019_Robot::Robot_Arm_Manager
+{
+private:
+	Robot_Arm *m_pParent;
+public: 
+	Robot_Arm_Manager(Robot_Arm *parent) : m_pParent(parent)
+	{
+	}
+	void TimeChange(double dTime_s)
+	{
+	}
+	//Currently these are all manual, but I'll convert into goals, and we can macro flip them
+	void CloseIntake(bool Close)
+	{
+		m_pParent->m_pParent->m_RobotControl->CloseSolenoid(eIntakeDeploy, Close);
+	}
+	void CloseHatchDeploy(bool Close)
+	{
+		m_pParent->m_pParent->m_RobotControl->CloseSolenoid(eHatchDeploy, Close);
+	}
+	void CloseHatchGrabDeploy(bool Close)
+	{
+		m_pParent->m_pParent->m_RobotControl->CloseSolenoid(eHatchGrabDeploy, Close);
+	}
+};
 
   /***********************************************************************************************************************************/
  /*													FRC2019_Robot::Robot_Arm														*/
@@ -111,6 +134,7 @@ void FRC2019_Robot::Robot_Claw::BindAdditionalEventControls(bool Bind)
 FRC2019_Robot::Robot_Arm::Robot_Arm(FRC2019_Robot *parent,Rotary_Control_Interface *robot_control) : 
 	Rotary_Position_Control("Arm",robot_control,eArm),m_pParent(parent),m_Advance(false),m_Retract(false)
 {
+	m_RobotArmManager = std::make_shared<FRC2019_Robot::Robot_Arm_Manager>(this);
 }
 
 void FRC2019_Robot::Robot_Arm::TimeChange(double dTime_s)
@@ -122,29 +146,9 @@ void FRC2019_Robot::Robot_Arm::TimeChange(double dTime_s)
 	if (m_Advance ^ m_Retract)
 		SetCurrentLinearAcceleration(m_Advance?Accel:-Brake);
 
+	m_RobotArmManager->TimeChange(dTime_s);
 	__super::TimeChange(dTime_s);
-	#if 0
-	#ifdef __DebugLUA__
-	Dout(m_pParent->m_RobotProps.GetIntakeDeploymentProps().GetRotaryProps().Feedback_DiplayRow,7,"p%.1f",RAD_2_DEG(GetPos_m()));
-	#endif
-	#endif
-	#ifdef Robot_TesterCode
-	const FRC2019_Robot_Props &props=m_pParent->GetRobotProps().GetFRC2019RobotProps();
-	const double c_GearToArmRatio=1.0/props.ArmToGearRatio;
-	double Pos_m=GetPos_m();
-	double height=AngleToHeight_m(Pos_m);
-	DOUT4("Arm=%f Angle=%f %fft %fin",m_Physics.GetVelocity(),RAD_2_DEG(Pos_m*c_GearToArmRatio),height*3.2808399,height*39.3700787);
-	#endif
 	}
-
-double FRC2019_Robot::Robot_Arm::GetPosRest()
-{
-	return 0.0;
-}
-void FRC2019_Robot::Robot_Arm::CloseRist(bool Close)
-{
-	m_pParent->m_RobotControl->CloseSolenoid(eRist,Close);
-}
 
 void FRC2019_Robot::Robot_Arm::SetRequestedVelocity_FromNormalized(double Velocity)
 { 
@@ -156,7 +160,9 @@ void FRC2019_Robot::Robot_Arm::SetRequestedVelocity_FromNormalized(double Veloci
 //Declare event names for arm
 const char *csz_Arm_SetPosRest = "Arm_SetPosRest";
 const char *csz_Arm_SetPosHatch = "Arm_SetPoshatch";
-
+const char *csz_Arm_IntakeDeploy = "Arm_IntakeDeploy";
+const char *csz_Arm_HatchDeploy = "Arm_HatchDeploy";
+const char *csz_Arm_HatchGrabDeploy = "Arm_HatchGrabDeploy";
 
 void FRC2019_Robot::Robot_Arm::BindAdditionalEventControls(bool Bind)
 {
@@ -181,15 +187,21 @@ void FRC2019_Robot::Robot_Arm::BindAdditionalEventControls(bool Bind)
 			{	m_Retract = on;
 			});
 
-		em->EventOnOff_Map["Arm_Rist"].Subscribe(ehl, *this, &FRC2019_Robot::Robot_Arm::CloseRist);
+		em->EventOnOff_Map[csz_Arm_IntakeDeploy].Subscribe([&](bool on)
+			{	m_RobotArmManager->CloseIntake(on);
+			});
+		em->EventOnOff_Map[csz_Arm_HatchDeploy].Subscribe([&](bool on)
+			{	m_RobotArmManager->CloseHatchDeploy(on);
+			});
+		em->EventOnOff_Map[csz_Arm_HatchGrabDeploy].Subscribe([&](bool on)
+			{	m_RobotArmManager->CloseHatchGrabDeploy(on);
+			});
 	}
 	else
 	{
 		//Note: I'm not going to worry about removing V2 events because these will auto cleanup
 		em->EventValue_Map["Arm_SetCurrentVelocity"].Remove(*this, &FRC2019_Robot::Robot_Arm::SetRequestedVelocity_FromNormalized);
 		em->EventOnOff_Map["Arm_SetPotentiometerSafety"].Remove(*this, &FRC2019_Robot::Robot_Arm::SetPotentiometerSafety);
-
-		em->EventOnOff_Map["Arm_Rist"]  .Remove(*this, &FRC2019_Robot::Robot_Arm::CloseRist);
 	}
 }
 
@@ -262,7 +274,7 @@ void FRC2019_Robot::TimeChange(double dTime_s)
 
 void FRC2019_Robot::CloseDeploymentDoor(bool Close)
 {
-	m_RobotControl->CloseSolenoid(eDeployment,Close);
+	m_RobotControl->CloseSolenoid(eWedgeDeploy,Close);
 }
 
 void FRC2019_Robot::BindAdditionalEventControls(bool Bind)
@@ -393,11 +405,11 @@ FRC2019_Robot_Properties::FRC2019_Robot_Properties() : m_RobotControls(&s_Contro
 //declared as global to avoid allocation on stack each iteration
 const char * const g_FRC2019_Controls_Events[] = 
 {
-	"Claw_SetCurrentVelocity","Claw_Close",
+	"Claw_SetCurrentVelocity",
 	"Claw_Grip","Claw_Squirt",
 	"Arm_SetCurrentVelocity","Arm_SetPotentiometerSafety",
-	csz_Arm_SetPosRest,csz_Arm_SetPosHatch,
-	"Arm_Rist","Arm_Advance","Arm_Retract",
+	csz_Arm_SetPosRest,csz_Arm_SetPosHatch,csz_Arm_HatchGrabDeploy,
+	csz_Arm_IntakeDeploy,csz_Arm_HatchDeploy,"Arm_Advance","Arm_Retract",
 	"Robot_CloseDoor",
 	"TestAuton","StopAuton"
 };
@@ -518,29 +530,23 @@ void FRC2019_Robot_Control::CloseSolenoid(size_t index,bool Close)
 {
 	switch (index)
 	{
-		case FRC2019_Robot::eDeployment:
-			//DebugOutput("CloseDeploymentDoor=%d\n",Close);
-			m_Deployment=Close;
-			SmartDashboard::PutBoolean("Deployment",m_Deployment);
+		case FRC2019_Robot::eWedgeDeploy:
+			SmartDashboard::PutBoolean("Wedge", Close);
 			break;
-		case FRC2019_Robot::eClaw:
-			//DebugOutput("CloseClaw=%d\n",Close);
-			m_Claw=Close;
-			SmartDashboard::PutBoolean("Claw",m_Claw);
-			//This was used to test error with the potentiometer
-			//m_Potentiometer.SetBypass(Close);
+		case FRC2019_Robot::eHatchDeploy:
+			SmartDashboard::PutBoolean("Hatch", Close);
 			break;
-		case FRC2019_Robot::eRist:
-			//DebugOutput("CloseRist=%d\n",Close);
-			m_Rist=Close;
-			SmartDashboard::PutBoolean("Wrist",m_Rist);
+		case FRC2019_Robot::eHatchGrabDeploy:
+			SmartDashboard::PutBoolean("HatchGrip", Close);
+			break;
+		case FRC2019_Robot::eIntakeDeploy:
+			SmartDashboard::PutBoolean("Intake", Close);
 			break;
 	}
 }
 
 
-FRC2019_Robot_Control::FRC2019_Robot_Control(bool UseSafety) : m_pTankRobotControl(&m_TankRobotControl),
-	m_Deployment(false),m_Claw(false),m_Rist(false)
+FRC2019_Robot_Control::FRC2019_Robot_Control(bool UseSafety) : m_pTankRobotControl(&m_TankRobotControl)
 {
 	//depreciated once we had smart dashboard
 	//m_TankRobotControl.SetDisplayVoltage(false); //disable display there so we can do it here
@@ -632,14 +638,6 @@ void FRC2019_Robot_Control::Robot_Control_TimeChange(double dTime_s)
 	#ifdef _Win32
 	m_Potentiometer.SetTimeDelta(dTime_s);
 	#endif
-	//depreciated once we had smart dashboard
-	//display voltages
-	//DOUT2("l=%f r=%f a=%f r=%f D%dC%dR%d\n",m_TankRobotControl.GetLeftVoltage(),m_TankRobotControl.GetRightVoltage(),m_ArmVoltage,m_RollerVoltage,
-	//	m_Deployment,m_Claw,m_Rist
-	//	);
-	//These are no longer placed here
-	//SmartDashboard::PutNumber("ArmVoltage",m_ArmVoltage);
-	//SmartDashboard::PutNumber("RollerVoltage",m_RollerVoltage);
 }
 
 //void Robot_Control::UpdateVoltage(size_t index,double Voltage)

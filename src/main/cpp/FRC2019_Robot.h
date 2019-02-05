@@ -86,9 +86,10 @@ class FRC2019_Robot : public Tank_Robot
 	public:
 		enum SolenoidDevices
 		{
-			eDeployment,
-			eClaw,
-			eRist
+			eWedgeDeploy,
+			eIntakeDeploy,
+			eHatchDeploy,
+			eHatchGrabDeploy
 		};
 		enum SpeedControllerDevices
 		{
@@ -124,8 +125,6 @@ class FRC2019_Robot : public Tank_Robot
 			public:
 				Robot_Claw(FRC2019_Robot *parent,Rotary_Control_Interface *robot_control);
 				IEvent::HandlerList ehl;
-				//public access needed for goals
-				void CloseClaw(bool Close);
 				//Using meaningful terms to assert the correct direction at this level
 				void Grip(bool on);
 				void Squirt(bool on);
@@ -142,14 +141,12 @@ class FRC2019_Robot : public Tank_Robot
 				FRC2019_Robot * const m_pParent;
 				bool m_Grip,m_Squirt;
 		};
+		class Robot_Arm_Manager;  //forward declare
 		class Robot_Arm : public Rotary_Position_Control
 		{
 			public:
 				Robot_Arm(FRC2019_Robot *parent,Rotary_Control_Interface *robot_control);
 				IEvent::HandlerList ehl;
-				//The parent needs to call initialize
-				double GetPosRest();
-				void CloseRist(bool Close);
 			protected:
 				//Intercept the time change to obtain current height as well as sending out the desired velocity
 				virtual void BindAdditionalEventControls(bool Bind);
@@ -163,8 +160,10 @@ class FRC2019_Robot : public Tank_Robot
 				#ifndef _Win32
 				typedef Rotary_Position_Control __super;
 				#endif
+				friend Robot_Arm_Manager;
 				FRC2019_Robot * const m_pParent;
 				bool m_Advance, m_Retract;
+				std::shared_ptr<Robot_Arm_Manager> m_RobotArmManager; //pointer to implementation
 		};
 
 		//Accessors needed for setting goals
@@ -271,9 +270,6 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		//Base::EventMap* m_EventMap=nullptr;  <---TODO see if we need this
 
 		double m_ArmMaxSpeed;
-		//cache voltage values for display   -Depreciated
-		//double m_ArmVoltage,m_RollerVoltage;
-		bool m_Deployment,m_Claw,m_Rist;
 	private:
 		//Note: these may be arrayed if we have more pots
 		KalmanFilter m_KalFilter_Arm;

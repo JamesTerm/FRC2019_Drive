@@ -1,5 +1,8 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="HatchGrip" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="111" y="310"/>
+	</widget>
 	<widget field="Show_Controls" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.CheckBox">
 		<location x="531" y="352"/>
 	</widget>
@@ -73,14 +76,14 @@
 	<widget field="Edit Position" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.CheckBox">
 		<location x="803" y="134"/>
 	</widget>
-	<widget field="Deployment" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
-		<location x="170" y="309"/>
+	<widget field="Wedge" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="242" y="311"/>
 	</widget>
-	<widget field="Claw" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
-		<location x="48" y="309"/>
+	<widget field="Hatch" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="50" y="310"/>
 	</widget>
-	<widget field="Wrist" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
-		<location x="118" y="310"/>
+	<widget field="Intake" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="186" y="310"/>
 	</widget>
 	<widget field="RollerVoltage" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
 		<location x="53" y="259"/>
