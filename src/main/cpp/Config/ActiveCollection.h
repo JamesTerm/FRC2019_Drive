@@ -22,6 +22,7 @@ Email: cooper.ryan@centaurisoftware.co
 #include "../Components/EncoderItem.h"
 #include "../Components/PotentiometerItem.h"
 #include "../Components/DoubleSolenoidItem.h"
+#include "../Components/DigitalInputItem.h"
 #include "../Components/NavX.h"
 
 using namespace std;

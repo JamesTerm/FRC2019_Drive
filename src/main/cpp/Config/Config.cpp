@@ -19,7 +19,6 @@ using namespace pugi;
 using namespace frc;
 
 /**
- * TODO: all of this stuff lol
  * Load in the document
  * Config Version and Comment (different from the Robot.cpp Version and Comment)
  * * Verbose Output: Need to give Ian the logging TODO first
@@ -28,14 +27,14 @@ using namespace frc;
  * * Vision Initialization -> need vision working with that
  * Allocate Components
  * Encoders
- * 	*DI
+ * DI
  *TODO *DO-> Write the abstraction classes
  *TODO:*AI-> Write the abstraction classes
  *TODO:*AO-> Write the abstraction classes
  *TODO: Lower and Upper Limit for DAI
  * Motors
- *?		Drive class integration? Probably Post-Season
- * 	*Solenoids
+ *?	Drive class integration? Probably Post-Season
+ * Solenoids
  *?	Relays
  * Potentiometers
  * *Allocate the Joysticks via the XML
@@ -180,8 +179,6 @@ void Config::AllocateComponents(xml_document &doc){
 
 #pragma endregion VictorSP
 
-//TODO: Support for VictorSPXPWM and TalonSRXPWM
-
 #pragma region VictorSPX
 
 	xml_node VictorSPX = robot.child("VictorSPX");
@@ -323,7 +320,30 @@ void Config::AllocateComponents(xml_document &doc){
 
 #pragma endregion DoubleSolenoid
 
-//TODO: DI
+#pragma region DigitalInput
+
+	xml_node DI = robot.child("DI");
+	if(DI){
+		for(xml_node di = DI.first_child(); di; di = di.next_sibling()){
+			string name = di.name();
+			xml_attribute channel = di.attribute("channel");
+			if(channel){
+				DigitalInputItem *tmp = new DigitalInputItem(channel.as_int(), name);
+				m_activeCollection->Add(tmp);
+				cout << "Added DigitalInput " << name << ", Channel: " << channel << endl;
+			}
+			else{
+				cout << "Failed to load DigitalInput " << name << ". This may cause a fatal runtime error!" << endl;
+			}
+		}
+	}
+	else{
+		cout << "DigitalInput definitions not found in config, skipping..." << endl;
+	}
+
+#pragma endregion DigitalInput
+
+//TODO: Support for VictorSPXPWM and TalonSRXPWM
 
 }
 
