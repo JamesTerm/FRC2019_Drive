@@ -237,7 +237,7 @@ MainRobot = {
 			
 			--Claw_SetCurrentVelocity  --not used
 			Arm_HatchDeploy =	 {type="joystick_button", key=6, keyboard='h', on_off=true},
-			Arm_HatchGrabDeploy={type="keyboard", key='o', on_off=true},
+			Arm_HatchGrabDeploy={type="joystick_button", key=3, keyboard='o', on_off=true},
 			Claw_Grip =		 {type="joystick_button", key=8, on_off=true},
 			--Claw_Squirt =	 {type="joystick_button", key=7, on_off=true},
 			Robot_CloseDoor= {type="joystick_button", key=9, keyboard='u', on_off=true}

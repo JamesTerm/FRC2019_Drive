@@ -177,8 +177,12 @@ private:
 			//otherwise we have to terminate and refresh with these new goals going in the other direction
 			if (m_Status == eActive)
 			{
-				if (m_Parent->m_IsIntakeDeployed == !IsStowed) 
+				if (m_Parent->m_IsIntakeDeployed == !IsStowed)
+				{
+					m_Status = eInactive;  //mark inactive... because the work is already done
+					m_Parent->m_GoalActive[eIntake] = false;
 					return;  //no work to do
+				}
 				else
 					Terminate();
 			}
@@ -235,8 +239,12 @@ private:
 			//otherwise we have to terminate and refresh with these new goals going in the other direction
 			if (m_Status == eActive)
 			{
-				if (m_Parent->m_IsHatchDeployed == !IsStowed) 
+				if (m_Parent->m_IsHatchDeployed == !IsStowed)
+				{
+					m_Status = eInactive;  //mark inactive... because the work is already done
+					m_Parent->m_GoalActive[eHatch] = false;
 					return;  //no work to do
+				}
 				else
 					Terminate();
 			}
@@ -297,7 +305,11 @@ private:
 			if (m_Status == eActive)
 			{
 				if (m_Parent->m_IsHatchGrabExpanded == !IsStowed)
+				{
+					m_Status = eInactive;  //mark inactive... because the work is already done
+					m_Parent->m_GoalActive[eHatchGrab] = false;
 					return;  //no work to do
+				}
 				else
 					Terminate();
 			}
