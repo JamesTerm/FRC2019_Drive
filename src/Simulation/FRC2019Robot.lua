@@ -149,6 +149,10 @@ MainRobot = {
 	},
 	robot_settings =
 	{
+		--These heights represent elevator height which correspond to height observed- Change as needed
+		hatch1_height=5,
+		hatch2_height=33,
+		hatch3_height=61.5,   --max height (and falls short but is ok)
 		arm =
 		{
 			is_closed=1,
@@ -164,16 +168,25 @@ MainRobot = {
 			voltage_multiply=1.0,			--May be reversed
 			encoder_to_wheel_ratio=1.0,
 			Arm_SetPotentiometerSafety=true,	
-			max_speed=8.8,	--loaded max speed (see sheet) which is 2.69 rps
-			accel=10.0,						--We may indeed have a two button solution (match with max accel)
+			-- Using speed of 14400, about 0.15 nm of torque (about 21 oz-in)
+			-- 8:50 1st stage = 0.16
+			-- 18:24 2nd stage = 0.75
+			-- 32:52 3rd stage = 0.62
+			-- 4608/62400 / 192/192= 24 / 325 final gear ratio
+			-- 14400 / 60 = 240 * gr = 17.72 rps
+			-- to linear is pi * d (1.26) = 3.95 inch per revolution
+			-- =69.994 about 70 ips
+			-- We should achieve full scale less than a second
+			max_speed=70,	
+			accel=100.0,						--todo find out why this has to be so much greater
 			brake=10.0,
-			max_accel_forward=24,			--just go with what feels right (up may need more)
-			max_accel_reverse=24,
+			max_accel_forward=140,			--just go with what feels right (up may need more)
+			max_accel_reverse=140,
 			predict_up=.200,
 			predict_down=.200,
 			using_range=1,					--Warning Only use range if we have a potentiometer!
 			--These min/max in inch units
-			max_range= 36,
+			max_range= 61.5,  --confirmed range
 			--Note the sketch used -43.33, but tests on actual assembly show -46.12
 			min_range= 0,
 			pot_offset=0,
@@ -181,6 +194,7 @@ MainRobot = {
 			use_aggressive_stop = 'yes',
 			forward_deadzone=0.37,
 			reverse_deadzone=0.37,
+			--TODO 775 pro, but not needed for current simulated pot
 			motor_specs =
 			{
 				wheel_mass=Pounds2Kilograms * 16.27,
