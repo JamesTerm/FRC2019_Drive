@@ -37,7 +37,7 @@ class VisionTarget
     }
     const int compareRadius(VisionTarget *target)
     {
-        return -(Radius - target->getRadius());
+        return (Radius - target->getRadius());
     }
 
   private:

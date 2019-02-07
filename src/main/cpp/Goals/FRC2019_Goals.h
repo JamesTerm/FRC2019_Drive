@@ -181,8 +181,8 @@ private:
   bool HasTarget;
 
   //constants for motor speeds. These are multiplied by vision error
-  const int TURN_KP = 0.005; //?guess for right now
-  const int STRAIGHT_KP = 0.01; //?guess for right now
+  const double TURN_KP = 0.0025; //?guess for right now
+  const double STRAIGHT_KP = 0.05; //?guess for right now
 
   nt::NetworkTableInstance m_inst;        //!Network tables
   shared_ptr<NetworkTable> m_visionTable; //!Vision table

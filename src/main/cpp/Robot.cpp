@@ -46,14 +46,14 @@ void Robot::RobotInit()
 
 	//TODO: put this in some sort of config
 	m_visionTable->PutNumber("LS",0);
-	m_visionTable->PutNumber("US",16);
-	m_visionTable->PutNumber("LH",72);
-	m_visionTable->PutNumber("UH",115);
+	m_visionTable->PutNumber("US",3);
+	m_visionTable->PutNumber("LH",87);
+	m_visionTable->PutNumber("UH",126);
 	m_visionTable->PutNumber("LV",255);
 	m_visionTable->PutNumber("UV",255);
-	m_visionTable->PutNumber("MinA",7420);
-	m_visionTable->PutNumber("MaxA",17694);
-	m_visionTable->PutNumber("MaxO",146);
+	m_visionTable->PutNumber("MinA",1112);
+	m_visionTable->PutNumber("MaxA",82763);
+	m_visionTable->PutNumber("MaxO",62);
 }
 
 /*

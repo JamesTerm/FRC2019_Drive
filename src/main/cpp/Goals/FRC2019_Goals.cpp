@@ -219,35 +219,39 @@ Goal::Goal_Status Goal_VisionAlign::Process(double dTime)
         return m_Status = eFailed;
     }
     updateVision();
-    cout << m_currentTarget->getX() << " " << m_currentTarget->getY() << " " << m_currentTarget->getRadius() << " " << Height << " " << Width << endl;
-    if(!HasTarget) return m_Status = eFailed;
+    cout << m_currentTarget->getX() << " " << m_currentTarget->getY() << " " << m_currentTarget->getRadius() << " " << Height << " " << Width << HasTarget << endl;
+    if(!HasTarget) 
+    {
+        cout << "no target" << endl;
+        StopDrive(m_activeCollection);
+        return m_Status = eActive; //!return failed for real thing or search
+    }
     if(m_target->compareX(m_currentTarget) < -20) 
     {
+        cout << "turn left" << endl;
         SetDrive(m_target->compareX(m_currentTarget) * TURN_KP,-(m_target->compareX(m_currentTarget) * TURN_KP),m_activeCollection);
     }
     else if(m_target->compareX(m_currentTarget) > 20)
     {
+        cout << "turn right" << endl;
         SetDrive(m_target->compareX(m_currentTarget) * TURN_KP,-(m_target->compareX(m_currentTarget) * TURN_KP),m_activeCollection);
     }
     else
     {
-        if(m_target->compareRadius(m_currentTarget) < -20)
+        if(m_target->compareRadius(m_currentTarget) < -2 || m_target->compareRadius(m_currentTarget) > 2)
         {
-            SetDrive(m_target->compareRadius(m_currentTarget) * STRAIGHT_KP,-(m_target->compareRadius(m_currentTarget) * STRAIGHT_KP),m_activeCollection);
-        }
-        else if(m_target->compareRadius(m_currentTarget) < -20)
-        {
-            SetDrive(m_target->compareRadius(m_currentTarget) * STRAIGHT_KP,-(m_target->compareRadius(m_currentTarget) * STRAIGHT_KP),m_activeCollection);
+            cout << "drive" << endl;
+            SetDrive(m_target->compareRadius(m_currentTarget) * STRAIGHT_KP,(m_target->compareRadius(m_currentTarget) * STRAIGHT_KP),m_activeCollection);
         }
         else
         {
             cout << "aligned" << endl;
             Terminate();
-            return m_Status = eCompleted;
+            //return m_Status = eCompleted;
         }
         
     }
-    cout << "nothing" << endl;
+    //cout << "nothing" << endl;
     return m_Status = eActive;
 
 }
