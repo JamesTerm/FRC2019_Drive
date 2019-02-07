@@ -6,6 +6,7 @@ class AutonMain;
 class RobotTester
 {
 public:
+	void RobotTester_create(void); //separate creation and calling init() to allow setting hooks
 	void RobotTester_init(void);  // allows the declaration to remain here
 	void Test(int test);
 	void StartStreaming();

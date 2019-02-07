@@ -197,9 +197,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//We made it this far... start up the robot
 	RobotTester _robot_tester;
 	s_pRobotTester = &_robot_tester;
-	_robot_tester.RobotTester_init();
+	_robot_tester.RobotTester_create();
 	//Bind robot for Keyboard binding
 	BindRobot(_robot_tester);
+	_robot_tester.RobotTester_init();
 	ShowWindow(m_hDlg, nCmdShow);
 	UpdateWindow(m_hDlg);
 

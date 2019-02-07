@@ -184,10 +184,13 @@ void RobotTester_Internal::StartStreaming()
 	}
 }
 
+void RobotTester::RobotTester_create(void)
+{
+	m_p_RobotTester = std::make_shared<RobotTester_Internal>();
+}
 
 void RobotTester::RobotTester_init()
 {
-	m_p_RobotTester = std::make_shared<RobotTester_Internal>();
 	m_p_RobotTester->InitRobot();  //go ahead and init
 }
 
