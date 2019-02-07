@@ -16,12 +16,14 @@
 #include "Systems/Drive.h"
 #include "Controls/AxisControl.h"
 #include "Autonomi/Autons.h"
+#include "Util/Log.h"
 
 using namespace frc;
 using namespace System;
 using namespace Controls;
 using namespace Configuration;
 using namespace Autonomi;
+using namespace Logger;
 
 #define VERSION 1 //!< Defines the program version for the entire program.
 #define REVISION "A" //!< Defines the revision of this version of the program.

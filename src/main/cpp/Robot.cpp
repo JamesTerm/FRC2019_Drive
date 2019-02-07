@@ -36,6 +36,11 @@ using namespace std;
 		cout << "Program Version: " << VERSION << " Revision: " << REVISION << endl;
 		//CameraServer::GetInstance()->StartAutomaticCapture();
 		Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
+
+		Log::restartfile();
+		Log::Error("This is an error");
+		Log::Warinig("This is a warning");
+		Log::General("This is a log");
 	}
 
 	/**
