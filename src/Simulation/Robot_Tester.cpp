@@ -81,6 +81,7 @@ void SetCommandPromptCallback(std::function<std::string(void)> callback)
 void CommandLineInterface()
 {
 	RobotTester _robot_tester;
+	_robot_tester.RobotTester_create();
 	_robot_tester.RobotTester_init();
 
 	using namespace std;
