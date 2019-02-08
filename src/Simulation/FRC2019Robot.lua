@@ -31,14 +31,15 @@ MainRobot = {
 		--by default module is 1, so only really need it for 2
 		victor_sp =
 		{
-			id_1 = { name= "right_drive_1", channel=1}, 
-			id_2 = { name= "right_drive_2", channel=2}, 
-			id_3 = { name= "right_drive_3", channel=3}, 
-			id_4 = { name="left_drive_1", channel=4},
-			id_5 = { name="left_drive_2", channel=5},
-			id_6 = { name="left_drive_3", channel=6},
-			id_7= { name="arm", channel=7}
+			-- id_1 = { name= "right_drive_1", channel=1}, 
+			-- id_2 = { name= "right_drive_2", channel=2}, 
+			-- id_3 = { name= "right_drive_3", channel=3}, 
+			-- id_4 = { name="left_drive_1", channel=4},
+			-- id_5 = { name="left_drive_2", channel=5},
+			-- id_6 = { name="left_drive_3", channel=6},
+			-- id_7= { name="arm", channel=7}
 			--If we decide we need more power we can assign these
+			id_1= { name="arm", channel=7}
 		},
 		-- relay =
 		-- {
@@ -225,10 +226,11 @@ MainRobot = {
 	},
 	controls =
 	{
-		slotlist = {slot_1="logitech dual action"},
+		--slotlist = {slot_1="operator"},
+		slotlist = {slot_1="driver",slot_2="operator"},
 		Joystick_1 =
 		{
-			control = "logitech dual action",
+			control = "developer",
 			--Joystick_SetLeftVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
 			--Joystick_SetRightVelocity = {type="joystick_analog", key=5, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
 			--Analog_Turn = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
@@ -259,52 +261,38 @@ MainRobot = {
 		
 		Joystick_2 =
 		{
-			control = "airflo",
+			control = "driver",
 			--Joystick_SetLeftVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
-			--Joystick_SetRightVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
-			Analog_Turn = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
-			Joystick_SetCurrentSpeed_2 = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			--Joystick_SetRightVelocity = {type="joystick_analog", key=5, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
+			--Analog_Turn = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
+			--Joystick_SetCurrentSpeed_2 = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			-- Joystick_FieldCentric_XAxis = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
+			-- Joystick_FieldCentric_YAxis = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			-- Analog_Turn = {type="joystick_analog", key=5, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
+			-- FieldCentric_Enable = {type="joystick_button", key=4, on_off=false},
+
 			--scaled down to 0.5 to allow fine tuning and a good top acceleration speed (may change with the lua script tweaks)
-			POV_Turn =  {type="joystick_analog", key=8, is_flipped=false, multiplier=1.0, filter=0.0, curve_intensity=0.0},
-			--Turn_180 = {type="joystick_button", key=7, on_off=false},
-			
-			Arm_SetPos0feet = {type="joystick_button", key=1, keyboard='y', on_off=false},
-			Arm_SetPos3feet = {type="joystick_button", key=3, keyboard='u', on_off=false},
-			Arm_SetPos6feet = {type="joystick_button", key=2, keyboard='l', on_off=false},
-			Arm_SetPos9feet = {type="joystick_button", key=4, keyboard=';', on_off=false},
-			Arm_SetCurrentVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=0.6, filter=0.1, curve_intensity=3.0},
-			Arm_Rist={type="joystick_button", key=5, keyboard='r', on_off=true},
-			Arm_Advance={type="keyboard", key='k', on_off=true},
-			Arm_Retract={type="keyboard", key='j', on_off=true},
-			
-			--Claw_SetCurrentVelocity  --not used
-			Claw_Close =	 {type="joystick_button", key=6, keyboard='c', on_off=true},
-			Claw_Grip =		 {type="joystick_button", key=8, keyboard='i', on_off=true},
-			Claw_Squirt =	 {type="joystick_button", key=7, keyboard='h', on_off=true},
-			Robot_CloseDoor= {type="joystick_button", key=9, keyboard='o', on_off=true}
+			-- POV_Turn =  {type="joystick_analog", key=8, is_flipped=false, multiplier=1.0, filter=0.0, curve_intensity=0.0},
+			-- Turn_180 = {type="joystick_button", key=7, on_off=false},
 		},
 
 		Joystick_3 =
 		{
-			control = "gamepad f310 (controller)",
-			Analog_Turn = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
-			Joystick_SetCurrentSpeed_2 = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
-			--scaled down to 0.5 to allow fine tuning and a good top acceleration speed (may change with the lua script tweaks)
-			POV_Turn =  {type="joystick_analog", key=8, is_flipped=false, multiplier=1.0, filter=0.0, curve_intensity=0.0},
-			--Turn_180 = {type="joystick_button", key=7, on_off=false},
+			control = "operator",
 			
-			Arm_SetPos0feet = {type="joystick_button", key=1, on_off=false},
-			Arm_SetPos3feet = {type="joystick_button", key=3, on_off=false},
-			Arm_SetPos6feet = {type="joystick_button", key=2, on_off=false},
-			Arm_SetPos9feet = {type="joystick_button", key=4, on_off=false},
-			Arm_SetCurrentVelocity = {type="joystick_analog", key=4, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
-			Arm_Rist={type="joystick_button", key=5, on_off=true},
+			Arm_SetPosRest = {type="joystick_button", key=2, keyboard='l', on_off=false},
+			Arm_SetPoshatch = {type="joystick_button", key=1, keyboard=';', on_off=false},
+			Arm_SetCurrentVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			Arm_IntakeDeploy={type="joystick_button", key=5, keyboard='i', on_off=true},
+			Arm_Advance={type="keyboard", key='k', on_off=true},
+			Arm_Retract={type="keyboard", key='j', on_off=true},
 			
-			Claw_SetCurrentVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
-			Claw_Close =	 {type="joystick_button", key=6, on_off=true},
-			Claw_Grip =		 {type="joystick_button", key=9, on_off=true},
-			Claw_Squirt =	 {type="joystick_button", key=7, on_off=true},
-			Robot_CloseDoor= {type="joystick_button", key=8, on_off=true}
+			--Claw_SetCurrentVelocity  --not used
+			Arm_HatchDeploy =	 {type="joystick_button", key=6, keyboard='h', on_off=true},
+			Arm_HatchGrabDeploy={type="joystick_button", key=3, keyboard='o', on_off=true},
+			Claw_Grip =		 {type="joystick_button", key=8, on_off=true},
+			--Claw_Squirt =	 {type="joystick_button", key=7, on_off=true},
+			Robot_CloseDoor= {type="joystick_button", key=9, keyboard='u', on_off=true}
 		},
 	},
 		

@@ -104,6 +104,7 @@ void Robot::OperatorControl()
 		Wait(0.010);
 	}
 	#else
+	cout << "Teleoperation Started." << endl;
 	double LastTime = GetTime();
 	//We can test teleop auton goals here a bit later
 	while (IsOperatorControl() && !IsDisabled())
@@ -118,6 +119,7 @@ void Robot::OperatorControl()
 		#else
 		m_Robot.Update(0.01);  //It's best to use sythetic time for simulation to step through code
 		#endif
+		m_drive->Update();
 		//using this from test runs from robo wranglers code
 		Wait(0.010);
 	}
