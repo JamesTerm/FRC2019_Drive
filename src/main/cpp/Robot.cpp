@@ -47,6 +47,7 @@ void Robot::RobotInit()
 	Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
 	//Must have this for smartdashboard to work properly
 	SmartDashboard::init();
+	m_Robot.AutonMain_init("FRC2019Robot.lua", m_activeCollection);
 }
 
 /*
@@ -95,28 +96,17 @@ void Robot::Autonomous()
  */
 void Robot::OperatorControl()
 {
+	#if 0
 	cout << "Teleoperation Started." << endl;
 	while (IsOperatorControl() && !IsDisabled())
 	{
 		m_drive->Update();
 		Wait(0.010);
 	}
-}
-
-/*
- * Called when the Test period starts
- */
-#include "AutonMain.h"
-
-void Robot::Test()
-{
-	//Fow now keep this detached from manual solution... can macro define it later
-	AutonMain m_Robot;
-	m_Robot.AutonMain_init("FRC2019Robot.lua",m_activeCollection);
-	
+	#else
 	double LastTime = GetTime();
 	//We can test teleop auton goals here a bit later
-	while (IsTest() && !IsDisabled())
+	while (IsOperatorControl() && !IsDisabled())
 	{
 		const double CurrentTime = GetTime();
 		const double DeltaTime = CurrentTime - LastTime;
@@ -131,6 +121,14 @@ void Robot::Test()
 		//using this from test runs from robo wranglers code
 		Wait(0.010);
 	}
+	#endif
+}
+
+/*
+ * Called when the Test period starts
+ */
+void Robot::Test()
+{
 }
 
 START_ROBOT_CLASS(Robot) //!< This identifies Robot as the main Robot starting class

@@ -158,8 +158,8 @@ public:
 			assert(false);
 		}
 
-		//start in auton (can manage this later)
-		SmartDashboard::SetDefaultBoolean("Test_Auton", true);
+		//start in tele... if auton is handled it can be called explicitly
+		SmartDashboard::SetDefaultBoolean("Test_Auton", false);
 		SmartDashboard::SetDefaultNumber("AutonTest", 0.0);
 	}
 	AutonMain_Internal(AutonMain *parent,const char *RobotLua, Configuration::ActiveCollection *Collection) : m_pParent(parent),
