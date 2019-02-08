@@ -26,9 +26,9 @@ namespace Logger
     	{
         	public:
 				static void Error(string message);
-				static void General(string message, bool toDriverStation);
-				static void General(string message);
-				static void Warinig(string message);
+				static void General(string message, bool toDriverStation = false);
+				//, bool toDriverStation);
+				static void Warning(string message);
 				static void restartfile();
 			private:
 				//static const string filename;

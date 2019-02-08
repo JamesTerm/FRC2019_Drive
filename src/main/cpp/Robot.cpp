@@ -32,15 +32,10 @@ using namespace std;
 	 */
 	void Robot::RobotInit()
 	{
-
+		Log::restartfile();
 		cout << "Program Version: " << VERSION << " Revision: " << REVISION << endl;
 		//CameraServer::GetInstance()->StartAutomaticCapture();
 		Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
-
-		Log::restartfile();
-		Log::Error("This is an error");
-		Log::Warinig("This is a warning");
-		Log::General("This is a log");
 	}
 
 	/**
@@ -74,6 +69,9 @@ using namespace std;
 		while (IsOperatorControl() && !IsDisabled())
 		{
 			m_drive->Update();
+			Log::Error("This is an error");
+			Log::Warning("This is a warning");
+			Log::General("This is a Log", true);
 			Wait(0.010);
 		}
 	}
