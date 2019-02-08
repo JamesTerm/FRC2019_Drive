@@ -2,7 +2,7 @@
 #include "Robot_Tester.h"
 
 #include "../main/cpp/Config/ActiveCollection.h"
-#include "../main/cpp/AutonMain.h"
+#include "../main/cpp/RobotAssem.h"
 
 void SetCommandPromptCallback(std::function<std::string(void)> callback);  //allow this code to manipulate the command prompt
 std::string DefaultCommandPrompt();  //set back for proper closing
@@ -19,7 +19,7 @@ const char * const csz_GameMode_Enum[] =
 	"Auton","TeleOp","Test"
 };
 
-void SetParentBindCallback(std::function<void(AutonMain *,bool)> callback);
+void SetParentBindCallback(std::function<void(RobotAssem *,bool)> callback);
 
 class RobotTester_Internal
 {
@@ -34,9 +34,9 @@ private:
 		eTest
 	} m_GameMode= eTeleop;  //default is like it is on the driver station
 	bool m_DisplayControls = false;
-	AutonMain *m_pAutonMain=nullptr;  //this is dynamic so we must always check for null
+	RobotAssem *m_pRobotAssem=nullptr;  //this is dynamic so we must always check for null
 	bool m_HookSamples = false; //cache incase the call is made while robot is not available
-	std::function<void(AutonMain *,bool)> m_ParentBind = nullptr;
+	std::function<void(RobotAssem *,bool)> m_ParentBind = nullptr;
 public:
 	RobotTester_Internal()
 	{
@@ -53,15 +53,15 @@ public:
 			return m_DisplayControls;
 		});
 		SetParentBindCallback(
-			[&](AutonMain *instance, bool PropertiesBound)
+			[&](RobotAssem *instance, bool PropertiesBound)
 		{
 			//call parent first if available
 			if (m_ParentBind)
 				m_ParentBind(instance,PropertiesBound);
 			if (PropertiesBound)
 			{
-				m_pAutonMain = instance;
-				if (m_pAutonMain == nullptr)
+				m_pRobotAssem = instance;
+				if (m_pRobotAssem == nullptr)
 					m_HookSamples = false;  //unhook if we are being destroyed (pedantic)
 				HookSampleGoals(m_HookSamples);
 			}
@@ -76,7 +76,7 @@ public:
 	}
 
 
-	void RobotTester_SetParentBindCallback(std::function<void(AutonMain *,bool)> callback)
+	void RobotTester_SetParentBindCallback(std::function<void(RobotAssem *,bool)> callback)
 	{
 		m_ParentBind = callback;
 	}
@@ -120,9 +120,9 @@ public:
 	void HookSampleGoals(bool hook=true)
 	{	
 		#if 0
-		if (m_pAutonMain)
+		if (m_pRobotAssem)
 		{
-			FRC2019_Robot *_pRobot = dynamic_cast<FRC2019_Robot *>(m_pAutonMain->GetRobot());
+			FRC2019_Robot *_pRobot = dynamic_cast<FRC2019_Robot *>(m_pRobotAssem->GetRobot());
 			if (hook)
 			{
 				_pRobot->SetTestAutonCallbackGoal(
@@ -227,7 +227,7 @@ void RobotTester::HookSampleGoals(bool hook)
 	m_p_RobotTester->HookSampleGoals(hook);
 }
 
-void RobotTester::RobotTester_SetParentBindCallback(std::function<void(AutonMain *,bool)> callback)
+void RobotTester::RobotTester_SetParentBindCallback(std::function<void(RobotAssem *,bool)> callback)
 {
 	m_p_RobotTester->RobotTester_SetParentBindCallback(callback);
 }

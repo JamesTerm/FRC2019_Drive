@@ -47,7 +47,7 @@ void Robot::RobotInit()
 	Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
 	//Must have this for smartdashboard to work properly
 	SmartDashboard::init();
-	m_Robot.AutonMain_init("FRC2019Robot.lua", m_activeCollection);
+	m_Robot.RobotAssem_init("FRC2019Robot.lua", m_activeCollection);
 }
 
 /*

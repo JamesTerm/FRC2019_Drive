@@ -40,17 +40,17 @@
 #include "Common/SmartDashboard.h"
 
 #include "Config/ActiveCollection.h"
-#include "AutonMain.h"
+#include "RobotAssem.h"
 
 
 #ifdef _Win32
-void DefaultParentBind(AutonMain *,bool)
+void DefaultParentBind(RobotAssem *,bool)
 {
 }
 
-static std::function<void(AutonMain *,bool)> s_ParentBind = DefaultParentBind;
+static std::function<void(RobotAssem *,bool)> s_ParentBind = DefaultParentBind;
 
-void SetParentBindCallback(std::function<void(AutonMain *,bool)> callback)
+void SetParentBindCallback(std::function<void(RobotAssem *,bool)> callback)
 {
 	s_ParentBind = callback;
 }
@@ -94,10 +94,10 @@ public:
 	//virtual void Initialize(const Entity_Properties *props)	{}
 };
 
-class AutonMain_Internal
+class RobotAssem_Internal
 {
 private:
-	AutonMain *m_pParent = nullptr;
+	RobotAssem *m_pParent = nullptr;
 #if 0
 	//keep around for diagnostics //taking away control stress
 	FRC_2019_Control m_Control;
@@ -162,7 +162,7 @@ public:
 		SmartDashboard::SetDefaultBoolean("Test_Auton", false);
 		SmartDashboard::SetDefaultNumber("AutonTest", 0.0);
 	}
-	AutonMain_Internal(AutonMain *parent,const char *RobotLua, Configuration::ActiveCollection *Collection) : m_pParent(parent),
+	RobotAssem_Internal(RobotAssem *parent,const char *RobotLua, Configuration::ActiveCollection *Collection) : m_pParent(parent),
 		m_Joystick(3,0),m_JoyBinder(m_Joystick), m_Collection(Collection)
 	{
 		m_LuaPath = RobotLua;
@@ -210,7 +210,7 @@ public:
 		//We can call init now:
 		InitRobot();
 	}
-	~AutonMain_Internal()
+	~RobotAssem_Internal()
 	{
 		//no longer binding... let parent know before destorying AutoMain
 		#ifdef _Win32
@@ -233,24 +233,24 @@ public:
 	Ship_Tester *GetRobot() { return m_pRobot; }
 };
 
-void AutonMain::AutonMain_init(const char *RobotLua, Configuration::ActiveCollection *Collection)
+void RobotAssem::RobotAssem_init(const char *RobotLua, Configuration::ActiveCollection *Collection)
 {
-	m_p_AutonMain = std::make_shared<AutonMain_Internal>(this, RobotLua, Collection);
-	m_p_AutonMain->Init_BindProperties();
+	m_p_RobotAssem = std::make_shared<RobotAssem_Internal>(this, RobotLua, Collection);
+	m_p_RobotAssem->Init_BindProperties();
 	#ifdef _Win32
 	//establish the second parent bind well after everything is set up
 	s_ParentBind(this, true);
 	#endif
 }
 
-void AutonMain::Update(double dTime_s)
+void RobotAssem::Update(double dTime_s)
 {
-	m_p_AutonMain->Update(dTime_s);
+	m_p_RobotAssem->Update(dTime_s);
 }
 
 #ifdef _Win32
-Ship_Tester *AutonMain::GetRobot()
+Ship_Tester *RobotAssem::GetRobot()
 {
-	return m_p_AutonMain->GetRobot();
+	return m_p_RobotAssem->GetRobot();
 }
 #endif

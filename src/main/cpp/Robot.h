@@ -18,7 +18,7 @@
 #include "Autonomi/Autons.h"
 #include "Goals/FRC2019_Goals.h"
 #include "Goals/GoalSelector.h"
-#include "AutonMain.h"
+#include "RobotAssem.h"
 
 using namespace frc;
 using namespace System;
@@ -46,5 +46,5 @@ class Robot : public SampleRobot
 	    ActiveCollection *m_activeCollection; //!< Pointer to the only instantiation of the ActiveCollection Class in the program
 	    const string m_driveStraight = "drive";
         MultitaskGoal_ac* m_masterGoal;
-		AutonMain m_Robot;
+		RobotAssem m_Robot;
 };

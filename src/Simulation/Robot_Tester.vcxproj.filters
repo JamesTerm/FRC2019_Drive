@@ -33,7 +33,7 @@
     <ClInclude Include="..\main\cpp\FRC2019_Robot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\cpp\AutonMain.h">
+    <ClInclude Include="..\main\cpp\RobotAssem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,7 +50,7 @@
     <ClCompile Include="..\main\cpp\FRC2019_Robot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\main\cpp\AutonMain.cpp">
+    <ClCompile Include="..\main\cpp\RobotAssem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

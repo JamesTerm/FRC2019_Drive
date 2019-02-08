@@ -254,7 +254,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 }
 
 
-//To bind the keyboard we'll need to access AutonMain and Eventmap
+//To bind the keyboard we'll need to access RobotAssem and Eventmap
 #include "../../main/cpp/Common/Entity_Properties.h"
 #include "../../main/cpp/Common/Physics_1D.h"
 #include "../../main/cpp/Common/Physics_2D.h"
@@ -264,9 +264,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 #include "../../main/cpp/Common/Ship.h"
 
 #include "../../main/cpp/Config/ActiveCollection.h"
-#include "../../main/cpp/AutonMain.h"
+#include "../../main/cpp/RobotAssem.h"
 #include "../../main/cpp/Common/SmartDashboard.h"
-AutonMain *s_RobotContainer=nullptr;
+RobotAssem *s_RobotContainer=nullptr;
 Keyboard *s_StagedKeyboard = nullptr;
 
 void BindKeyboard()
@@ -311,7 +311,7 @@ void SetupPreferences()
 void BindRobot(RobotTester &_robot_tester)
 {
 	_robot_tester.RobotTester_SetParentBindCallback(
-		[](AutonMain *instance, bool PropertiesBound)
+		[](RobotAssem *instance, bool PropertiesBound)
 	{
 		s_RobotContainer = instance;
 		if (!PropertiesBound)
