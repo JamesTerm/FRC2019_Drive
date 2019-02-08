@@ -1063,3 +1063,19 @@ double FRC2019_Robot_Control::GetRotaryCurrentPorV(size_t index)
 	return result;
 }
 #endif
+
+//Keeping around for any quick testing goals
+
+  /***********************************************************************************************************************************/
+ /*														FRC2019_Goals																*/
+/***********************************************************************************************************************************/
+
+Goal *FRC2019_Goals::Get_FRC2019_Autonomous(FRC2019_Robot *Robot)
+{
+	Goal_NotifyWhenComplete *MainGoal = new Goal_NotifyWhenComplete(*Robot->GetEventMap(), "Complete", "Failed");
+	//SmartDashboard::PutNumber("Sequence",1.0);  //ensure we are on the right sequence
+	//Inserted in reverse since this is LIFO stack list
+	//MainGoal->AddSubgoal(new FRC2019_Goals_Impl(*Robot));
+	//MainGoal->AddSubgoal(goal_waitforturret);
+	return MainGoal;
+}

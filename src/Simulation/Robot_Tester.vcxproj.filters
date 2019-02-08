@@ -47,13 +47,7 @@
     <ClCompile Include="RobotTester_Internal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\main\cpp\FRC2019_Goals.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\main\cpp\FRC2019_Robot.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\cpp\SampleGoals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\main\cpp\AutonMain.cpp">

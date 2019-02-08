@@ -119,8 +119,7 @@ public:
 	//Give command ability to switch to different set of goals
 	void HookSampleGoals(bool hook=true)
 	{	
-		m_HookSamples = hook;
-		//m_Robot.TestCommand(hook?"hook_samples":"default_goals");
+		#if 0
 		if (m_pAutonMain)
 		{
 			FRC2019_Robot *_pRobot = dynamic_cast<FRC2019_Robot *>(m_pAutonMain->GetRobot());
@@ -135,6 +134,7 @@ public:
 			else 
 				_pRobot->SetTestAutonCallbackGoal(nullptr);
 		}
+		#endif
 	}
 
 	void ShowControls(bool show)

@@ -204,10 +204,6 @@ class FRC2019_Robot : public Tank_Robot
 namespace FRC2019_Goals
 {
 	Goal *Get_FRC2019_Autonomous(FRC2019_Robot *Robot);
-	//Temporary for testing
-	#if 1
-	Goal *Get_Sample_Goal(FRC2019_Robot *Robot);
-	#endif
 }
 
 //TODO enable this
