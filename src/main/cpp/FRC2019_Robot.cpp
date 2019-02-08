@@ -304,14 +304,23 @@ private:
 			//otherwise we have to terminate and refresh with these new goals going in the other direction
 			if (m_Status == eActive)
 			{
-				if (m_Parent->m_IsHatchGrabExpanded == !IsStowed)
+				//See if we need to add new goals... 
+				//First see if the current state is the requested state
+				//Next see if we are deployed... that implies everything is set
+				//finally see if last session was deployed on the hatch
+				if ((m_Parent->m_IsHatchGrabExpanded == !IsStowed)&&((!IsStowed)||!m_LastDeployStowed))
 				{
 					m_Status = eInactive;  //mark inactive... because the work is already done
 					m_Parent->m_GoalActive[eHatchGrab] = false;
 					return;  //no work to do
 				}
 				else
+				{
+					//See if we are terminating to stow the expansion, and then if this session didn't have the hatch deployed
+					if ((IsStowed)&&(m_LastDeployStowed))
+						m_EventMap.EventOnOff_Map[csz_Arm_HatchDeploy_manual].Fire(false);  //stow it as it was before now, before termination
 					Terminate();
+				}
 			}
 
 			m_Parent->m_IntendedHatchGrabExpanded = !IsStowed;
@@ -501,6 +510,12 @@ public:
 FRC2019_Robot::Robot_Arm::Robot_Arm(FRC2019_Robot *parent,Rotary_Control_Interface *robot_control) : 
 	Rotary_Position_Control("Arm",robot_control,eArm),m_pParent(parent),m_Advance(false),m_Retract(false)
 {
+}
+
+void FRC2019_Robot::Robot_Arm::Initialize(Base::EventMap& em, const Entity1D_Properties *props)
+{
+	__super::Initialize(em,props);
+	//Hold off on creating this until now... now that we have an eventmap
 	m_RobotArmManager = std::make_shared<FRC2019_Robot::Robot_Arm_Manager>(this);
 }
 

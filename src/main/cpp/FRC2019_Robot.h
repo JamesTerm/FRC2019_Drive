@@ -157,7 +157,8 @@ class FRC2019_Robot : public Tank_Robot
 				Robot_Arm(FRC2019_Robot *parent,Rotary_Control_Interface *robot_control);
 				IEvent::HandlerList ehl;
 				virtual void ResetPos();
-		protected:
+				void Initialize(Base::EventMap& em, const Entity1D_Properties *props);  //initialize Robot_Arm_Manager once we have the eventmap
+			protected:
 				//Intercept the time change to obtain current height as well as sending out the desired velocity
 				virtual void BindAdditionalEventControls(bool Bind);
 				//events are a bit picky on what to subscribe so we'll just wrap from here... also great place for breakpoint
