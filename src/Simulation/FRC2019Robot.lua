@@ -52,24 +52,24 @@ MainRobot = {
 			id_3 = { name="hatch",    forward_channel=5, reverse_channel=6},
 			id_4 = { name="hatch_grab",    forward_channel=7, reverse_channel=8},
 		},
-		-- digital_input =
-		-- {
-		-- 	--These channels must be unique to digital input encoder channels as well
-		-- 	--Also ensure you do not use the slot for the compressor ;)
-		-- 	id_1 = { name="dart_upper_limit",  channel=5},
-		-- 	id_2 = { name="dart_lower_limit",  channel=6}
-		-- },
+		--These channels must be unique to digital input encoder channels as well
+		--Also ensure you do not use the slot for the compressor ;)
+		digital_input =
+		{
+			id_1 = { name="elevator_min",  channel=5},
+			id_2 = { name="elevator_max",  channel=6}
+		},
 		analog_input =
 		{
 			id_1 = { name="arm_potentiometer",  channel=2},
 		},
-		digital_input_encoder =
-		{	
-			--encoder names must be the same name list from the victor (or other speed controls)
-			--These channels must be unique to digital input channels as well
-			id_1 = { name= "left_drive_1",  a_channel=3, b_channel=4},
-			id_2 = { name="right_drive_1",  a_channel=1, b_channel=2},
-		},
+		--encoder names must be the same name list from the victor (or other speed controls)
+		--These channels must be unique to digital input channels as well
+		-- digital_input_encoder =
+		-- {	
+		-- 	id_1 = { name= "left_drive_1",  a_channel=3, b_channel=4},
+		-- 	id_2 = { name="right_drive_1",  a_channel=1, b_channel=2},
+		-- },
 		compressor	=	{ relay=8, limit=14 },
 		accelerometer	=	{ gRange=1 }
 	},

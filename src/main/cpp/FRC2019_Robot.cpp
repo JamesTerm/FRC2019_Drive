@@ -532,6 +532,15 @@ void FRC2019_Robot::Robot_Arm::TimeChange(double dTime_s)
 	__super::TimeChange(dTime_s);
 	}
 
+bool FRC2019_Robot::Robot_Arm::DidHitMinLimit() const
+{
+	return m_pParent->m_RobotControl->GetBoolSensorState(eElevatorMin);
+}
+bool FRC2019_Robot::Robot_Arm::DidHitMaxLimit() const
+{
+	return m_pParent->m_RobotControl->GetBoolSensorState(eElevatorMax);
+}
+
 void FRC2019_Robot::Robot_Arm::ResetPos()
 {
 	m_RobotArmManager->ResetPos();
@@ -945,6 +954,21 @@ void FRC2019_Robot_Control::UpdateVoltage(size_t index,double Voltage)
 	}
 }
 
+bool FRC2019_Robot_Control::GetBoolSensorState(size_t index) const
+{
+	bool ret=false;
+	switch (index)
+	{
+	case FRC2019_Robot::eElevatorMin:
+		ret = m_ElevatorMin;
+		break;
+	case FRC2019_Robot::eElevatorMax:
+		ret = m_ElevatorMax;
+		break;
+	}
+	return ret;
+}
+
 void FRC2019_Robot_Control::CloseSolenoid(size_t index,bool Close)
 {
 	switch (index)
@@ -1061,6 +1085,11 @@ void FRC2019_Robot_Control::Robot_Control_TimeChange(double dTime_s)
 	#ifdef _Win32
 	m_Potentiometer.SetTimeDelta(dTime_s);
 	#endif
+	//Update limit switches on each time slice, this avoids multiple calls and can ensure reliable up to date monitoring on when they become triggered
+	m_ElevatorMin = BoolSensor_GetState(FRC2019_Robot::eElevatorMin);
+	m_ElevatorMax = BoolSensor_GetState(FRC2019_Robot::eElevatorMax);
+	SmartDashboard::PutBoolean("LimitElevatorMin", m_ElevatorMin);
+	SmartDashboard::PutBoolean("LimitElevatorMax", m_ElevatorMax);
 }
 
 //void Robot_Control::UpdateVoltage(size_t index,double Voltage)

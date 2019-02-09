@@ -82,6 +82,11 @@ const char * const csz_FRC2019_Robot_Solenoid_Enum[] =
 	"wedge","intake","hatch","hatch_grab"
 };
 
+const char * const csz_FRC2019_Robot_BoolSensorDevices_Enum[] =
+{
+	"elevator_min","elevator_max"
+};
+
 ///This is a specific robot that is a robot tank and is composed of an arm, it provides addition methods to control the arm, and applies updates to
 ///the Robot_Control_Interface
 class FRC2019_Robot : public Tank_Robot
@@ -114,6 +119,17 @@ class FRC2019_Robot : public Tank_Robot
 		static SolenoidDevices GetSolenoidDevices_Enum(const char *value)
 		{
 			return Enum_GetValue<SolenoidDevices>(value, csz_FRC2019_Robot_Solenoid_Enum, _countof(csz_FRC2019_Robot_Solenoid_Enum));
+		}
+
+		enum BoolSensorDevices
+		{
+			eElevatorMin,
+			eElevatorMax
+		};
+
+		static BoolSensorDevices GetBoolSensorDevices_Enum(const char *value)
+		{
+			return Enum_GetValue<BoolSensorDevices>(value, csz_FRC2019_Robot_BoolSensorDevices_Enum, _countof(csz_FRC2019_Robot_BoolSensorDevices_Enum));
 		}
 
 		FRC2019_Robot(const char EntityName[],FRC2019_Control_Interface *robot_control,bool UseEncoders=false);
@@ -164,6 +180,9 @@ class FRC2019_Robot : public Tank_Robot
 
 				void SetPotentiometerSafety(bool DisableFeedback) {__super::SetPotentiometerSafety(DisableFeedback);}
 				virtual void TimeChange(double dTime_s);
+				//limit switch implementation
+				virtual bool DidHitMinLimit() const;
+				virtual bool DidHitMaxLimit() const;
 			private:
 				#ifndef _Win32
 				typedef Rotary_Position_Control __super;
@@ -227,6 +246,7 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		}
 	protected: //from Robot_Control_Interface
 		virtual void UpdateVoltage(size_t index, double Voltage);
+		virtual bool GetBoolSensorState(size_t index) const;
 		virtual void CloseSolenoid(size_t index,bool Close);
 		virtual void OpenSolenoid(size_t index,bool Open) {CloseSolenoid(index,!Open);}
 		virtual bool GetIsSolenoidOpen(size_t index) const;
@@ -243,16 +263,12 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		virtual double GetRotaryCurrentPorV(size_t index);
 		virtual void UpdateRotaryVoltage(size_t index, double Voltage) { UpdateVoltage(index, Voltage); }
 
-		//These should no longer be necessary
-		//virtual void CloseRist(bool Close) {CloseSolenoid(FRC2019_Robot::eRist,Close);}
-		//virtual void OpenRist(bool Close) {CloseSolenoid(FRC2019_Robot::eRist,!Close);}
 		protected: //from RobotControlCommon
 			virtual size_t RobotControlCommon_Get_PWMSpeedController_EnumValue(const char *name) const
 			{	return FRC2019_Robot::GetSpeedControllerDevices_Enum(name);
 			}
 			virtual size_t RobotControlCommon_Get_DigitalInput_EnumValue(const char *name) const
-			{  //return FRC2019_Robot::GetBoolSensorDevices_Enum(name);
-				return 0;
+			{  return FRC2019_Robot::GetBoolSensorDevices_Enum(name);
 			}
 			virtual size_t RobotControlCommon_Get_AnalogInput_EnumValue(const char *name) const
 			{	return FRC2019_Robot::GetAnalogInputs_Enum(name);
@@ -282,6 +298,7 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		Potentiometer_Tester2 m_Potentiometer; //simulate a real potentiometer for calibration testing
 		#endif
 		bool m_FirstRun = false;
+		bool m_ElevatorMin, m_ElevatorMax;
 };
 #endif
 

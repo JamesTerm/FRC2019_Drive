@@ -796,7 +796,7 @@ bool Control_1C_Element_UI::get_bool() const
 
 double Control_1C_Element_UI::get_number() const
 {
-	double ret = 0.0;
+	double ret = m_DefaultNumber;
 	if (s_ShowControlsCallback())
 	{
 		if (!m_PutNumber_Used)

@@ -1,5 +1,11 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="LimitElevatorMin" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="47" y="236"/>
+	</widget>
+	<widget field="LimitElevatorMax" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="183" y="236"/>
+	</widget>
 	<widget field="HatchGrip" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
 		<location x="111" y="310"/>
 	</widget>
