@@ -284,21 +284,21 @@ MainRobot = {
 		{
 			control = "operator",
 			
-			Arm_SetPosRest = {type="joystick_button", key=2, keyboard='l', on_off=false},
-			Arm_SetPosCargo1 = {type="joystick_button", key=1, keyboard='1', on_off=false},
-			Arm_SetPosCargo2 = {type="keyboard", key='2', on_off=false},   --TODO figure out where to assign the buttons
-			Arm_SetPosCargo3 = {type="keyboard", key='3', on_off=false},
+			Arm_SetPosRest = {type="joystick_button", key=5, keyboard='l', on_off=false},
+			Arm_SetPosCargo1 = {type="joystick_button", key=6, keyboard='1', on_off=false},
+			Arm_SetPosCargo2 = {type="joystick_button", key=7,keyboard='2', on_off=false},
+			Arm_SetPosCargo3 = {type="joystick_button", key=8,keyboard='3', on_off=false},
 			Arm_SetCurrentVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
-			Arm_IntakeDeploy={type="joystick_button", key=5, keyboard='i', on_off=true},
+			Arm_IntakeDeploy={type="joystick_button", key=3, keyboard='i', on_off=true},
 			Arm_Advance={type="keyboard", key='k', on_off=true},
 			Arm_Retract={type="keyboard", key='j', on_off=true},
 			
-			--Claw_SetCurrentVelocity  --not used
-			Arm_HatchDeploy =	 {type="joystick_button", key=6, keyboard='h', on_off=true},
-			Arm_HatchGrabDeploy={type="joystick_button", key=3, keyboard='o', on_off=true},
-			Claw_Grip =		 {type="joystick_button", key=8, on_off=true},
-			--Claw_Squirt =	 {type="joystick_button", key=7, on_off=true},
-			Robot_CloseDoor= {type="joystick_button", key=9, keyboard='u', on_off=true}
+			Claw_SetCurrentVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			Arm_HatchDeploy =	 {type="joystick_button", key=2, keyboard='h', on_off=true},
+			Arm_HatchGrabDeploy={type="joystick_button", key=4, keyboard='o', on_off=true},
+			Claw_Grip =		 {type="keyboard", key='r', on_off=true},
+			Claw_Squirt =	 {type="keyboard", key='t', on_off=true},
+			Robot_CloseDoor= {type="joystick_button", key=1, keyboard='u', on_off=true}
 		},
 	},
 		
