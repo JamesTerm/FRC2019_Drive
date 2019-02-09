@@ -171,9 +171,19 @@ public:
 		m_Control.SetExternalPWMSpeedControllerHook(
 		[&](size_t module, size_t Channel, const char *Name, const char*Type,bool &DoNotCreate)
 		{
+			if (!m_Collection) return (void *)nullptr;  //support if I'm not going to use a collection
+			void *ret = nullptr;
 			//TODO hook our active collection here
 			//printf("Robot: Get External PWMSpeedController %s[%d,%d]\n",Name,module,Channel);
-			return nullptr;
+			#if 0
+			//This is temporary as long as the active configuration populates it
+			if (strcmp(Name, "wedge")==0)
+			{
+				DoubleSolenoidItem *SolenoidTest =dynamic_cast<DoubleSolenoidItem *>( m_Collection->Get("SolenoidToggle"));
+				ret = SolenoidTest->AsDoubleSolenoid();
+			}
+			#endif
+			return ret;
 		});
 		//Note: For Simulation, Tank_Robot_Control needs __Tank_TestControlAssignments__ defined; otherwise there are no hooks to set
 		//Swerve drive merged both techniques, and eventually Tank could do the same, for now, they are still separate

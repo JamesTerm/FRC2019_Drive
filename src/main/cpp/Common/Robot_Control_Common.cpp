@@ -7,6 +7,7 @@
 #include "../Base/Base_Includes.h"
 #include <math.h>
 #include <assert.h>
+#include <map>
 #include "../Base/Vec2d.h"
 #include "../Base/Misc.h"
 #include "../Base/Event.h"
@@ -39,6 +40,87 @@
 #include "SmartDashboard.h"
 
 using namespace frc;
+
+
+
+#ifdef _Win32
+namespace frc
+{
+class InstanceTester_internal
+{
+private:
+	using channel_list=std::vector<int>;
+	std::map<std::string, channel_list, std::greater<std::string>> m_database;
+	using db_iter = std::map<std::string, channel_list, std::greater<std::string>>::iterator;
+	using const_db_iter = std::map<std::string, channel_list, std::greater<std::string>>::const_iterator;
+
+public:
+	bool Test(const char *category, uint32_t channel)
+	{
+		bool ret = true;
+		db_iter test = m_database.find(category);
+		if (test != m_database.end())
+		{
+			//linear search the channels
+			const channel_list &channels = test->second;
+			for (auto i : channels)
+			{
+				if (i == channel)
+				{
+					printf("Duplicate %s[%d]", category, channel);
+					assert(false);
+					ret = false;
+				}
+			}
+		}
+		else
+			m_database[category].push_back(channel);
+		return ret;
+	}
+	bool Test2(const char *category, uint32_t channelA, uint32_t channelB)
+	{
+		bool ret = true;
+		db_iter test = m_database.find(category);
+		if (test != m_database.end())
+		{
+			//linear search the channels
+			const channel_list &channels = test->second;
+			for (auto i : channels)
+			{
+				if ((i == channelA)|| (i == channelB))
+				{
+					printf("Duplicate %s[%d,%d]", category, channelA, channelB);
+					assert(false);
+					ret = false;
+				}
+			}
+		}
+		else
+		{
+			m_database[category].push_back(channelA);
+			m_database[category].push_back(channelB);
+		}
+		return ret;
+	}
+};
+}
+
+frc::InstanceTester::InstanceTester()
+{
+	m_InstanceTester=std::make_shared<InstanceTester_internal>();
+}
+bool frc::InstanceTester::operator()(const char *category, uint32_t channel)
+{
+	return m_InstanceTester->Test(category, channel);
+}
+bool frc::InstanceTester::operator()(const char *category, uint32_t channelA, uint32_t channelB)
+{
+	return m_InstanceTester->Test2(category, channelA, channelB);
+}
+
+frc::InstanceTester frc::g_InstanceTester;
+#endif
+
   /***********************************************************************************************************************************/
  /*													Control_Assignment_Properties													*/
 /***********************************************************************************************************************************/
@@ -266,7 +348,9 @@ __inline void Initialize_1C_LUT(const Control_Assignment_Properties::Controls_1C
 
 template <class T>
 __inline void Initialize_2C_LUT(const Control_Assignment_Properties::Controls_2C &control_props,std::vector<T *> &controls,
-								RobotControlCommon::Controls_LUT &control_LUT,RobotControlCommon *instance,size_t (RobotControlCommon::*delegate)(const char *name) const)
+		RobotControlCommon::Controls_LUT &control_LUT,RobotControlCommon *instance,
+		size_t (RobotControlCommon::*delegate)(const char *name) const, 
+		std::function<void *(size_t, size_t, const char *, const char *, bool &DoNotCreate)>External)
 {
 	//typedef Control_Assignment_Properties::Controls_2C Controls_2C;
 	typedef Control_Assignment_Properties::Control_Element_2C Control_Element_2C;
@@ -278,14 +362,25 @@ __inline void Initialize_2C_LUT(const Control_Assignment_Properties::Controls_2C
 		//The name may not exist in this list (it may be a name specific to the robot)... in which case there is no work to do
 		if (enumIndex==(size_t)-1)
 			continue;
-		//create the new Control
-		#ifdef _Win32
-		T *NewElement=new T((uint8_t)element.Module,(uint32_t)element.ForwardChannel,(uint32_t)element.ReverseChannel,element.name.c_str());
-		#else
-		//quick debug when things are not working
-		printf("new %s as %d, %d\n",element.name.c_str(),element.ForwardChannel,element.ReverseChannel);
-		T *NewElement=new T(element.Module,element.ForwardChannel,element.ReverseChannel);
-		#endif
+		bool DoNotCreate = false;
+		//See if we have an external hook to allocate this control already
+		T *NewElement = (T *)External(element.ForwardChannel, element.ReverseChannel, element.name.c_str(), element.name.c_str(), DoNotCreate);
+		if (DoNotCreate)
+			continue;
+		if (NewElement == nullptr)
+		{
+			//create the new Control
+			#ifdef _Win32
+			NewElement = new T((uint8_t)element.Module, (uint32_t)element.ForwardChannel, (uint32_t)element.ReverseChannel, element.name.c_str());
+			#else
+			//quick debug when things are not working
+			printf("new %s as %d, %d\n", element.name.c_str(), element.ForwardChannel, element.ReverseChannel);
+			NewElement = new T(element.Module, element.ForwardChannel, element.ReverseChannel);
+			#endif
+		}
+		else
+			printf("external %s=[%d,%d]\n", element.name.c_str(), element.ForwardChannel, element.ReverseChannel);  //keep track of things which are external
+
 		const size_t LUT_index=controls.size(); //get size before we add it in
 		//const size_t PopulationIndex=controls.size();  //get the ordinal value before we add it
 		controls.push_back(NewElement);  //add it to our list of PWMSpeedControllers
@@ -346,13 +441,18 @@ void RobotControlCommon::RobotControlCommon_Initialize(const Control_Assignment_
 	//relays
 	Initialize_1C_LUT<Relay, Relay>(props.GetRelays(),m_Relays,m_RelayLUT,this,&RobotControlCommon::RobotControlCommon_Get_PWMSpeedController_EnumValue, DefaultExternalControlHook);
 	//double solenoids
-	Initialize_2C_LUT<DoubleSolenoid>(props.GetDoubleSolenoids(),m_DoubleSolenoids,m_DoubleSolenoidLUT,this,&RobotControlCommon::RobotControlCommon_Get_DoubleSolenoid_EnumValue);
+	Initialize_2C_LUT<DoubleSolenoid>(props.GetDoubleSolenoids(),m_DoubleSolenoids,m_DoubleSolenoidLUT,this,&RobotControlCommon::RobotControlCommon_Get_DoubleSolenoid_EnumValue, 
+		[&](size_t Forward, size_t Reverse, const char *Name, const char *Type, bool &DoNotCreate)
+		{
+		void *ret = m_ExternalPWMSpeedController(Forward, Reverse, Name, Type, DoNotCreate);  //we'll just use the same callback since it can fit
+		return ret;
+		});
 	//digital inputs
 	Initialize_1C_LUT<DigitalInput, DigitalInput>(props.GetDigitalInputs(),m_DigitalInputs,m_DigitalInputLUT,this,&RobotControlCommon::RobotControlCommon_Get_DigitalInput_EnumValue, DefaultExternalControlHook);
 	//analog inputs
 	Initialize_1C_LUT<AnalogInput, AnalogInput>(props.GetAnalogInputs(),m_AnalogInputs,m_AnalogInputLUT,this,&RobotControlCommon::RobotControlCommon_Get_AnalogInput_EnumValue, DefaultExternalControlHook);
 	//encoders
-	Initialize_2C_LUT<Encoder2>(props.GetEncoders(),m_Encoders,m_EncoderLUT,this,&RobotControlCommon::RobotControlCommon_Get_PWMSpeedController_EnumValue);
+	Initialize_2C_LUT<Encoder2>(props.GetEncoders(),m_Encoders,m_EncoderLUT,this,&RobotControlCommon::RobotControlCommon_Get_PWMSpeedController_EnumValue, DefaultExternalControlHook);
 }
 
 

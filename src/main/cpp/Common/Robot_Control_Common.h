@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <memory>
 
 namespace frc
 {
@@ -98,14 +99,29 @@ private:
 	double m_CurrentVoltage;
 };
 
+//Making a global instance tester to ensure there are no duplicate modules instantiated
+class InstanceTester_internal;
+class InstanceTester
+{
+public:
+	InstanceTester();
+	//returns true if successful, asserts if it fails
+	bool operator()(const char *category,uint32_t channel);
+	bool operator()(const char *category, uint32_t channelA, uint32_t channelB);
+private:
+	std::shared_ptr<InstanceTester_internal> m_InstanceTester;
+};
+extern InstanceTester g_InstanceTester;
+
+
 class Victor : public PWMSpeedController
 {
 public:
 	Victor(int channel) : PWMSpeedController(0, channel, "Victor") 
-	{
+	{	g_InstanceTester("pwm", channel);
 	}
 	Victor(uint8_t moduleNumber, uint32_t channel, const char *name) : PWMSpeedController(0, channel, name)
-	{
+	{	g_InstanceTester("pwm", channel);
 	}
 	Victor(Victor&&) = default;
 	Victor& operator=(Victor&&) = default;
@@ -121,10 +137,10 @@ public:
 	 *                on-board, 10-19 are on the MXP port
 	 */
 	VictorSP(int channel) : PWMSpeedController(0, channel, "VictorSP")
-	{
+	{	g_InstanceTester("pwm", channel);
 	}
 	VictorSP(uint8_t moduleNumber, uint32_t channel, const char *name) : PWMSpeedController(0, channel, name)
-	{
+	{	g_InstanceTester("pwm", channel);
 	}
 
 	VictorSP(VictorSP&&) = default;
@@ -135,7 +151,9 @@ class Servo : public Control_1C_Element_UI
 {
 public:
 	Servo(uint8_t moduleNumber, uint32_t channel,const char *name) : Control_1C_Element_UI(moduleNumber,channel,name),
-		m_ModuleNumber(moduleNumber), m_Channel(channel) {}
+		m_ModuleNumber(moduleNumber), m_Channel(channel) 
+	{	g_InstanceTester("Servo", channel);
+	}
 	void Set(float value) {m_CurrentVoltage=value; display_number(value);}
 	//void SetOffline();
 	float Get()  {return m_CurrentVoltage;}
@@ -158,9 +176,13 @@ class DigitalInput : public Control_1C_Element_UI
 {
 public:
 	DigitalInput(uint8_t moduleNumber, uint32_t channel,const char *name) : Control_1C_Element_UI(moduleNumber,channel,name,1.0),
-		m_ModuleNumber(moduleNumber), m_Channel(channel) {}
+		m_ModuleNumber(moduleNumber), m_Channel(channel) 
+	{	g_InstanceTester("DigitalInput", channel);
+	}
 	DigitalInput(uint32_t channel, const char *name="DigitalInput") : Control_1C_Element_UI(0, channel, name, 1.0),
-		m_ModuleNumber(0), m_Channel(channel) {}
+		m_ModuleNumber(0), m_Channel(channel) 
+	{	g_InstanceTester("DigitalInput", channel);
+	}
 	uint32_t Get() {return (uint32_t)get_number();}
 	uint32_t GetChannel() {return m_Channel;}
 private:
@@ -172,7 +194,9 @@ class AnalogChannel : public Control_1C_Element_UI
 {
 public:
 	AnalogChannel(uint8_t moduleNumber, uint32_t channel,const char *name) : Control_1C_Element_UI(moduleNumber,channel,name,1.0),
-		m_ModuleNumber(moduleNumber), m_Channel(channel) {}
+		m_ModuleNumber(moduleNumber), m_Channel(channel) 
+	{	g_InstanceTester("AnalogChannel", channel);
+	}
 
 	int16_t GetValue() {return (int16_t)get_number();}
 	int32_t GetAverageValue()  {return (int32_t)get_number();}
@@ -188,11 +212,15 @@ public:
 	typedef enum {kOff, kForward, kReverse} Value;
 	DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel, uint32_t reverseChannel,const char *name) : 
 		Control_2C_Element_UI(moduleNumber,forwardChannel,reverseChannel,name),
-		m_ModuleNumber(moduleNumber),m_forwardChannel(forwardChannel),m_reverseChannel(reverseChannel) {}
+		m_ModuleNumber(moduleNumber),m_forwardChannel(forwardChannel),m_reverseChannel(reverseChannel) 
+	{	g_InstanceTester("DoubleSolenoid", forwardChannel, reverseChannel);
+	}
 
 	DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel, const char *name="DoubleSolenoid") :
 		Control_2C_Element_UI(0, forwardChannel, reverseChannel, name),
-		m_ModuleNumber(0), m_forwardChannel(forwardChannel), m_reverseChannel(reverseChannel) {}
+		m_ModuleNumber(0), m_forwardChannel(forwardChannel), m_reverseChannel(reverseChannel) 
+	{	g_InstanceTester("DoubleSolenoid", forwardChannel, reverseChannel);
+	}
 
 	virtual void Set(Value value) {m_CurrentValue=value; display_bool(value==kForward);}
 	virtual Value Get() {return m_CurrentValue=get_bool(m_CurrentValue==kForward)?kForward:kReverse;}
