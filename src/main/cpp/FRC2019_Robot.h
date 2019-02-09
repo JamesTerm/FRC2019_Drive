@@ -19,16 +19,14 @@ public:
 struct FRC2019_Robot_Props
 {
 public:
-	//TODO evaluate how this translates into the dart
-	//everything in meters and radians
-	double OptimalAngleUp;
-	double OptimalAngleDn;
-	double ArmLength;
-	double ArmToGearRatio;
-	double PotentiometerToArmRatio;
-	double PotentiometerMaxRotation;
-	double GearHeightOffset;
-	double MotorToWheelGearRatio;
+	double hatch_deploy_time;
+	double cargo_deploy_time;
+	double hatch_grab_deploy_time;
+
+	double cargo1_height;
+	double cargo2_height;
+	double cargo3_height;
+
 	struct Autonomous_Properties
 	{
 		size_t AutonTest;
@@ -276,7 +274,6 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		//frc::Accelerometer *m_RoboRIO_Accelerometer=nullptr;   <---for reference
 		//Base::EventMap* m_EventMap=nullptr;  <---TODO see if we need this
 
-		double m_ArmMaxSpeed;
 	private:
 		//Note: these may be arrayed if we have more pots
 		KalmanFilter m_KalFilter_Arm;

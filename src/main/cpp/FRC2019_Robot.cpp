@@ -105,9 +105,6 @@ void FRC2019_Robot::Robot_Claw::BindAdditionalEventControls(bool Bind)
 const char *csz_Arm_IntakeDeploy_manual = "Arm_IntakeDeploy_manual";
 const char *csz_Arm_HatchDeploy_manual = "Arm_HatchDeploy_manual";
 const char *csz_Arm_HatchGrabDeploy_manual = "Arm_HatchGrabDeploy_manual";
-double c_HatchDeployTime = 1.0;
-double c_IntakeDeployTime = 1.0;
-double c_HatchGrabDeployTime = 0.75;  //no one is waiting for this
 
 class FRC2019_Robot::Robot_Arm_Manager
 {
@@ -137,8 +134,10 @@ private:
 		Robot_Arm_Manager *m_Parent;
 		FRC2019_Robot &m_Robot;
 		Entity2D_Kind::EventMap &m_EventMap;
+		const FRC2019_Robot_Props &m_props;
 	public:
-		SetUpProps(Robot_Arm_Manager *Parent) : m_Parent(Parent), m_Robot(Parent->m_Robot), m_EventMap(*m_Robot.GetEventMap())
+		SetUpProps(Robot_Arm_Manager *Parent) : m_Parent(Parent), m_Robot(Parent->m_Robot), m_EventMap(*m_Robot.GetEventMap()), 
+			m_props(m_Robot.GetRobotProps().GetFRC2019RobotProps())
 		{
 		}
 	};
@@ -194,7 +193,7 @@ private:
 			#endif
 			//Keep this around for test purposes
 			//m_Parent->mutual_exlude_other_goals(eIntake);
-			AddSubgoal(new Goal_Wait(c_IntakeDeployTime));
+			AddSubgoal(new Goal_Wait(m_props.cargo_deploy_time));
 			AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_IntakeDeploy_manual, !IsStowed));
 			m_Status = eActive;
 			m_Parent->m_GoalActive[eIntake] = true;
@@ -256,7 +255,7 @@ private:
 			#endif
 			//Keep this around for test purposes
 			//m_Parent->mutual_exlude_other_goals(eHatch);
-			AddSubgoal(new Goal_Wait(c_HatchDeployTime));
+			AddSubgoal(new Goal_Wait(m_props.hatch_deploy_time));
 			AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_HatchDeploy_manual, !IsStowed));
 			m_Status = eActive;
 			m_Parent->m_GoalActive[eHatch] = true;
@@ -324,6 +323,7 @@ private:
 			}
 
 			m_Parent->m_IntendedHatchGrabExpanded = !IsStowed;
+			const double HatchDeployTime = m_props.hatch_deploy_time;
 
 			//We'll override the other goals if using the automated version, note it's easier to trace code if we handle this before adding any new goals
 			#ifndef __UseSimpleHatchGrip__
@@ -332,7 +332,7 @@ private:
 
 			#ifdef __UseSimpleHatchGrip__
 			//Go ahead add these goals... but we may add more keep reading
-			AddSubgoal(new Goal_Wait(1.0));
+			AddSubgoal(new Goal_Wait(m_props.hatch_grab_deploy_time));
 			AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_HatchGrabDeploy_manual, !IsStowed));
 			#else	
 			if (!IsStowed)
@@ -340,7 +340,7 @@ private:
 				m_LastDeployStowed = !m_Parent->m_IsHatchDeployed; //cache this... this will be the state we return when stowing the grabber
 
 				//Go ahead add these goals... but we may add more keep reading
-				AddSubgoal(new Goal_Wait(1.0));
+				AddSubgoal(new Goal_Wait(m_props.hatch_grab_deploy_time));
 				AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_HatchGrabDeploy_manual, !IsStowed));
 
 				//This one is more automated it will add to stow the intake and deploy the hatch as needed
@@ -348,14 +348,14 @@ private:
 				if (!m_Parent->m_IsHatchDeployed)
 				{
 					//rather than activate the other goals (messy and could cause recursion)-- just add the goals here
-					AddSubgoal(new Goal_Wait(c_HatchDeployTime));
+					AddSubgoal(new Goal_Wait(HatchDeployTime));
 					AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_HatchDeploy_manual, true));
 					m_Parent->m_IsHatchDeployed = true;
 				}
 				//Now to see about the intake... it must be stowed
 				if (m_Parent->m_IsIntakeDeployed)
 				{
-					AddSubgoal(new Goal_Wait(c_IntakeDeployTime));
+					AddSubgoal(new Goal_Wait(m_props.cargo_deploy_time));
 					AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_IntakeDeploy_manual, false));
 					m_Parent->m_IsIntakeDeployed = false;
 				}
@@ -365,12 +365,12 @@ private:
 				//for stowing... let's stow the hatch as well
 				if ((m_Parent->m_IsHatchDeployed)&&(m_LastDeployStowed))
 				{
-					AddSubgoal(new Goal_Wait(c_HatchDeployTime));
+					AddSubgoal(new Goal_Wait(HatchDeployTime));
 					AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_HatchDeploy_manual, false));
 					m_Parent->m_IsHatchDeployed = false;
 				}
 				//Go ahead add these goals... but we may add more keep reading
-				AddSubgoal(new Goal_Wait(1.0));
+				AddSubgoal(new Goal_Wait(m_props.hatch_grab_deploy_time));
 				AddSubgoal(new RobotQuickNotify(m_Parent, csz_Arm_HatchGrabDeploy_manual, !IsStowed));
 			}
 			#endif
@@ -547,7 +547,9 @@ void FRC2019_Robot::Robot_Arm::SetRequestedVelocity_FromNormalized(double Veloci
 
 //Declare event names for arm
 const char *csz_Arm_SetPosRest = "Arm_SetPosRest";
-const char *csz_Arm_SetPosHatch = "Arm_SetPoshatch";
+const char *csz_Arm_SetPosCargo1 = "Arm_SetPosCargo1";
+const char *csz_Arm_SetPosCargo2 = "Arm_SetPosCargo2";
+const char *csz_Arm_SetPosCargo3 = "Arm_SetPosCargo3";
 const char *csz_Arm_IntakeDeploy = "Arm_IntakeDeploy";
 const char *csz_Arm_HatchDeploy = "Arm_HatchDeploy";
 const char *csz_Arm_HatchGrabDeploy = "Arm_HatchGrabDeploy";
@@ -555,6 +557,7 @@ const char *csz_Arm_HatchGrabDeploy = "Arm_HatchGrabDeploy";
 void FRC2019_Robot::Robot_Arm::BindAdditionalEventControls(bool Bind)
 {
 	Base::EventMap *em=GetEventMap(); //grrr had to explicitly specify which EventMap
+	const FRC2019_Robot_Props &props = m_pParent->m_RobotProps.GetFRC2019RobotProps();
 
 	if (Bind)
 	{
@@ -564,10 +567,16 @@ void FRC2019_Robot::Robot_Arm::BindAdditionalEventControls(bool Bind)
 		em->Event_Map[csz_Arm_SetPosRest].Subscribe([&]()
 			{	SetIntendedPosition(1.0);  //inches from ground
 			});
-		em->Event_Map[csz_Arm_SetPosHatch].Subscribe([&]()
-			{	SetIntendedPosition(20.0);  //TODO pull from lua, as we need to calibrate on the field
+		em->Event_Map[csz_Arm_SetPosCargo1].Subscribe([&]()
+			{	SetIntendedPosition(props.cargo1_height);
 			});
-		
+		em->Event_Map[csz_Arm_SetPosCargo2].Subscribe([&]()
+		{	SetIntendedPosition(props.cargo2_height);
+		});
+		em->Event_Map[csz_Arm_SetPosCargo3].Subscribe([&]()
+		{	SetIntendedPosition(props.cargo3_height);
+		});
+
 		em->EventOnOff_Map["Arm_Advance"].Subscribe([&](bool on)
 			{	m_Advance = on;
 			});
@@ -763,17 +772,6 @@ void FRC2019_Robot::GoalComplete()
 
 FRC2019_Robot_Properties::FRC2019_Robot_Properties() : m_RobotControls(&s_ControlsEvents)
 {
-	const double c_OptimalAngleUp_r=DEG_2_RAD(70.0);
-	const double c_OptimalAngleDn_r=DEG_2_RAD(50.0);
-	const double c_ArmLength_m=1.8288;  //6 feet
-	const double c_ArmToGearRatio=72.0/28.0;
-	//const double c_GearToArmRatio=1.0/c_ArmToGearRatio;
-	//const double c_PotentiometerToGearRatio=60.0/32.0;
-	//const double c_PotentiometerToArmRatio=c_PotentiometerToGearRatio * c_GearToArmRatio;
-	const double c_PotentiometerToArmRatio=36.0/54.0;
-	//const double c_PotentiometerToGearRatio=c_PotentiometerToArmRatio * c_ArmToGearRatio;
-	const double c_PotentiometerMaxRotation=DEG_2_RAD(270.0);
-	const double c_GearHeightOffset=1.397;  //55 inches
 	const double c_WheelDiameter=0.1524;  //6 inches
 	const double c_MotorToWheelGearRatio=12.0/36.0;
 
@@ -788,14 +786,15 @@ FRC2019_Robot_Properties::FRC2019_Robot_Properties() : m_RobotControls(&s_Contro
 	}
 
 	FRC2019_Robot_Props props;
-	props.OptimalAngleUp=c_OptimalAngleUp_r;
-	props.OptimalAngleDn=c_OptimalAngleDn_r;
-	props.ArmLength=c_ArmLength_m;
-	props.ArmToGearRatio=c_ArmToGearRatio;
-	props.PotentiometerToArmRatio=c_PotentiometerToArmRatio;
-	props.PotentiometerMaxRotation=c_PotentiometerMaxRotation;
-	props.GearHeightOffset=c_GearHeightOffset;
-	props.MotorToWheelGearRatio=c_MotorToWheelGearRatio;
+	//Note: setting defaults to arbitrary numbers to ensure lua is properly loaded
+	props.hatch_deploy_time = 1.0;
+	props.cargo_deploy_time = 1.0;
+	props.hatch_grab_deploy_time = 1.0;
+
+	props.cargo1_height = 5.0;
+	props.cargo2_height = 30;
+	props.cargo3_height = 60;
+
 	m_FRC2019RobotProps=props;
 }
 
@@ -805,7 +804,8 @@ const char * const g_FRC2019_Controls_Events[] =
 	"Claw_SetCurrentVelocity",
 	"Claw_Grip","Claw_Squirt",
 	"Arm_SetCurrentVelocity","Arm_SetPotentiometerSafety",
-	csz_Arm_SetPosRest,csz_Arm_SetPosHatch,csz_Arm_HatchGrabDeploy,
+	csz_Arm_SetPosRest,csz_Arm_HatchGrabDeploy,
+	csz_Arm_SetPosCargo1,csz_Arm_SetPosCargo2,csz_Arm_SetPosCargo3,
 	csz_Arm_IntakeDeploy,csz_Arm_HatchDeploy,"Arm_Advance","Arm_Retract",
 	"Robot_CloseDoor",
 	"TestAuton","StopAuton"
@@ -831,6 +831,27 @@ void FRC2019_Robot_Properties::LoadFromScript(Scripting::Script& script)
 	err = script.GetFieldTable("robot_settings");
 	if (!err) 
 	{
+		FRC2019_Robot_Props &props = m_FRC2019RobotProps;
+		double fValue;
+		err = script.GetField("cargo1_height", NULL, NULL, &fValue);
+		if (!err)
+			props.cargo1_height = fValue;
+		err = script.GetField("cargo2_height", NULL, NULL, &fValue);
+		if (!err)
+			props.cargo2_height = fValue;
+		err = script.GetField("cargo3_height", NULL, NULL, &fValue);
+		if (!err)
+			props.cargo3_height = fValue;
+		err = script.GetField("cargo_deploy_time", NULL, NULL, &fValue);
+		if (!err)
+			props.cargo_deploy_time= fValue;
+		err = script.GetField("hatch_deploy_time", NULL, NULL, &fValue);
+		if (!err)
+			props.hatch_deploy_time = fValue;
+		err = script.GetField("hatch_grab_deploy_time", NULL, NULL, &fValue);
+		if (!err)
+			props.hatch_grab_deploy_time = fValue;
+
 		err = script.GetFieldTable("arm");
 		if (!err)
 		{
@@ -997,9 +1018,6 @@ void FRC2019_Robot_Control::Initialize(const Entity_Properties *props)
 		m_RobotProps=*robot_props;  //save a copy
 		assert(robot_props);
 		Rotary_Properties writeable_arm_props=robot_props->GetArmProps();
-		m_ArmMaxSpeed=writeable_arm_props.GetMaxSpeed();
-		//This is not perfect but will work for our simulation purposes
-		writeable_arm_props.RotaryProps().EncoderToRS_Ratio=robot_props->GetFRC2019RobotProps().ArmToGearRatio;
 		m_Potentiometer.Initialize(&writeable_arm_props);
 		#endif
 	}

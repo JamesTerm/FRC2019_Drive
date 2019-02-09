@@ -151,9 +151,13 @@ MainRobot = {
 	robot_settings =
 	{
 		--These heights represent elevator height which correspond to height observed- Change as needed
-		hatch1_height=5,
-		hatch2_height=33,
-		hatch3_height=61.5,   --max height (and falls short but is ok)
+		hatch_deploy_time = 0.4,
+		cargo_deploy_time = 0.76,
+		hatch_grab_deploy_time = 0.5,
+
+		cargo1_height=5,
+		cargo2_height=33,
+		cargo3_height=61.5,   --max height (and falls short but is ok)
 		arm =
 		{
 			is_closed=1,
@@ -262,8 +266,8 @@ MainRobot = {
 		Joystick_2 =
 		{
 			control = "driver",
-			--Joystick_SetLeftVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
-			--Joystick_SetRightVelocity = {type="joystick_analog", key=5, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
+			--Joystick_SetLeftVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			--Joystick_SetRightVelocity = {type="joystick_analog", key=4, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
 			--Analog_Turn = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
 			--Joystick_SetCurrentSpeed_2 = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
 			-- Joystick_FieldCentric_XAxis = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
@@ -281,7 +285,9 @@ MainRobot = {
 			control = "operator",
 			
 			Arm_SetPosRest = {type="joystick_button", key=2, keyboard='l', on_off=false},
-			Arm_SetPoshatch = {type="joystick_button", key=1, keyboard=';', on_off=false},
+			Arm_SetPosCargo1 = {type="joystick_button", key=1, keyboard='1', on_off=false},
+			Arm_SetPosCargo2 = {type="keyboard", key='2', on_off=false},   --TODO figure out where to assign the buttons
+			Arm_SetPosCargo3 = {type="keyboard", key='3', on_off=false},
 			Arm_SetCurrentVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
 			Arm_IntakeDeploy={type="joystick_button", key=5, keyboard='i', on_off=true},
 			Arm_Advance={type="keyboard", key='k', on_off=true},

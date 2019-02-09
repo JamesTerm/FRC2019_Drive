@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\main\cpp\FRC2019_Robot.h" />
     <ClInclude Include="..\Robot_Tester.h" />
     <ClInclude Include="DriverStation.h" />
     <ClInclude Include="Keyboard.h" />
