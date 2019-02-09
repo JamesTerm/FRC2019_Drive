@@ -15,7 +15,7 @@ private:
 	using EventHandlerList = std::list<protocol>;
 	EventHandlerList m_handlerList;
 public:
-	__inline void Fire()
+	__inline void Fire() const
 	{
 		for (auto &pos : m_handlerList)
 			pos();
@@ -55,7 +55,7 @@ private:
 	using EventHandlerList = std::list<protocol>;
 	EventHandlerList m_handlerList;
 public:
-	__inline void Fire(Args... args)
+	__inline void Fire(Args... args) const
 	{
 		for (auto &pos : m_handlerList)
 			pos(args...);
@@ -142,7 +142,7 @@ private:
 	{
 	public:
 		IEventHandler0(Event0& event, IEvent::HandlerList& ehl) : IEventHandler(event, ehl) {}
-		virtual void Fire() = 0;
+		virtual void Fire() const = 0;
 	};
 
 	template<class T>
@@ -151,7 +151,7 @@ private:
 	public:
 		EventHandler0(Event0& event, IEvent::HandlerList& ehl, T& client, void (T::*delegate)()) : 
 		  IEventHandler0(event, ehl), _client(client), _delegate(delegate) {}
-		  virtual void Fire(){(_client.*_delegate)();}
+		  virtual void Fire() const {(_client.*_delegate)();}
 
 		  T& _client;
 		  void (T::*_delegate)();
@@ -174,9 +174,9 @@ public:
 		_handlerList.clear();
 	}
 
-	void Fire()
+	void Fire() const
 	{
-		std::list<IEventHandler0*>::iterator pos;
+		std::list<IEventHandler0*>::const_iterator pos;
 		for (pos = _handlerList.begin(); pos != _handlerList.end(); )
 		{
 			IEventHandler0* eh = *pos;
@@ -274,9 +274,9 @@ public:
 		_handlerList.clear();
 	}
 
-	void Fire(P1 p1)
+	void Fire(P1 p1) const
 	{
-		typename std::list<IEventHandler1*>::iterator pos;
+		typename std::list<IEventHandler1*>::const_iterator pos;
 		for (pos = _handlerList.begin(); pos != _handlerList.end(); )
 		{
 			IEventHandler1* eh = *pos;
@@ -374,9 +374,9 @@ public:
 		_handlerList.clear();
 	}
 
-	void Fire(P1 p1, P2 p2)
+	void Fire(P1 p1, P2 p2) const
 	{
-		typename std::list<IEventHandler2*>::iterator pos;
+		typename std::list<IEventHandler2*>::const_iterator pos;
 		for (pos = _handlerList.begin(); pos != _handlerList.end(); )
 		{
 			IEventHandler2* eh = *pos;
@@ -472,9 +472,9 @@ public:
 		_handlerList.clear();
 	}
 
-	void Fire(P1 p1, P2 p2, P3 p3)
+	void Fire(P1 p1, P2 p2, P3 p3) const
 	{
-		typename std::list<IEventHandler3*>::iterator pos;
+		typename std::list<IEventHandler3*>::const_iterator pos;
 		for (pos = _handlerList.begin(); pos != _handlerList.end(); )
 		{
 			IEventHandler3* eh = *pos;
@@ -572,9 +572,9 @@ public:
 		_handlerList.clear();
 	}
 
-	void Fire(P1 p1, P2 p2, P3 p3, P4 p4)
+	void Fire(P1 p1, P2 p2, P3 p3, P4 p4) const
 	{
-		typename std::list<IEventHandler4*>::iterator pos;
+		typename std::list<IEventHandler4*>::const_iterator pos;
 		for (pos = _handlerList.begin(); pos != _handlerList.end(); )
 		{
 			IEventHandler4* eh = *pos;
@@ -644,7 +644,7 @@ private:
 public:
 	using protocol = std::function<function_signature>;  //allow client to access
 
-	__inline void Fire()
+	__inline void Fire() const
 	{	m_Event0.Fire(), m_EventV2_0.Fire();
 	}
 
@@ -678,7 +678,7 @@ private:
 public:
 	using protocol = std::function<function_signature>;  //allow client to access
 
-	__inline void Fire(P1 p1)
+	__inline void Fire(P1 p1) const
 	{
 		m_Event1.Fire(p1), m_EventV2_1.Fire(p1);
 	}
