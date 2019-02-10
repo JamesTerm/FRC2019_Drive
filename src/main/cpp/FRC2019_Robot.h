@@ -224,10 +224,6 @@ namespace FRC2019_Goals
 	Goal *Get_FRC2019_Autonomous(FRC2019_Robot *Robot);
 }
 
-//TODO enable this
-#if 1
-///This class is a dummy class to use for simulation only.  It does however go through the conversion process, so it is useful to monitor the values
-///are correct
 class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Control_Interface
 {
 	public:
@@ -300,5 +296,4 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		bool m_FirstRun = false;
 		bool m_ElevatorMin, m_ElevatorMax;
 };
-#endif
 

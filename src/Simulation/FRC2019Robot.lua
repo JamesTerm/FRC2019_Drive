@@ -300,12 +300,6 @@ MainRobot = {
 			Claw_Squirt =	 {type="keyboard", key='t', on_off=true},
 			Robot_CloseDoor= {type="joystick_button", key=1, keyboard='u', on_off=true}
 		},
-	},
-		
-	UI =
-	{
-		Length=5, Width=5,
-		TextImage="(   )\n|   |\n(-+-)\n|   |\n(   )"
 	}
 }
 

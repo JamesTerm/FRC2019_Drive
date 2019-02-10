@@ -190,6 +190,9 @@
       <Project>{2ab6419f-e1ab-4c0f-9e30-b3732efc683f}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\FRC2019Robot.lua" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

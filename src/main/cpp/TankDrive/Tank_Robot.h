@@ -171,20 +171,12 @@ class DRIVE_API Tank_Robot : public Ship_Tester,
 		double GetRightVelocity() const {return m_VehicleDrive->GetRightVelocity();}
 };
 
-#ifndef Robot_TesterCode
-typedef Ship_Properties UI_Ship_Properties;
-#endif
-
-class DRIVE_API Tank_Robot_Properties : public UI_Ship_Properties
+class DRIVE_API Tank_Robot_Properties : public Ship_Properties
 {
 	public:
 		Tank_Robot_Properties();
 		virtual void LoadFromScript(Scripting::Script& script);
 		const Tank_Robot_Props &GetTankRobotProps() const {return m_TankRobotProps;}
-		#ifdef Robot_TesterCode
-		const EncoderSimulation_Props &GetEncoderSimulationProps() const {return m_EncoderSimulation.GetEncoderSimulationProps();}
-		EncoderSimulation_Props &EncoderSimulationProps() {return m_EncoderSimulation.EncoderSimulationProps();}
-		#endif
 		//note derived class will populate these properties because of where it is in the script 
 		const frc::Control_Assignment_Properties &Get_ControlAssignmentProps() const {return m_ControlAssignmentProps;}
 	protected:
@@ -193,9 +185,6 @@ class DRIVE_API Tank_Robot_Properties : public UI_Ship_Properties
 	private:
 		#ifndef _Win32
 		typedef Ship_Properties __super;
-		#endif
-		#ifdef Robot_TesterCode
-		EncoderSimulation_Properties m_EncoderSimulation;
 		#endif
 };
 
