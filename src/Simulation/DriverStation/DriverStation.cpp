@@ -269,6 +269,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 RobotAssem *s_RobotContainer=nullptr;
 Keyboard *s_StagedKeyboard = nullptr;
 
+
+//TODO find a place for this class
+class RobotCommon
+{
+private:
+	Entity2D_Kind::EventMap* m_eventMap;
+protected:
+	virtual void Initialize(Entity2D_Kind::EventMap& em, const Entity_Properties *props = NULL);
+public:
+	Entity2D_Kind::EventMap* GetEventMap();
+};
+
+
 void BindKeyboard()
 {
 	if (s_RobotContainer)
@@ -278,7 +291,7 @@ void BindKeyboard()
 			assert(false);  //recoverable but need to see use-case
 			delete s_Keyboard;
 		}
-		Ship_Tester *_pRobot = s_RobotContainer->GetRobot();
+		RobotCommon *_pRobot = s_RobotContainer->GetRobot();
 		s_StagedKeyboard->SetEventMap(_pRobot->GetEventMap());
 		s_Keyboard = s_StagedKeyboard;
 		s_StagedKeyboard = nullptr;

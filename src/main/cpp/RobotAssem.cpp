@@ -108,6 +108,7 @@ private:
 	FRC2019_Robot *m_pRobot = nullptr;
 	frc::Driver_Station_Joystick m_Joystick;
 	Framework::UI::JoyStick_Binder m_JoyBinder;
+	Framework::UI::KeyboardMouse_CB m_KeyboardBinder;
 	UI_Controller *m_pUI;
 
 	Framework::Base::EventMap m_EventMap;
@@ -142,6 +143,7 @@ public:
 		//establish the first parent bind, before setting up the UI controller, and after instantiation of the robot
 		s_ParentBind(m_pParent, false);
 		#endif
+		#if 0
 		//To to bind the UI controller to the robot
 		AI_Base_Controller *controller = m_pRobot->GetController();
 		assert(controller);
@@ -161,6 +163,12 @@ public:
 		//start in tele... if auton is handled it can be called explicitly
 		SmartDashboard::SetDefaultBoolean("Test_Auton", false);
 		SmartDashboard::SetDefaultNumber("AutonTest", 0.0);
+		#else
+		m_pRobot->AsRobotCommon()->BindAdditionalEventControls(true);
+		//Will look into this later
+		//m_FieldCentricDrive.BindAdditionalEventControls(true, em, ehl);
+		m_pRobot->AsRobotCommon()->BindAdditionalUIControls(true, &m_JoyBinder, &m_KeyboardBinder);
+		#endif
 	}
 	RobotAssem_Internal(RobotAssem *parent,const char *RobotLua, Configuration::ActiveCollection *Collection) : m_pParent(parent),
 		m_Joystick(3,0),m_JoyBinder(m_Joystick), m_Collection(Collection)
@@ -226,8 +234,13 @@ public:
 		#ifdef _Win32
 		s_ParentBind(nullptr,true);
 		#endif
+		#if 0
 		delete m_pUI;
 		m_pUI = nullptr;
+		#else
+		m_pRobot->AsRobotCommon()->BindAdditionalEventControls(false);
+		//m_FieldCentricDrive.BindAdditionalEventControls(false, em, ehl);
+		#endif
 		delete m_pRobot;  //checks for null implicitly 
 		m_pRobot = nullptr;
 	}
@@ -240,7 +253,7 @@ public:
 			m_pRobot->TimeChange(dTime_s);
 		}
 	}
-	Ship_Tester *GetRobot() { return m_pRobot; }
+	RobotCommon *GetRobot() { return m_pRobot; }
 };
 
 void RobotAssem::RobotAssem_init(const char *RobotLua, Configuration::ActiveCollection *Collection)
@@ -259,7 +272,7 @@ void RobotAssem::Update(double dTime_s)
 }
 
 #ifdef _Win32
-Ship_Tester *RobotAssem::GetRobot()
+RobotCommon *RobotAssem::GetRobot()
 {
 	return m_p_RobotAssem->GetRobot();
 }

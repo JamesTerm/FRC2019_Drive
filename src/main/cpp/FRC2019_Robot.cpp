@@ -624,14 +624,14 @@ void FRC2019_Robot::Robot_Arm::BindAdditionalEventControls(bool Bind)
  /*															FRC2019_Robot															*/
 /***********************************************************************************************************************************/
 FRC2019_Robot::FRC2019_Robot(const char EntityName[],FRC2019_Control_Interface *robot_control,bool UseEncoders) : 
-	Tank_Robot(EntityName,robot_control,UseEncoders), m_RobotControl(robot_control), m_Arm(this,robot_control), m_Claw(this,robot_control)
+	//Tank_Robot(EntityName,robot_control,UseEncoders), 
+	m_RobotControl(robot_control), m_Arm(this,robot_control), m_Claw(this,robot_control)
 {
 }
 
 void FRC2019_Robot::Initialize(Entity2D_Kind::EventMap& em, const Entity_Properties *props)
 {
 	__super::Initialize(em,props);
-	//TODO construct Arm-Ship1D properties from FRC 2011 Robot properties and pass this into the robot control and arm
 	m_RobotControl->Initialize(props);
 
 	const FRC2019_Robot_Properties *RobotProps=dynamic_cast<const FRC2019_Robot_Properties *>(props);
@@ -642,7 +642,7 @@ void FRC2019_Robot::Initialize(Entity2D_Kind::EventMap& em, const Entity_Propert
 }
 void FRC2019_Robot::ResetPos()
 {
-	__super::ResetPos();
+	//__super::ResetPos();
 	m_Arm.ResetPos();
 	m_Claw.ResetPos();
 }
@@ -659,6 +659,9 @@ FRC2019_Robot_Props::Autonomous_Properties &FRC2019_Robot::GetAutonProps()
 
 void FRC2019_Robot::TimeChange(double dTime_s)
 {
+	//Will keep this disabled for now unless we really want it back...
+	//for simulation we'll need to put the checkbox as its version of smartdashboard requires a put
+	#if 0
 	//monitor the AutonTest CheckBox
 	if (m_SmartDashboard_AutonTest_Valve)
 	{
@@ -677,10 +680,11 @@ void FRC2019_Robot::TimeChange(double dTime_s)
 		if (SmartDashboard::GetBoolean("Test_Auton"))
 			TestAutonomous();
 	}
+	#endif
 
 	//For the simulated code this must be first so the simulators can have the correct times
 	m_RobotControl->Robot_Control_TimeChange(dTime_s);
-	__super::TimeChange(dTime_s);
+	//__super::TimeChange(dTime_s);
 	Entity1D &arm_entity=m_Arm;  //This gets around keeping time change protected in derived classes
 	arm_entity.TimeChange(dTime_s);
 	Entity1D &claw_entity=m_Claw;  //This gets around keeping time change protected in derived classes
@@ -716,24 +720,24 @@ void FRC2019_Robot::BindAdditionalEventControls(bool Bind)
 	ArmShip_Access.BindAdditionalEventControls(Bind);
 	Ship_1D &ClawShip_Access=m_Claw;
 	ClawShip_Access.BindAdditionalEventControls(Bind);
-	__super::BindAdditionalEventControls(Bind);
+	//__super::BindAdditionalEventControls(Bind);
 }
 
 void FRC2019_Robot::BindAdditionalUIControls(bool Bind,void *joy,void *key)
 {
 	m_RobotProps.Get_RobotControls().BindAdditionalUIControls(Bind,joy,key);
-	__super::BindAdditionalUIControls(Bind,joy,key);  //call super for more general control assignments
+	//__super::BindAdditionalUIControls(Bind,joy,key);  //call super for more general control assignments
 }
 
 void FRC2019_Robot::StopAuton(bool isOn)
 {
-	m_SmartDashboard_AutonTest_Valve = false;
-	SmartDashboard::PutBoolean("Test_Auton", false);
-	//FreezeArm(isOn);
-	m_controller->GetUIController_RW()->SetAutoPilot(false);
-	GetEventMap()->Event_Map["StopAutonAbort"].Fire();
-	ClearGoal();
-	//LockPosition(false);
+	//m_SmartDashboard_AutonTest_Valve = false;
+	//SmartDashboard::PutBoolean("Test_Auton", false);
+	////FreezeArm(isOn);
+	//m_controller->GetUIController_RW()->SetAutoPilot(false);
+	//GetEventMap()->Event_Map["StopAutonAbort"].Fire();
+	//ClearGoal();
+	////LockPosition(false);
 }
 
 Goal *TestAutonDefaultGoalCallback(FRC2019_Robot *Robot)
@@ -744,35 +748,35 @@ Goal *TestAutonDefaultGoalCallback(FRC2019_Robot *Robot)
 //No longer are these restricted to simulation
 void FRC2019_Robot::TestAutonomous()
 {
-	m_SmartDashboard_AutonTest_Valve = true;
-	SmartDashboard::PutBoolean("Test_Auton", true);
-	Goal *oldgoal = ClearGoal();
-	if (oldgoal)
-		delete oldgoal;
+	//m_SmartDashboard_AutonTest_Valve = true;
+	//SmartDashboard::PutBoolean("Test_Auton", true);
+	//Goal *oldgoal = ClearGoal();
+	//if (oldgoal)
+	//	delete oldgoal;
 
-	{
-		Goal *goal = NULL;
-		//Note: we may change how this gets implemented
-		#if 0
-		goal = FRC2019_Goals::Get_FRC2019_Autonomous(this);
-		#else
-		if (!m_TestAutonGoalCallback)
-			m_TestAutonGoalCallback = TestAutonDefaultGoalCallback;
-		//goal = FRC2019_Goals::Get_Sample_Goal(this);
-		goal = m_TestAutonGoalCallback(this);
-		#endif
-		if (goal)
-			goal->Activate(); //now with the goal(s) loaded activate it
-		SetGoal(goal);
-		//enable autopilot (note windriver does this in main)
-		m_controller->GetUIController_RW()->SetAutoPilot(true);
-	}
+	//{
+	//	Goal *goal = NULL;
+	//	//Note: we may change how this gets implemented
+	//	#if 0
+	//	goal = FRC2019_Goals::Get_FRC2019_Autonomous(this);
+	//	#else
+	//	if (!m_TestAutonGoalCallback)
+	//		m_TestAutonGoalCallback = TestAutonDefaultGoalCallback;
+	//	//goal = FRC2019_Goals::Get_Sample_Goal(this);
+	//	goal = m_TestAutonGoalCallback(this);
+	//	#endif
+	//	if (goal)
+	//		goal->Activate(); //now with the goal(s) loaded activate it
+	//	SetGoal(goal);
+	//	//enable autopilot (note windriver does this in main)
+	//	m_controller->GetUIController_RW()->SetAutoPilot(true);
+	//}
 }
 
 void FRC2019_Robot::GoalComplete()
 {
-	printf("Goals completed!\n");
-	m_controller->GetUIController_RW()->SetAutoPilot(false);
+	//printf("Goals completed!\n");
+	//m_controller->GetUIController_RW()->SetAutoPilot(false);
 }
 
   /***********************************************************************************************************************************/

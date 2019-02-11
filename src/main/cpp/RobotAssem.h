@@ -1,6 +1,6 @@
 #pragma once
 class RobotAssem_Internal; //forward declare... 
-class Ship_Tester;
+class RobotCommon;
 
 class RobotAssem
 {
@@ -11,7 +11,7 @@ public:
 	void Update(double dTime_s);
 	#ifdef _Win32
 	//Give simulation parent access to robot
-	Ship_Tester *GetRobot();
+	RobotCommon *GetRobot();
 	#endif
 private:
 	std::shared_ptr<RobotAssem_Internal> m_p_RobotAssem; //a pointer to implementation idiom (using shared_ptr allows declaration to be hidden from destructor)

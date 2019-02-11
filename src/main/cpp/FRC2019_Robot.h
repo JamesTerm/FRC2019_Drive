@@ -87,11 +87,26 @@ const char * const csz_FRC2019_Robot_BoolSensorDevices_Enum[] =
 	"elevator_min","elevator_max"
 };
 
-///This is a specific robot that is a robot tank and is composed of an arm, it provides addition methods to control the arm, and applies updates to
+//All common traits can be added here, this allows simulation to have access
+class RobotCommon
+{
+	private:
+		Entity2D_Kind::EventMap* m_eventMap;
+	protected:
+		virtual void Initialize(Entity2D_Kind::EventMap& em, const Entity_Properties *props = NULL) { m_eventMap = &em; }
+	public:
+		Entity2D_Kind::EventMap* GetEventMap() { return m_eventMap; }
+		//Robot implements... client code calls
+		virtual void BindAdditionalEventControls(bool Bind) =0;
+		virtual void BindAdditionalUIControls(bool Bind, void *joy, void *key) =0;
+};
+
+///This is a specific robot that is a robot common and is composed of an arm, it provides addition methods to control the arm, and applies updates to
 ///the Robot_Control_Interface
-class FRC2019_Robot : public Tank_Robot
+class FRC2019_Robot : public RobotCommon
 {
 	public:
+		RobotCommon *AsRobotCommon() { return this; }
 		enum SolenoidDevices
 		{
 			eWedgeDeploy,
@@ -204,7 +219,7 @@ class FRC2019_Robot : public Tank_Robot
 	private:
 		FRC2019_Robot_Properties m_RobotProps;
 		#ifndef _Win32
-		typedef  Tank_Robot __super;
+		typedef  RobotCommon __super;
 		#endif
 		FRC2019_Control_Interface * const m_RobotControl;
 		Robot_Arm m_Arm;

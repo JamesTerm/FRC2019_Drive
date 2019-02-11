@@ -67,6 +67,21 @@ public:
 	}
 	static void PutNumber(std::string keyName, double value);
 	static double GetNumber(std::string keyName);
+	//Similar to SetDefaultNumber except that it will safely get if it can without writing it return default value if it doesn't exist
+	static double GetNumber(std::string keyName, double defaultValue)
+	{
+		double ret = false;
+		try
+		{
+			ret = SmartDashboard::GetNumber(keyName);
+		}
+		catch (...)
+		{
+			ret = defaultValue;   //* @return        False if the table key already exists with a different type
+		}
+		return ret;
+	}
+
 	static bool SetDefaultNumber(std::string keyName, double defaultValue)
 	{
 		bool ret = true;
