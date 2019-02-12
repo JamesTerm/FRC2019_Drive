@@ -163,12 +163,12 @@ public:
 private:
   void updateVision()
   {
-    m_currentTarget->setX(m_visionTable->GetNumber("X", 0));
-    m_currentTarget->setY(m_visionTable->GetNumber("Y", 0));
-    m_currentTarget->setRadius(m_visionTable->GetNumber("RADIUS", 0));
+    m_currentTarget->setX((int)m_visionTable->GetNumber("X", 0));
+    m_currentTarget->setY((int)m_visionTable->GetNumber("Y", 0));
+    m_currentTarget->setRadius((int)m_visionTable->GetNumber("RADIUS", 0));
     //Area = m_visionTable->GetNumber("AREA", 0);
-    Height = m_visionTable->GetNumber("HEIGHT", 0);
-    Width = m_visionTable->GetNumber("WIDTH", 0);
+    Height = (int)m_visionTable->GetNumber("HEIGHT", 0);
+    Width = (int)m_visionTable->GetNumber("WIDTH", 0);
     HasTarget = m_visionTable->GetBoolean("HASTARGET", false);
   }
   int Height, Width;

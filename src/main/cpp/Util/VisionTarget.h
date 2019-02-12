@@ -24,9 +24,21 @@ class VisionTarget
     const int getY() { return Y; }
     const int getRadius() { return Radius; }
 
-    const int setX(int _x) { X = _x; }
-    const int setY(int _y) { Y = _y; }
-    const int setRadius(int _radius) { Radius = _radius; }
+    const int setX(int _x) 
+	{ 
+		X = _x; 
+		return X;
+	}
+    const int setY(int _y) 
+	{ 
+		Y = _y; 
+		return Y;
+	}
+    const int setRadius(int _radius) 
+	{ 
+		Radius = _radius; 
+		return Radius;
+	}
     const int compareX(VisionTarget *target)
     {
         return -(X - target->getX());

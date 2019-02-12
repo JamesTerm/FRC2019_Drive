@@ -196,3 +196,11 @@ namespace frc {
 
 	int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs, int32_t leftRumble, int32_t rightRumble);
 }
+
+namespace cs
+{
+	class UsbCamera
+	{
+
+	};
+}

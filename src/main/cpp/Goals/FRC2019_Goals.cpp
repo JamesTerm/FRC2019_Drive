@@ -195,6 +195,7 @@ Goal::Goal_Status Goal_DriveStraight::Process(double dTime)
 
         m_encLeft->Reset();
         m_encRight->Reset();
+		return m_Status;
     }
     else
     {

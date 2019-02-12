@@ -46,6 +46,7 @@
     <ClCompile Include="..\..\main\cpp\Systems\Drive.cpp" />
     <ClCompile Include="frc\DirectInput_Joystick.cpp" />
     <ClCompile Include="frc\Joystick.cpp" />
+    <ClCompile Include="NetworkTables\NetworkTable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main\cpp\Components\DigitalInputItem.h" />
@@ -80,6 +81,9 @@
     <ClInclude Include="frc\Joystick.h" />
     <ClInclude Include="frc\SampleRobot.h" />
     <ClInclude Include="frc\WPILib.h" />
+    <ClInclude Include="NetworkTables\NetworkTable.h" />
+    <ClInclude Include="NetworkTables\NetworkTableEntry.h" />
+    <ClInclude Include="NetworkTables\NetworkTableInstance.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

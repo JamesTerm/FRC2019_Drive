@@ -45,6 +45,9 @@
     <Filter Include="Util\Units">
       <UniqueIdentifier>{b761e367-9f90-472c-8ba2-63fd63fdded3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="NetworkTables">
+      <UniqueIdentifier>{c9dc9df5-c7bf-4269-988c-b1390c4d6b3b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\main\cpp\Components\DigitalInputItem.cpp">
@@ -103,6 +106,9 @@
     </ClCompile>
     <ClCompile Include="..\..\main\cpp\Goals\Goal.cpp">
       <Filter>Goals</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkTables\NetworkTable.cpp">
+      <Filter>NetworkTables</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -201,6 +207,15 @@
     </ClInclude>
     <ClInclude Include="..\..\main\cpp\Util\Units\Distances.h">
       <Filter>Util\Units</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkTables\NetworkTable.h">
+      <Filter>NetworkTables</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkTables\NetworkTableEntry.h">
+      <Filter>NetworkTables</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkTables\NetworkTableInstance.h">
+      <Filter>NetworkTables</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
