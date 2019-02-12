@@ -2,27 +2,99 @@
 
 #include "FRC2019_Goals.h"
 
-static bool SelectAuton(ActiveCollection *activeCollection, MultitaskGoal_ac *goal, string autonSelected)
+static bool SelectAuton(ActiveCollection *activeCollection, MultitaskGoal_ac *goal, string autonSelected, string positionSelected)
 {
     bool isFound = true;
-    if (autonSelected.compare("DriveStraight") == 0)
+    if(autonSelected == "DEBUG")
     {
-        goal->AddGoal(new Goal_DriveWithTimer(activeCollection, .5, .5, 5));
-        cout << "drive straight" << endl;
+        goal->AddGoal(new Goal_VisionAlign(activeCollection,new VisionTarget(320,20),140.0)); //!120 sec timeout for DEBUG only
+        return true;
     }
-    else if (autonSelected.compare("DEBUG1") == 0)
+    if(positionSelected == "Level 1 Left")
     {
-        goal->AddGoal(new Goal_Turn(activeCollection, 45));
-        cout << "Debug 1" << endl;
+        if(autonSelected == "DriveStraight")
+        {
+            goal->AddGoal(new Goal_DriveStraight(activeCollection, new Feet(10.0),.75));
+        }
+        else if(autonSelected == "OneHatchAuto")
+        {
+            //TODO
+        }
+        else
+        {
+            goal->AddGoal(new Goal_DriveStraight(activeCollection, new Feet(10.0),.75));
+            isFound = false;
+        }
     }
-
-    //TODO remaining selections
+    else if(positionSelected == "Level 1 Center")
+    {
+        if(autonSelected == "DriveStraight")
+        {
+            goal->AddGoal(new Goal_DriveStraight(activeCollection, new Feet(10.0),.75));
+        }
+        else if(autonSelected == "OneHatchAuto")
+        {
+            //TODO
+        }
+        else
+        {
+            goal->AddGoal(new Goal_DriveStraight(activeCollection, new Feet(10.0),.75));
+            isFound = false;
+        }
+    }
+    else if(positionSelected == "Level 1 Right")
+    {
+        if(autonSelected == "DriveStraight")
+        {
+            goal->AddGoal(new Goal_DriveStraight(activeCollection, new Feet(10.0),.75));
+        }
+        else if(autonSelected == "OneHatchAuto")
+        {
+            //TODO
+        }
+        else
+        {
+            goal->AddGoal(new Goal_DriveStraight(activeCollection, new Feet(10.0),.75));
+            isFound = false;
+        }
+    }
+    else if(positionSelected == "Level 2 Left")
+    {
+        if(autonSelected == "DriveStraight")
+        {
+            goal->AddGoal(new Goal_DriveStraight(activeCollection, new Feet(10.0),.75));
+        }
+        else if(autonSelected == "OneHatchAuto")
+        {
+            //TODO
+        }
+        else
+        {
+            goal->AddGoal(new Goal_DriveStraight(activeCollection, new Feet(10.0),.75));
+            isFound = false;
+        }
+    }
+    else if(positionSelected == "Level 2 Right")
+    {
+        if(autonSelected == "DriveStraight")
+        {
+            goal->AddGoal(new Goal_DriveStraight(activeCollection, new Feet(10.0),.75));
+        }
+        else if(autonSelected == "OneHatchAuto")
+        {
+            //TODO
+        }
+        else
+        {
+            goal->AddGoal(new Goal_DriveStraight(activeCollection, new Feet(10.0),.75));
+            isFound = false;
+        }
+    }
     else
     {
-        goal->AddGoal(new Goal_DriveStraight(activeCollection, 100, .5));
+        goal->AddGoal(new Goal_DriveStraight(activeCollection, new Feet(10.0),.75));
         isFound = false;
-        cout << "Auton not found" << endl;
     }
-
+    
     return isFound;
 }

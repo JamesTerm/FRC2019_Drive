@@ -36,7 +36,6 @@ void Config::AllocateComponents(){
 	m_activeCollection->Add(left_1);
 	m_activeCollection->Add(right_0);
 	m_activeCollection->Add(right_1);
-	//m_activeCollection->Add(SolenoidTest);
 
 	NavX *navx = new NavX();
 	m_activeCollection->Add(navx);

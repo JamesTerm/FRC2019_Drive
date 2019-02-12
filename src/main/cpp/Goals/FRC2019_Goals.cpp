@@ -62,7 +62,7 @@ Goal::Goal_Status Goal_TimeOut::Process(double dTime)
             Terminate();
             return m_Status = eFailed;
         }
-        cout << m_activeCollection->GetNavX()->GetAngle() << endl; //DEBUG
+        //cout << m_activeCollection->GetNavX()->GetAngle() << endl; //DEBUG
         return eActive;
     }
     else
@@ -114,7 +114,11 @@ Goal::Goal_Status Goal_Turn::Process(double dTime)
     {
         m_currentTime += dTime;
         if (m_currentTime > m_timeOut)
-            return m_Status = eFailed; //set m_Status to failed and return m_Status in one line
+        {
+            Terminate();
+            cout << "no target" << endl;
+            //return m_Status = eFailed; //set m_Status to failed and return m_Status in one line
+        }
 
         double lowerBound = m_target - m_freedom;
         double upperBound = m_target + m_freedom;
@@ -192,7 +196,7 @@ Goal::Goal_Status Goal_DriveStraight::Process(double dTime)
         m_encLeft->Reset();
         m_encRight->Reset();
     }
-    //else
+    else
     {
         return m_Status;
     }
@@ -202,6 +206,66 @@ void Goal_DriveStraight::Terminate()
 {
     StopDrive(m_activeCollection);
 }
+/***********************Goal_VisionAlign***********************/
+void Goal_VisionAlign::Activate()
+{
+    cout << "goal active" << endl;
+    m_Status = eActive;
+    updateVision();
+}
+
+Goal::Goal_Status Goal_VisionAlign::Process(double dTime)
+{
+    m_currentTime += dTime;
+    if(m_currentTime > m_timeOut)
+    {
+        cout << "time out" << endl;
+        Terminate();
+        return m_Status = eFailed;
+    }
+    updateVision();
+    cout << m_currentTarget->getX() << " " << m_currentTarget->getY() << " " << m_currentTarget->getRadius() << " " << Height << " " << Width << HasTarget << endl;
+    if(!HasTarget) 
+    {
+        cout << "no target" << endl;
+        StopDrive(m_activeCollection);
+        return m_Status = eActive; //!return failed for real thing or search
+    }
+    if(m_target->compareX(m_currentTarget) < -20) 
+    {
+        cout << "turn left" << endl;
+        SetDrive(m_target->compareX(m_currentTarget) * TURN_KP,-(m_target->compareX(m_currentTarget) * TURN_KP),m_activeCollection);
+    }
+    else if(m_target->compareX(m_currentTarget) > 20)
+    {
+        cout << "turn right" << endl;
+        SetDrive(m_target->compareX(m_currentTarget) * TURN_KP,-(m_target->compareX(m_currentTarget) * TURN_KP),m_activeCollection);
+    }
+    else
+    {
+        if(m_target->compareRadius(m_currentTarget) < -2 || m_target->compareRadius(m_currentTarget) > 2)
+        {
+            cout << "drive" << endl;
+            SetDrive(m_target->compareRadius(m_currentTarget) * STRAIGHT_KP,(m_target->compareRadius(m_currentTarget) * STRAIGHT_KP),m_activeCollection);
+        }
+        else
+        {
+            cout << "aligned" << endl;
+            Terminate();
+            //return m_Status = eCompleted;
+        }
+        
+    }
+    //cout << "nothing" << endl;
+    return m_Status = eActive;
+
+}
+
+void Goal_VisionAlign::Terminate()
+{
+    StopDrive(m_activeCollection);
+}
+
 #pragma endregion
 
 #pragma region UtilGoals

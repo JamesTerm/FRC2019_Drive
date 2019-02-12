@@ -14,6 +14,7 @@ Email: chrisrweeks@aol.com
 
 #include <iostream>
 #include "Goal.h"
+#include "../Util/VisionTarget.h"
 #include "../Util/Units/Distances.h"
 
 //?HINT ctrl+k then ctrl+0 will collapse all regions
@@ -33,8 +34,7 @@ class Goal_Wait_ac : public AtomicGoal
 public:
   Goal_Wait_ac(ActiveCollection *activeCollection, double timeOut)
   {
-    m_Status = eInactive;
-    m_timeOut = timeOut;
+
     m_activeCollection = activeCollection;
     m_currentTime = 0;
   }
@@ -69,7 +69,7 @@ public:
     m_leftSpeed = leftSpeed;
     m_rightSpeed = rightSpeed;
   }
-  virtual Goal::Goal_Status Process(double dTime);
+  Goal::Goal_Status Process(double dTime);
   void Terminate();
 
 private:
@@ -86,12 +86,7 @@ private:
 class Goal_Turn : public Goal_Wait_ac
 {
 public:
-  Goal_Turn(ActiveCollection *activeCollection, double angle, double timeOut) : Goal_Wait_ac(activeCollection, timeOut)
-  {
-    m_target = angle;
-    m_navx = m_activeCollection->GetNavX();
-  }
-  Goal_Turn(ActiveCollection *activeCollection, double angle) : Goal_Turn(activeCollection, angle, 3.0) {} //default timeOut is 3 seconds
+  Goal_Turn(ActiveCollection *activeCollection, double angle, double timeOut = 3.0) : Goal_Wait_ac(activeCollection, timeOut) {}
   virtual void Activate();
   virtual Goal::Goal_Status Process(double dTime);
   virtual void Terminate();
@@ -143,6 +138,50 @@ private:
   double bias = 0; //bias is a constant that is added to the output. We most likely will not use it but it is here if needed.
   double error, integ, deriv;
   double errorPrior;
+};
+
+//TODO vision aligment:
+/* if x is out of bounds, turn towards target
+ * then, if radius (distance) out of bounds, drive straight towards target 
+ * SetDrive() not turn goal
+ */
+class Goal_VisionAlign : public Goal_TimeOut
+{
+public:
+  Goal_VisionAlign(ActiveCollection *activeCollection, VisionTarget *target, double timeOut = 7.0) : Goal_TimeOut(activeCollection, timeOut)
+  {
+    m_inst = nt::NetworkTableInstance::GetDefault(); //!Network tables
+    m_visionTable = m_inst.GetTable("VISION_2019");  //!Vision network table
+    m_target = target;
+    m_currentTarget = new VisionTarget();
+  }
+
+  virtual void Activate();
+  virtual Goal::Goal_Status Process(double dTime);
+  virtual void Terminate();
+
+private:
+  void updateVision()
+  {
+    m_currentTarget->setX(m_visionTable->GetNumber("X", 0));
+    m_currentTarget->setY(m_visionTable->GetNumber("Y", 0));
+    m_currentTarget->setRadius(m_visionTable->GetNumber("RADIUS", 0));
+    //Area = m_visionTable->GetNumber("AREA", 0);
+    Height = m_visionTable->GetNumber("HEIGHT", 0);
+    Width = m_visionTable->GetNumber("WIDTH", 0);
+    HasTarget = m_visionTable->GetBoolean("HASTARGET", false);
+  }
+  int Height, Width;
+  bool HasTarget;
+
+  //constants for motor speeds. These are multiplied by vision error
+  const double TURN_KP = 0.0025;   //?guess for right now
+  const double STRAIGHT_KP = 0.05; //?guess for right now
+
+  nt::NetworkTableInstance m_inst;        //!Network tables
+  shared_ptr<NetworkTable> m_visionTable; //!Vision table
+  VisionTarget *m_target;
+  VisionTarget *m_currentTarget;
 };
 #pragma endregion
 
