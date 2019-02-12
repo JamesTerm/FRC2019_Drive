@@ -31,13 +31,13 @@ MainRobot = {
 		--by default module is 1, so only really need it for 2
 		victor_sp =
 		{
-			-- id_1 = { name= "right_drive_1", channel=1}, 
-			-- id_2 = { name= "right_drive_2", channel=2}, 
-			-- id_3 = { name= "right_drive_3", channel=3}, 
-			-- id_4 = { name="left_drive_1", channel=4},
-			-- id_5 = { name="left_drive_2", channel=5},
-			-- id_6 = { name="left_drive_3", channel=6},
-			-- id_7= { name="arm", channel=7}
+			-- id_1= { name="arm", channel=7}
+			-- id_2 = { name= "right_drive_1", channel=1}, 
+			-- id_3 = { name= "right_drive_2", channel=2}, 
+			-- id_4 = { name= "right_drive_3", channel=3}, 
+			-- id_5 = { name="left_drive_1", channel=4},
+			-- id_6 = { name="left_drive_2", channel=5},
+			-- id_7 = { name="left_drive_3", channel=6},
 			--If we decide we need more power we can assign these
 			id_1= { name="arm", channel=7}
 		},
@@ -59,9 +59,10 @@ MainRobot = {
 			id_1 = { name="elevator_min",  channel=5},
 			id_2 = { name="elevator_max",  channel=6}
 		},
+		--analog names must be the same name list from the victor (or other speed controls)
 		analog_input =
 		{
-			id_1 = { name="arm_potentiometer",  channel=2},
+			id_1 = { name="arm_pot",  channel=2},
 		},
 		--encoder names must be the same name list from the victor (or other speed controls)
 		--These channels must be unique to digital input channels as well
@@ -70,8 +71,10 @@ MainRobot = {
 		-- 	id_1 = { name= "left_drive_1",  a_channel=3, b_channel=4},
 		-- 	id_2 = { name="right_drive_1",  a_channel=1, b_channel=2},
 		-- },
+		--the relay and limit parameters are depreciated; however, keeping this line in will determine if the compressor is
+		--loaded.  TODO change parameters to one PCM_node_ID parameter, as this is currently just hardcoded in.
 		compressor	=	{ relay=8, limit=14 },
-		accelerometer	=	{ gRange=1 }
+		--accelerometer	=	{ gRange=1 }
 	},
 	--Version helps to identify a positive update to lua
 	--version = 1;
@@ -160,7 +163,7 @@ MainRobot = {
 		cargo3_height=61.5,   --max height (and falls short but is ok)
 		arm =
 		{
-			is_closed=1,
+			is_closed=0,
 			show_pid_dump='n',
 			ds_display_row=-1,
 			use_pid_up_only='y',  --for now make the same, but this may change
@@ -172,6 +175,8 @@ MainRobot = {
 			tolerance_count=1,
 			voltage_multiply=1.0,			--May be reversed
 			encoder_to_wheel_ratio=1.0,
+			--If using an encoder check its pulses per revolution spec
+			--encoder_pulses_per_revolution=560/4,
 			Arm_SetPotentiometerSafety=true,	
 			-- Using speed of 14400, about 0.15 nm of torque (about 21 oz-in)
 			-- 8:50 1st stage = 0.16
@@ -189,7 +194,13 @@ MainRobot = {
 			max_accel_reverse=140,
 			predict_up=.200,
 			predict_down=.200,
-			using_range=1,					--Warning Only use range if we have a potentiometer!
+			using_range=0,					--Warning Only use range if we have a potentiometer!
+
+			--These are in native units of the pot / encoder
+			pot_min_limit=232*4.215+5,
+			pot_max_limit=890*4.215+5,
+			pot_range_flipped='n',
+
 			--These min/max in inch units
 			max_range= 61.5,  --confirmed range
 			--Note the sketch used -43.33, but tests on actual assembly show -46.12
