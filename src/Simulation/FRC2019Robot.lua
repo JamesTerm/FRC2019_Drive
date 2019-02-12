@@ -61,7 +61,7 @@ MainRobot = {
 		},
 		analog_input =
 		{
-			id_1 = { name="arm_potentiometer",  channel=2},
+			id_1 = { name="arm_pot",  channel=2},
 		},
 		--encoder names must be the same name list from the victor (or other speed controls)
 		--These channels must be unique to digital input channels as well
@@ -172,6 +172,8 @@ MainRobot = {
 			tolerance_count=1,
 			voltage_multiply=1.0,			--May be reversed
 			encoder_to_wheel_ratio=1.0,
+			--If using an encoder check its pulses per revolution spec
+			--encoder_pulses_per_revolution=560/4,
 			Arm_SetPotentiometerSafety=true,	
 			-- Using speed of 14400, about 0.15 nm of torque (about 21 oz-in)
 			-- 8:50 1st stage = 0.16
@@ -190,6 +192,12 @@ MainRobot = {
 			predict_up=.200,
 			predict_down=.200,
 			using_range=1,					--Warning Only use range if we have a potentiometer!
+
+			--These are in native units of the pot / encoder
+			pot_min_limit=232*4.215+5,
+			pot_max_limit=890*4.215+5,
+			pot_range_flipped='n',
+
 			--These min/max in inch units
 			max_range= 61.5,  --confirmed range
 			--Note the sketch used -43.33, but tests on actual assembly show -46.12
