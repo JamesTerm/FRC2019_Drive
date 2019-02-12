@@ -72,6 +72,7 @@ const char * const csz_FRC2019_Robot_SpeedControllerDevices_Enum[] =
 };
 
 //Note: rotary systems share the same index as their speed controller counterpart
+//this can be any kind of sensor (e.g. pot, encoder etc) that get resolved in robot control
 const char * const csz_FRC2019_Robot_AnalogInputs_Enum[] =
 {
 	"arm_pot"
@@ -251,9 +252,7 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		//Give access to set hooks in the drive as well
 		void SetDriveExternalPWMSpeedControllerHook(std::function<void *(size_t, size_t, const char *, const char*,bool &)> callback) 
 		{
-			#if !defined _Win32 || defined __Tank_TestControlAssignments__
 			m_TankRobotControl.SetExternalPWMSpeedControllerHook(callback);
-			#endif
 		}
 	protected: //from Robot_Control_Interface
 		virtual void UpdateVoltage(size_t index, double Voltage);
@@ -304,7 +303,7 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 	private:
 		//Note: these may be arrayed if we have more pots
 		KalmanFilter m_KalFilter_Arm;
-		Averager<double, 5> m_Averager;
+		Averager<double, 5> m_Averager_Arm;
 		#ifdef _Win32
 		Potentiometer_Tester2 m_Potentiometer; //simulate a real potentiometer for calibration testing
 		#endif

@@ -193,8 +193,6 @@ public:
 			#endif
 			return ret;
 		});
-		//Note: For Simulation, Tank_Robot_Control needs __Tank_TestControlAssignments__ defined; otherwise there are no hooks to set
-		//Swerve drive merged both techniques, and eventually Tank could do the same, for now, they are still separate
 		m_Control.SetDriveExternalPWMSpeedControllerHook(
 			[&](size_t module, size_t Channel, const char *Name, const char*Type, bool &DoNotCreate)
 		{

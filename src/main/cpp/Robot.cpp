@@ -47,7 +47,14 @@ void Robot::RobotInit()
 	Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
 	//Must have this for smartdashboard to work properly
 	SmartDashboard::init();
-	m_Robot.RobotAssem_init("FRC2019Robot.lua", m_activeCollection);
+	//Select which lua to load here
+	#ifdef _Win32
+	const char *RobotScript = "FRC2019_Simulation.lua";
+	//const char *RobotScript = "FRC2019Robot.lua";
+	#else
+	const char *RobotScript = "FRC2019Robot.lua";
+	#endif	
+	m_Robot.RobotAssem_init(RobotScript, m_activeCollection);
 	m_inst = nt::NetworkTableInstance::GetDefault();		  //!Network tables
 	m_visionTable = m_inst.GetTable("VISION_2019");			  //!Vision network table
 	m_dashboardTable = m_inst.GetTable("DASHBOARD_TABLE");
