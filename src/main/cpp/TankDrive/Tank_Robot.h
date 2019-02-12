@@ -61,10 +61,6 @@ struct Tank_Robot_Props
 };
 
 class Tank_Robot_UI;
-#ifndef Robot_TesterCode
-#define DRIVE_API
-#endif
-
 const char * const csz_Tank_Robot_SpeedControllerDevices_Enum[] =
 {
 	"left_drive_1","left_drive_2","left_drive_3","right_drive_1","right_drive_2","right_drive_3"
@@ -72,7 +68,7 @@ const char * const csz_Tank_Robot_SpeedControllerDevices_Enum[] =
 
 ///This is a specific robot that is a robot tank and is composed of an arm, it provides addition methods to control the arm, and applies updates to
 ///the Robot_Control_Interface
-class DRIVE_API Tank_Robot : public Ship_Tester,
+class Tank_Robot : public Ship_Tester,
 				   public Vehicle_Drive_Common_Interface
 {
 	public:
@@ -171,7 +167,7 @@ class DRIVE_API Tank_Robot : public Ship_Tester,
 		double GetRightVelocity() const {return m_VehicleDrive->GetRightVelocity();}
 };
 
-class DRIVE_API Tank_Robot_Properties : public Ship_Properties
+class Tank_Robot_Properties : public Ship_Properties
 {
 	public:
 		Tank_Robot_Properties();
@@ -188,43 +184,7 @@ class DRIVE_API Tank_Robot_Properties : public Ship_Properties
 		#endif
 };
 
-#define __Tank_TestControlAssignments__
-#if defined _Win32 && !defined __Tank_TestControlAssignments__
-
-class DRIVE_API Tank_Robot_Control : public Tank_Drive_Control_Interface
-{
-	public:
-		Tank_Robot_Control(bool UseSafety=true);
-		//This is only needed for simulation
-		virtual void Tank_Drive_Control_TimeChange(double dTime_s);
-		double GetLeftVoltage() const {return m_LeftVoltage;}
-		double GetRightVoltage() const {return m_RightVoltage;}
-		void SetDisplayVoltage(bool display) {m_DisplayVoltage=display;}
-
-		void SetLeftRightReverseDirectionEncoder(bool Left_reverseDirection,bool Right_reverseDirection) 
-		{	m_Encoders.SetLeftRightReverseDirectionEncoder(Left_reverseDirection,Right_reverseDirection);
-		}
-	protected: //from Robot_Control_Interface
-		virtual void Reset_Encoders();
-		virtual void Initialize(const Entity_Properties *props);
-		virtual void GetLeftRightVelocity(double &LeftVelocity,double &RightVelocity);
-		virtual void UpdateLeftRightVoltage(double LeftVoltage,double RightVoltage);
-		double RPS_To_LinearVelocity(double RPS);
-	protected:
-		double m_RobotMaxSpeed;  //cache this to covert velocity to motor setting
-		Encoder_Tester m_Encoders;
-		KalmanFilter m_KalFilter_Arm,m_KalFilter_EncodeLeft,m_KalFilter_EncodeRight;
-		//cache voltage values for display
-		double m_LeftVoltage,m_RightVoltage;
-		bool m_DisplayVoltage;
-		Tank_Robot_Props m_TankRobotProps; //cached in the Initialize from specific robot
-	private:
-		//Used for diagnostics, but also may be used for path align information
-		void InterpolateVelocities(double LeftLinearVelocity,double RightLinearVelocity,Vec2D &LocalVelocity,double &AngularVelocity,double dTime_s);
-		double m_dTime_s;  //Stamp the current time delta slice for other functions to use
-};
-#else
-class DRIVE_API Tank_Robot_Control :  public frc::RobotControlCommon, public Tank_Drive_Control_Interface
+class Tank_Robot_Control :  public frc::RobotControlCommon, public Tank_Drive_Control_Interface
 {
 	public:
 		Tank_Robot_Control(bool UseSafety=true);
@@ -276,4 +236,3 @@ class DRIVE_API Tank_Robot_Control :  public frc::RobotControlCommon, public Tan
 	public:
 		double Get_dTime_s() const {return m_dTime_s;}
 };
-#endif
