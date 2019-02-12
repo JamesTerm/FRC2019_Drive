@@ -13,7 +13,9 @@ Email: cooper.ryan@centaurisoft.org, ruizdylann@gmail.com
 
 #ifndef SRC_UTIL_UTILITYFUNCTIONS_H_
 #define SRC_UTIL_UTILITYFUNCTIONS_H_
-
+/*
+ * THIS CLASS IS FOR SETTING AND RETREIVING AND SENDING DATA, AND SIMPLE CALCULATIONS
+ */
 
 #include "../Config/ActiveCollection.h"
 #include "LoopChecks.h"
@@ -36,10 +38,12 @@ static void SetDrive(double left, double right, ActiveCollection *activeCollecti
 
 	left_0->Set(left); //sets left and right motors to desired power
 	left_1->Set(left);
-	left_2->Set(left);
+	if (left_2)
+		left_2->Set(left);
 	right_0->Set(right);
 	right_1->Set(right);
-	right_2->Set(right);
+	if (right_2)
+		right_2->Set(right);
 }
 static void StopDrive(ActiveCollection *activeCollection) //sets drive power to zero
 {

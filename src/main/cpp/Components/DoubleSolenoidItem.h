@@ -41,6 +41,7 @@ public:
 	DoubleSolenoid::Value GetState();
 	DoubleSolenoid::Value GetDefaultValue();
 	virtual ~DoubleSolenoidItem();
+	DoubleSolenoid *AsDoubleSolenoid() { return solenoid; }
 };
 }
 
