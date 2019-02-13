@@ -18,41 +18,59 @@ Email:	irobot9803@gmail.com
 using namespace std;
 using namespace Logger;
 
-    const string filename = "RoboLog.txt"; //name of file to be created
-    static ofstream file_(filename);
+    const string filename = "home/lvuser/RoboLog.txt"; //name of file to be created
+    static ofstream file_;
+    static bool atComp = false; //bool for comp
 
     void Log::General(string message, bool toDriverStation)
     {
-        if(toDriverStation)
+        if(!atComp)
         {
-            cout << "WARNING LOG:" + message << endl;
-        }
-        Log::Append("log: " + message);
-	}
-
+            if(toDriverStation)
+            {
+                cout << "WARNING LOG:" + message << endl;
+            }
+            Log::Append("LOG: " + message);
+	    }
+    }
     void Log::Error(string message)
     {
-		cout << "ERROR: " + message << endl;
+		cout << "ERROR: " + message << endl; //displays Error
         Log::Append("ERROR: " + message);
 	}
 
 	void Log::Warning(string message)
     {
-		cout << "WARNING: " + message << endl;
+		cout << "WARNING: " + message << endl; //displays Warning
 		Log::Append("WARNING: " + message);
 	}
 
     void Log::restartfile()
     {
-        file_.open(filename);
-        //file_.open(filename, ios::app | ios::trunc); //opens file then clears it (trunc) then appends things in it (app)
+        file_.open(filename); //opens file then clears it
         cout << "File " + filename + " created" << endl;
     }
 
     void Log::Append(string message)
     {
-        if(file_)
+        if(file_.is_open())
         {
             file_ << message << endl; //appends message in file
+            for(int i = 0; i < 1024 - message.length(); i++){
+                file_ << " ";
+            }
+        }
+        else
+        {
+            cout << "File not open" << endl;
         }   
+    }
+
+    void Log::closeLogFile()
+    {
+        if(file_.is_open())
+        {
+            file_.close();
+            cout << "File closed" << endl;
+        }
     }

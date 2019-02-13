@@ -65,15 +65,14 @@ using namespace std;
     **/
 	void Robot::OperatorControl()
 	{
+		Log::restartfile();
 		cout << "Teleoperation Started." << endl;
 		while (IsOperatorControl() && !IsDisabled())
 		{
 			m_drive->Update();
-			Log::Error("This is an error");
-			Log::Warning("This is a warning");
-			Log::General("This is a Log", true);
 			Wait(0.010);
 		}
+		Log::closeLogFile();
 	}
 
 	/**
