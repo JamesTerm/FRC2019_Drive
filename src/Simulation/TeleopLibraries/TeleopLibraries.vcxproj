@@ -44,6 +44,7 @@
     <ClCompile Include="..\..\main\cpp\Goals\Goal.cpp" />
     <ClCompile Include="..\..\main\cpp\Robot.cpp" />
     <ClCompile Include="..\..\main\cpp\Systems\Drive.cpp" />
+    <ClCompile Include="..\..\main\cpp\Util\Log.cpp" />
     <ClCompile Include="frc\DirectInput_Joystick.cpp" />
     <ClCompile Include="frc\Joystick.cpp" />
     <ClCompile Include="NetworkTables\NetworkTable.cpp" />

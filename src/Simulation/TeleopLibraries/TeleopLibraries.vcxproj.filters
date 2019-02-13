@@ -110,6 +110,9 @@
     <ClCompile Include="NetworkTables\NetworkTable.cpp">
       <Filter>NetworkTables</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Util\Log.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main\cpp\Components\DigitalInputItem.h">
