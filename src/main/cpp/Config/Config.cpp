@@ -149,8 +149,18 @@ void Config::LoadValues(xml_document &doc){
 	#pragma endregion MetaData
 
 	AllocateComponents(root);
-	AllocateDriverControls(root);
-	//TODO: Controls
+
+	xml_node controls = root.child("Controls");
+
+	if(controls){
+		cout << "Controls tag found" << endl;
+	}
+	else{
+		cout << "Control definitions were not found in Config! Returning to Robot.cpp" << endl;\
+		return;
+	}
+
+	AllocateDriverControls(controls);
 }
 
 void Config::AllocateComponents(xml_node &root){
@@ -361,8 +371,30 @@ void Config::AllocateComponents(xml_node &root){
 
 }
 
-void Config::AllocateDriverControls(xml_node &root){
+void Config::AllocateDriverControls(xml_node &controls){
+	xml_node drive = controls.child("Driver");
+	if(!drive){
+		cout << "Drive Control definitions not found in config! Skipping..." < endl;
+		return;
+	}
+	int slot = drive.attribute("slot").as_int();
+	cout << "Configured Driver Joystick at slot " << slot << endl;
+	m_driveJoy = new Joystick(slot);
 
+	#pragma region AxisControl
+	
+	//TODO: Support for multiple drive fits?
+
+	xml_node AxisControls = controls.child("AxisControls");
+	if(AxisControls){
+		
+	}
+	else{
+		cout << "Axis Control Driver definitions not found! Skipping..." << endl;
+	}
+		
+
+	#pragma endregion AxisControl
 }
 
 //! DEPRECATED: Here only for reference

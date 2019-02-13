@@ -40,7 +40,11 @@
         </DigitalInput>
     </RobotConfig>
 
+    <!-- Root of all control definitions -->
     <Controls>
-        
+        <!-- Driver Controller, slot should always be 0 -->
+        <Driver slot="0">
+            
+        </Driver>
     </Controls>
 </Robot>

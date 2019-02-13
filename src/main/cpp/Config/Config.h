@@ -33,7 +33,7 @@ public:
 	//TODO: Make this a bool return
 	void LoadValues(xml_document &doc);
 	void AllocateComponents(xml_node &root);
-	void AllocateDriverControls(xml_node &root);
+	void AllocateDriverControls(xml_node &controls);
 	void AllocateComponentsDep();
 	virtual ~Config();
 private:
