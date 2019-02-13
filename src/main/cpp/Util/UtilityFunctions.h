@@ -13,7 +13,9 @@ Email: cooper.ryan@centaurisoft.org, ruizdylann@gmail.com
 
 #ifndef SRC_UTIL_UTILITYFUNCTIONS_H_
 #define SRC_UTIL_UTILITYFUNCTIONS_H_
-
+/*
+ * THIS CLASS IS FOR SETTING AND RETREIVING AND SENDING DATA, AND SIMPLE CALCULATIONS
+ */
 
 #include "../Config/ActiveCollection.h"
 #include "LoopChecks.h"
@@ -32,13 +34,16 @@ static void SetDrive(double left, double right, ActiveCollection *activeCollecti
 	VictorSPItem *right_0 = activeCollection->GetVictor("Right_0");
 	VictorSPItem *right_1 = activeCollection->GetVictor("Right_1");
 	VictorSPItem *right_2 = activeCollection->GetVictor("Right_2");
+	
 
 	left_0->Set(left); //sets left and right motors to desired power
 	left_1->Set(left);
-	left_2->Set(left);
+	if (left_2)
+		left_2->Set(left);
 	right_0->Set(right);
 	right_1->Set(right);
-	right_2->Set(right);
+	if (right_2)
+		right_2->Set(right);
 }
 static void StopDrive(ActiveCollection *activeCollection) //sets drive power to zero
 {
@@ -54,66 +59,8 @@ static void DriveWithTimer(double left, double right, double sec, ActiveCollecti
 }
 
 /***********************OPERATOR METHODS************************/
-static void SetIntake(double power, ActiveCollection *activeCollection) //sets intake motors to desired power. range [0,1]
-{
-	VictorSPItem *intakeLeft = activeCollection->GetVictor("RightIntake"); //creates pointers to motor objects
-	VictorSPItem *intakeRight = activeCollection->GetVictor("LeftIntake");
 
-	intakeLeft->Set(power); //sets motors to desired power
-	intakeRight->Set(power);
-}
-static void StopIntake(ActiveCollection *activeCollection) //sets intake pwoer to zero
-{
-	SetIntake(0, activeCollection);
-}
-static void SetArm(double power, ActiveCollection *activeCollection) //sets arm motor power. range: [0,1]
-{
-	VictorSPItem *dropIntake = activeCollection->GetVictor("IntakeDrop"); //creates pointer to motor object
-	dropIntake->Set(power); //sets motor to desired power
-}
-static void StopArm(ActiveCollection *activeCollection) //sets arm power to zero
-{
-	SetArm(0, activeCollection);
-}
-static void SetArmTimer(double power, double sec, ActiveCollection *activeCollection) //sets arm at specified power for specified amount of seconds
-{
-	SetArm(power, activeCollection);
-	Wait(sec);
-
-	StopArm(activeCollection);
-}
-static void DropCube(ActiveCollection *activeCollection) //sets arm and intake motors at predetermined powers/times designed to drop the cube reliably
-{
-	SetArm(-.8, activeCollection);
-	Wait(.25);
-	StopArm(activeCollection);
-
-	SetIntake(-.3, activeCollection);
-	Wait(1);
-
-	StopIntake(activeCollection);
-}
-static void DropCube2(ActiveCollection *activeCollection) //small interation on DropCube. Wait is smaller
-{
-	SetArm(-.8, activeCollection);
-	Wait(.25);
-	StopArm(activeCollection);
-
-	SetIntake(-.3, activeCollection);
-	Wait(.5);
-
-	StopIntake(activeCollection);
-}
-static void SetElevator(double power, ActiveCollection *activeCollection) //sets elevator 
-{
-	TalonSRXItem *lift = activeCollection->GetTalon("Lift"); //gets lift motor pointer
-
-	lift->Set(power); //sets lift power
-}
-static void StopElevator(ActiveCollection *activeCollection) //sets elevator power to zero
-{
-	SetElevator(0, activeCollection);
-}
+//we dont have any yet because robot doesn't exist yet...
 
 /********************************AUTON METHODS********************************/
 static void SlowStop(double left, double right, ActiveCollection *activeCollection) //sets motor power and decreases it over time until robot comes to a stop
@@ -299,247 +246,5 @@ static void Turn(double target, ActiveCollection *activeCollection)
 	//cout << "final angle = " << currentValue << endl;
 }
 //DriveLong is exactly the same as DriveForward except dist0 is 75% of dist
-static void DriveLong(double dist, double power, ActiveCollection *activeCollection)
-{
-	NavX *navx = activeCollection->GetNavX();
-	navx->Reset();
-	EncoderItem *enc0 = activeCollection->GetEncoder("enc0");
-	enc0->Reset();
-	Wait(.25);
 
-	//cout << "initial angle = " << navx->GetAngle() << " initial enc = " << enc0->Get() << endl;
-
-	double dist0 = dist*.75;
-
-	double left, right;
-
-	double setPoint = navx->GetAngle(), currentValue = navx->GetAngle(), enc = enc0->Get();
-
-	double kp = .02, ki = 0, kd = .000005;
-	double errorPrior = 0, error, integ = 0, deriv, output;
-
-	while(enc < dist0 &&_IsAutononomous())
-	{
-		error = setPoint - currentValue;
-		integ = integ + error;
-		deriv = (error - errorPrior);
-		output = (kp*error) + (ki*integ) + (kd*deriv);
-		errorPrior = error;
-
-		//cout << "output = " << output << endl;
-
-		left = power + output;
-		right = power - output;
-
-		SetDrive(left, right, activeCollection);
-
-		currentValue = navx->GetAngle();
-		enc = enc0->Get();
-
-		Wait(.05);
-		//cout<<"angle = " << currentValue << "	left = " << left << "	right = " << right << endl;
-	}
-
-	power = .20;
-	while(enc < dist && _IsAutononomous())
-	{
-		error = setPoint - currentValue;
-		integ = integ + error;
-		deriv = (error - errorPrior);
-		output = (kp*error) + (ki*integ) + (kd*deriv);
-		errorPrior = error;
-
-		//cout << "output = " << output << endl;
-
-		left = power + output;
-		right = power - output;
-
-		SetDrive(left, right, activeCollection);
-
-		currentValue = navx->GetAngle();
-		enc = enc0->Get();
-
-		Wait(.05);
-		//cout<<"angle = " << currentValue << "	left = " << left << "	right = " << right << endl;
-	}
-	StopDrive(activeCollection);
-}
-
-//TurnShort is the same as Turn except killTime is smaller
-static void TurnShort(double target, ActiveCollection *activeCollection)
-{
-	NavX *navx = activeCollection->GetNavX();
-	navx->Reset();
-	Wait(.25);
-
-	//cout << "initial angle = " << navx->GetAngle() << endl;
-
-	double killTime = .2, elapsedTime = 0;
-
-	double left, right, power = 0;
-
-	double currentValue = navx->GetAngle();
-
-	double kp = .0052, ki = 0, kd = .0223;
-	double allow = 2, errorPrior = 0, error, integ = 0, deriv, output;
-
-	while(((currentValue > target + allow) || (currentValue < target - allow)) && (elapsedTime < killTime) && _IsAutononomous())
-	{
-		error = target - currentValue;
-		integ = integ + error;
-		deriv = (error - errorPrior);
-		output = (kp*error) + (ki*integ) + (kd*deriv);
-		errorPrior = error;
-
-		//cout << "output = " << output << endl;
-
-		left = power + output;
-		right = power - output;
-
-		SetDrive(left, right, activeCollection);
-
-		currentValue = navx->GetAngle();
-
-		Wait(.04);
-		elapsedTime += .04;
-		//cout<<"angle = " << currentValue << "	left = " << left << "	right = " << right << endl;
-	}
-	StopDrive(activeCollection);
-	Wait(.25);
-	currentValue = navx->GetAngle();
-	//cout << "final angle = " << currentValue << endl;
-}
-//TurnLong is the same as Turn excpet killTime is larger
-static void TurnLong(double target, ActiveCollection *activeCollection)
-{
-	NavX *navx = activeCollection->GetNavX();
-	navx->Reset();
-	Wait(.25);
-
-	//cout << "initial angle = " << navx->GetAngle() << endl;
-
-	double killTime = .75, elapsedTime = 0;
-
-	double left, right, power = 0;
-
-	double currentValue = navx->GetAngle();
-
-	double kp = .0041, ki = 0, kd = .03;
-	double allow = 2, errorPrior = 0, error, integ = 0, deriv, output;
-
-	while(((currentValue > target + allow) || (currentValue < target - allow)) && (elapsedTime < killTime) && _IsAutononomous())
-	{
-		error = target - currentValue;
-		integ = integ + error;
-		deriv = (error - errorPrior);
-		output = (kp*error) + (ki*integ) + (kd*deriv);
-		errorPrior = error;
-
-		//cout << "output = " << output << endl;
-
-		left = power + output;
-		right = power - output;
-
-		SetDrive(left, right, activeCollection);
-
-		currentValue = navx->GetAngle();
-
-		Wait(.04);
-		elapsedTime += .04;
-		//cout<<"angle = " << currentValue << "	left = " << left << "	right = " << right << endl;
-	}
-	StopDrive(activeCollection);
-	Wait(.25);
-	currentValue = navx->GetAngle();
-	//cout << "final angle = " << currentValue << endl;
-}
-
-//Turn2 is the same at Turn except killTime is longer (even longer than TurnLong)
-static void Turn2(double target, ActiveCollection *activeCollection)
-{
-	NavX *navx = activeCollection->GetNavX();
-	navx->Reset();
-	Wait(.25);
-
-	//cout << "initial angle = " << navx->GetAngle() << endl;
-
-	double killTime = 1, elapsedTime = 0;
-
-	double left, right, power = 0;
-
-	double currentValue = navx->GetAngle();
-
-	double kp = .0052, ki = 0, kd = .0223;
-	double allow = 3, errorPrior = 0, error, integ = 0, deriv, output;
-
-	while(((currentValue > target + allow) || (currentValue < target - allow)) && (elapsedTime < killTime) && _IsAutononomous())
-	{
-		error = target - currentValue;
-		integ = integ + error;
-		deriv = (error - errorPrior);
-		output = (kp*error) + (ki*integ) + (kd*deriv);
-		errorPrior = error;
-
-		//cout << "output = " << output << endl;
-
-		left = power + output;
-		right = power - output;
-
-		SetDrive(left, right, activeCollection);
-
-		currentValue = navx->GetAngle();
-
-		Wait(.04);
-		elapsedTime += .04;
-		//cout<<"angle = " << currentValue << "	left = " << left << "	right = " << right << endl;
-	}
-	StopDrive(activeCollection);
-	Wait(.25);
-	currentValue = navx->GetAngle();
-	//cout << "final angle = " << currentValue << endl;
-}
-
-//TurnNoReset is the same as turn except NavX is not reset
-static void TurnNoReset(double target, ActiveCollection *activeCollection)
-{
-	NavX *navx = activeCollection->GetNavX();
-	Wait(.25);
-
-	//cout << "initial angle = " << navx->GetAngle() << endl;
-
-	double killTime = .5, elapsedTime = 0;
-
-	double left, right, power = 0;
-
-	double currentValue = navx->GetAngle();
-
-	double kp = .0052, ki = 0, kd = .0223;
-	double allow = 2, errorPrior = 0, error, integ = 0, deriv, output;
-
-	while(((currentValue > target + allow) || (currentValue < target - allow)) && (elapsedTime < killTime) && _IsAutononomous())
-	{
-		error = target - currentValue;
-		integ = integ + error;
-		deriv = (error - errorPrior);
-		output = (kp*error) + (ki*integ) + (kd*deriv);
-		errorPrior = error;
-
-		//cout << "output = " << output << endl;
-
-		left = power + output;
-		right = power - output;
-
-		SetDrive(left, right, activeCollection);
-
-		currentValue = navx->GetAngle();
-
-		Wait(.04);
-		elapsedTime += .04;
-		//cout<<"angle = " << currentValue << "	left = " << left << "	right = " << right << endl;
-	}
-	StopDrive(activeCollection);
-	Wait(.25);
-	currentValue = navx->GetAngle();
-	//cout << "final angle = " << currentValue << endl;
-}
 #endif /* SRC_UTIL_UTILITYFUNCTIONS_H_ */

@@ -144,22 +144,26 @@ bool ToggleButtonControl::ButtonUp(bool input)
 
 DoubleSolenoid::Value ToggleButtonControl::GetSolenoidValue()
 {
+	DoubleSolenoid::Value ret = DoubleSolenoid::kOff;
 	for(int i=0; i<(int)components.size();i++)
 	{
 		//TODO: Fix for MultiComponent Use
-		return ((DoubleSolenoidItem*)(components[i]))->GetState();
+		ret=((DoubleSolenoidItem*)(components[i]))->GetState();
 		
 	}
+	return ret;
 }
 
 DoubleSolenoid::Value ToggleButtonControl::GetSolenoidDefaultValue()
 {
+	DoubleSolenoid::Value ret = DoubleSolenoid::kOff;
 	for(int i=0; i<(int)components.size();i++)
 	{
 		//TODO: Fix for MultiComponent Use
-		return ((DoubleSolenoidItem*)(components[i]))->GetDefaultValue();
+		ret=((DoubleSolenoidItem*)(components[i]))->GetDefaultValue();
 		
 	}
+	return ret;
 }
 
 ToggleButtonControl::~ToggleButtonControl() { }

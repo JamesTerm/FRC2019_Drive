@@ -1,0 +1,36 @@
+
+Teleop Goals: FRC 2019 example
+In this document there is a very similar use-case as it was in 2014, so first let's talk about what we have been given, and then talk about how teleop goals can be used as a solution to control it.
+
+For the 2019 robot there are 3 different pneumatic controls for the intake that interact with each other:
+1.  Intake Deployment
+2.  Hatch Deployment
+3.  Hatch Grabber Deployment
+
+The intake is stowed when it is up.  It must be stowed for the Hatch Deployment to work, that hatch deployment pushes out, and then can expand to latch on to the hatch.
+Likewise the Hatch must be stowed when the intake is deployed, when it is deployed it can work in conjunction with the rollers to pick up the cargo/balls.
+
+In this use case, not only are the intake and hatch deployment mutually exclusive, but they must also be in a completely stowed state before allowing control for each other to ensure the deployments do not thrash.  At the time of this writing the geometry is capable of damaging the robot if they are both deployed.
+
+So let's first address the capability of mutual exclusion via goals.  One proposed way to view the controls is as such:
+Button A:  Deploy Intake  when pressed until released
+Button B:  Deploy Hatch   when pressed until released
+
+The idea here is that you can hit the next button and hold it down... if the other pneumatic is deployed it will wait until the goal is completed and once that alloted time has passed, the other pneumatic is ready to be deployed... so it will be deployed at a strategic well-tested time to be as efficient as possible.
+
+
+Now then let's talk about the Hatch Grabber,  it is possible that this control can do 1 of three things depending on the situation
+1.  If the intake is stowed, and if the hatch is already deployed it simply just expands
+2.  If the intake is stowed, and hatch is not deployed... it can deploy the hatch and then expand
+3.  If the intake is deployed, it can stow the intake, deploy the hatch and then expand
+
+Do you see the pattern here?  It is begging for new goals to be added to the stack depending on the current state of the other deployments.  So it can be a one button operation like so:
+
+Button C:  Grab Hatch... hold down and it will end up deployed and expanded
+    release will return it back to the state it was before using this button
+
+This button can interrupt the previous buttons goals because it is responsible for the entire outcome, so it terminates them and evaluates the state, adds the goals as they are needed.  When released it can terminate itself if it didn't finish and put the goals in reverse... to get the state as it was.  It caches the state it was so it knows how it was... that is... was the hatch deployed or not.
+
+
+Finally, It is possible to take this to the next level... its possible to inject a vision alignment period before deploying the hatch... it can align and fail if it can't align and provide feedback to the operator.  The operator simply holds the button down and it either ends up latching or sends feedback that it can't.
+

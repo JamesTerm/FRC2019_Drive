@@ -168,4 +168,5 @@ bin/
 *.idb
 *.opendb
 *.db-*
+*.res
 

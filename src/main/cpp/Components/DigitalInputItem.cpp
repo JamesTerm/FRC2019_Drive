@@ -29,11 +29,17 @@ double DigitalInputItem::Get()
 
 bool DigitalInputItem::GetBool()
 {
+	//This is bad... no since in casting to a double and back into an int, and not all control paths return a value
+#if 0
 	int get = Get();
 	if(get == 1)
 		return false;
 	else if(get == 0)
 		return true;
+#else
+	//This follows the logic previously, and for some unknown value... its false
+	return din->Get() == 0;
+#endif
 }
 
 string DigitalInputItem::GetName()

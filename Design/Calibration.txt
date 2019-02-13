@@ -1,0 +1,71 @@
+
+Calibration:
+============
+
+
+The strategy used for calibration has been to minimize the need for code deployment, this is especially important during competition, where the code should be locked down.
+
+During competition some things may need to be tweaked in lua
+1.  Adjustment of controls
+    a) Adjustment of joystick extreme limits
+    b) Adjustment of joystick curve
+    c) changing axis or button assignments
+    d) disabling a control all together (this has happened)
+2.  Adjustment of slot assignments 
+    a) needing to reverse an assignment
+    b) needing to adjust for slip (for potentiometers)
+    c) needing to reassign due to a faulty pin on roboRIO (yes this really happened on digital side car)
+3.  PID and open/closing loops in rotary systems
+    a) May need to open the loop because the encoder of potentiometers fail (yes that happened)
+    b) Adjusting PID as needed (I have not needed to do this, but should be available)
+3.  Autonomous adjustments
+4.  selected autonomous run for next match
+5.  Drive adjustments
+    a) Avoiding lurching when high sticking
+    b) Driver preference of turning velocity
+    c) switching drive type (e.g. fps to tank)
+6.  Forward development:  The simulation can have all closed loops, while the robot is transitioning towards this
+    a)  See SetPoint_HowTo.txt to safely transition from open to close loop
+
+Also we keep one lua per robot, and one for the simulation
+
+The way the lua is currently mapped out it has 3 sections
+control_assignments {}
+robot_settings {}
+controls {}
+
+control_assignments:
+--------------------
+control assignments is the slot assignment from generic names
+for example:
+id_1 = { name="elevator_min",  channel=5},
+
+Where elevator_min is a generic name, and it can be assigned to channel 5... it is also possible to leave out assignments where the code can still make the call but since it isn't assigned a channel it will safely do nothing.
+
+
+robot_settings:
+---------------
+This can be any setting needed and new ones can be added as you code.  Some settings have become well-defined and generic like those in the rotary systems, while others may be very specific only needed for one season.  It is also a place for autonomous if wanted.
+
+
+controls:
+---------
+This section maps out the joysticks.  For the simulation you can append keyboard assignments to any of the joystick button assignments, or create keyboard assignments explicitly.  These are grouped per joystick, where they are named.  The slotlist specifies which joystick or joysticks are to be used on the driver station:
+example
+slotlist = {slot_1="operator"}
+Only the operator joystick will be read on the first port (port as in the slot specified on the driver station)
+
+
+slotlist = {slot_1="driver",slot_2="operator"},
+Both driver and operator will be read... the names are arbitrary, but these names seem to make the most sense.
+
+slotlist = {slot_1="developer"}
+Another arbitrary name... note these will assign to the group as they are named.  For this the developer is an idea where the person coding can test everything from one control
+
+Note:
+While the joystick groups are local and only read as indicated in the slot list, they keyboard settings are global, and only intended for simulation.  So ideally the keyboard settings should be used in one group to make life easy.
+
+
+Summary:
+The LUA solution provides a strategy to mitigate the need to deploy code during calibration, and has been successfully used in 3 seasons so far.  It also makes it possible to not need to have different code on different robots that are using it... where different robots may be wired differently requiring special custom tweaking needs.
+
