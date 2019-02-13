@@ -18,7 +18,7 @@ Email:	irobot9803@gmail.com
 using namespace std;
 using namespace Logger;
 
-    const string filename = "home/lvuser/RoboLog.txt"; //name of file to be created
+    const string filename = "C/RoboLog.txt"; //name of file to be created
     static ofstream file_;
     static bool atComp = false; //bool for comp
 
