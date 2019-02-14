@@ -43,6 +43,24 @@ class COMMON_API Potentiometer_Tester2 : public Ship_1D
 
 };
 
+//This simulates the 10 turn poteniometer range of 5 - 4059
+class Potentiometer_AM2619_3590 : public Potentiometer_Tester2
+{
+private:
+	double m_Scale=1.0;
+	double m_Offset=0.0;
+public:
+	//The native units of the rotary system need to be normalized where 0 is absolute beginning, and 1 is the absolute end, where it accounts for the padding
+	//Use scale and offset to factor it as such
+	void SetNormalizedProperties(double scale, double offset) { m_Scale = scale, m_Offset = offset; }
+	//This will provide the actual number needed
+	__inline double GetActualPotPosition()
+	{	const double native = GetPotentiometerCurrentPosition();
+		const double norm = native * m_Scale + m_Offset;
+		return norm * 4054.0 + 5.0;
+	}
+};
+
 class COMMON_API Encoder_Simulator : public Ship_1D
 {
 	public:

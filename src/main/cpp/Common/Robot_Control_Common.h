@@ -199,6 +199,7 @@ public:
 	}
 	void TimeChange(double dTime_s, double external_value) //only used in simulation
 	{	m_DefaultNumber = external_value;
+		display_number(external_value);  //also update smartdashboard
 	}
 	int16_t GetValue() {return (int16_t)get_number();}
 	int32_t GetAverageValue()  {return (int32_t)get_number();}

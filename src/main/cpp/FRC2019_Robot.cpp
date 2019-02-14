@@ -1047,6 +1047,12 @@ void FRC2019_Robot_Control::Initialize(const Entity_Properties *props)
 		assert(robot_props);
 		Rotary_Properties writeable_arm_props=robot_props->GetArmProps();
 		m_Potentiometer.Initialize(&writeable_arm_props);
+		//Now to compute the scale down, there is 0-61.5 native range, and this account for 93% of the potentiometer, so we'll multiply this together
+		const double native_range_coef = 1 / 61.5;
+		const double pot_usage = 0.93;
+		//The amount of offset represents how much lead padding we give, ideally the safest is a centered 93% 
+		const double pot_offset = 3.5 / 100.0;
+		m_Potentiometer.SetNormalizedProperties(native_range_coef*pot_usage, pot_offset);
 		#endif
 	}
 	//Note: Initialize may be called multiple times so we'll only set this stuff up on first run
@@ -1088,6 +1094,8 @@ void FRC2019_Robot_Control::Robot_Control_TimeChange(double dTime_s)
 {
 	#ifdef _Win32
 	m_Potentiometer.SetTimeDelta(dTime_s);
+	//setup the actual potentiometer
+	Analog_TimeChange(FRC2019_Robot::eArmPot, dTime_s, m_Potentiometer.GetActualPotPosition());
 	#endif
 	//Update limit switches on each time slice, this avoids multiple calls and can ensure reliable up to date monitoring on when they become triggered
 	m_ElevatorMin = BoolSensor_GetState(FRC2019_Robot::eElevatorMin);
@@ -1108,7 +1116,11 @@ double FRC2019_Robot_Control::GetRotaryCurrentPorV(size_t index)
 	{
 		case FRC2019_Robot::eArm:
 		{
-			#ifndef _Win32
+			//In the simulation we can choose to view the values as they are, or a simpler native mode
+			//Ideally we want to view it as they are, but allow to flip if things are not working properly
+			//(e.g. especially with a new sensor)
+			//#ifndef _Win32
+			#if 1
 			//double raw_value = (double)m_Potentiometer.GetAverageValue();
 			//double raw_value = Pot_GetRawValue(index);
 			double raw_value = (double)Analog_GetAverageValue(index);
