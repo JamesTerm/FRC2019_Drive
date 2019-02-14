@@ -890,8 +890,6 @@ void FRC2019_Robot_Properties::LoadFromScript(Scripting::Script& script)
 }
 
 
-//TODO implement once tank is enabled
-#if 1
   /***********************************************************************************************************************************/
  /*													FRC2019_Robot_Control															*/
 /***********************************************************************************************************************************/
@@ -1104,9 +1102,86 @@ void FRC2019_Robot_Control::Robot_Control_TimeChange(double dTime_s)
 	SmartDashboard::PutBoolean("LimitElevatorMax", m_ElevatorMax);
 }
 
-//void Robot_Control::UpdateVoltage(size_t index,double Voltage)
-//{
-//}
+
+//This is becoming a standard way to work with potentiometers, I'll try to see if I can make it more generic, so that it can be called from any
+//instance
+double FRC2019_Robot_Control::GetPotValue(size_t index)
+{
+	double result = 0.0;
+	//In the simulation we can choose to view the values as they are, or a simpler native mode
+	//Ideally we want to view it as they are, but allow to flip if things are not working properly
+	//(e.g. especially with a new sensor)
+	//#ifndef _Win32
+	#if 1
+	double raw_value = (double)Analog_GetAverageValue(index);
+	raw_value = m_KalFilter_Arm(raw_value);  //apply the Kalman filter
+	raw_value = m_Averager_Arm.GetAverage(raw_value); //and Ricks x element averager
+
+
+	double PotentiometerRaw_To_Arm;
+
+	const double HiRange = m_RobotProps.GetArmProps().GetRotary_Pot_Properties().PotMaxValue;
+	const double LowRange = m_RobotProps.GetArmProps().GetRotary_Pot_Properties().PotMinValue;
+	//If this is true, the value is inverted with the negative operator
+	const bool FlipRange = m_RobotProps.GetArmProps().GetRotary_Pot_Properties().IsFlipped;
+
+	PotentiometerRaw_To_Arm = raw_value - LowRange;//zeros the potentiometer
+	PotentiometerRaw_To_Arm = PotentiometerRaw_To_Arm / (HiRange - LowRange);//scales values from 0 to 1 with +- .001
+
+	//Clip Range
+	//I imagine .001 corrections will not be harmful for when in use.
+	//if (PotentiometerRaw_To_Arm < 0) PotentiometerRaw_To_Arm = 0;//corrects .001 or less causing a negative value
+	//if (PotentiometerRaw_To_Arm > 1 || PotentiometerRaw_To_Arm > .999) PotentiometerRaw_To_Arm = 1;//corrects .001 or lass causing value greater than 1
+
+	//TODO see if we need a ratio multiply here... otherwise range is from 0-1 for full motion
+
+	if (FlipRange)
+		PotentiometerRaw_To_Arm = 1.0 - PotentiometerRaw_To_Arm;
+
+	const char * const Prefix = csz_FRC2019_Robot_SpeedControllerDevices_Enum[index];
+	string ContructedName;
+	ContructedName = Prefix, ContructedName += "_Raw";
+	SmartDashboard::PutNumber(ContructedName.c_str(), raw_value);
+	ContructedName = Prefix, ContructedName += "Pot_Raw";
+	SmartDashboard::PutNumber(ContructedName.c_str(), PotentiometerRaw_To_Arm);
+	const double Tolerance = m_RobotProps.GetArmProps().GetRotary_Pot_Properties().PotLimitTolerance;
+	//Potentiometer safety, if we lose wire connection it will be out of range in which case we turn on the safety (we'll see it turned on)
+	if (raw_value > HiRange + Tolerance || raw_value < LowRange - Tolerance)
+	{
+		std::string SmartLabel = csz_FRC2019_Robot_SpeedControllerDevices_Enum[index];
+		SmartLabel[0] -= 32; //Make first letter uppercase
+		ContructedName = SmartLabel + "Disable";
+		SmartDashboard::PutBoolean(ContructedName.c_str(), true);
+		//TODO see if we want this
+		//const bool mainSafetyLock = SmartDashboard::GetBoolean("SafetyLock_Arm") || SmartDashboard::GetBoolean("SafetyLock_Drive");
+		//if (!mainSafetyLock)
+		//	m_EventMap->Event_Map["Failed"].Fire();
+	}
+
+	//Now to compute the result... we start with the normalized value and give it the appropriate offset and scale
+	//the offset is delegated in script in the final scale units, and the scale is the total range in radians
+	result = PotentiometerRaw_To_Arm;
+	//get scale
+	const Ship_1D_Props &shipprops = m_RobotProps.GetArmProps().GetShip_1D_Props();
+	//SmartDashboard::PutNumber("Arm_ScaleTest",shipprops.MaxRange-shipprops.MinRange);
+	result *= shipprops.MaxRange - shipprops.MinRange;  //compute the total distance in radians
+	result *= m_RobotProps.GetArmProps().GetRotaryProps().EncoderToRS_Ratio;
+	//get offset... Note: scale comes first since the offset is of that scale
+	result += m_RobotProps.GetArmProps().GetRotary_Pot_Properties().PotentiometerOffset;
+	#else
+	result = (m_Potentiometer.GetPotentiometerCurrentPosition()) + 0.0;
+	//Now to normalize it
+	const Ship_1D_Props &shipprops = m_RobotProps.GetArmProps().GetShip_1D_Props();
+	const double NormalizedResult = (result - shipprops.MinRange) / (shipprops.MaxRange - shipprops.MinRange);
+	const char * const Prefix = csz_FRC2019_Robot_SpeedControllerDevices_Enum[index];
+	std::string ContructedName;
+	ContructedName = Prefix, ContructedName += "_Raw";
+	SmartDashboard::PutNumber(ContructedName.c_str(), result);  //this one is a bit different as it is the selected units we use
+	ContructedName = Prefix, ContructedName += "Pot_Raw";
+	SmartDashboard::PutNumber(ContructedName.c_str(), NormalizedResult);
+	#endif
+	return result;
+}
 
 double FRC2019_Robot_Control::GetRotaryCurrentPorV(size_t index)
 {
@@ -1115,87 +1190,11 @@ double FRC2019_Robot_Control::GetRotaryCurrentPorV(size_t index)
 	switch (index)
 	{
 		case FRC2019_Robot::eArm:
-		{
-			//In the simulation we can choose to view the values as they are, or a simpler native mode
-			//Ideally we want to view it as they are, but allow to flip if things are not working properly
-			//(e.g. especially with a new sensor)
-			//#ifndef _Win32
-			#if 1
-			//double raw_value = (double)m_Potentiometer.GetAverageValue();
-			//double raw_value = Pot_GetRawValue(index);
-			double raw_value = (double)Analog_GetAverageValue(index);
-			raw_value = m_KalFilter_Arm(raw_value);  //apply the Kalman filter
-			raw_value = m_Averager_Arm.GetAverage(raw_value); //and Ricks x element averager
-
-
-			double PotentiometerRaw_To_Arm;
-
-			const double HiRange = m_RobotProps.GetArmProps().GetRotary_Pot_Properties().PotMaxValue;
-			const double LowRange = m_RobotProps.GetArmProps().GetRotary_Pot_Properties().PotMinValue;
-			//If this is true, the value is inverted with the negative operator
-			const bool FlipRange = m_RobotProps.GetArmProps().GetRotary_Pot_Properties().IsFlipped;
-
-			PotentiometerRaw_To_Arm = raw_value - LowRange;//zeros the potentiometer
-			PotentiometerRaw_To_Arm = PotentiometerRaw_To_Arm / (HiRange - LowRange);//scales values from 0 to 1 with +- .001
-
-			//Clip Range
-			//I imagine .001 corrections will not be harmful for when in use.
-			//if (PotentiometerRaw_To_Arm < 0) PotentiometerRaw_To_Arm = 0;//corrects .001 or less causing a negative value
-			//if (PotentiometerRaw_To_Arm > 1 || PotentiometerRaw_To_Arm > .999) PotentiometerRaw_To_Arm = 1;//corrects .001 or lass causing value greater than 1
-
-			//TODO see if we need a ratio multiply here... otherwise range is from 0-1 for full motion
-
-			if (FlipRange)
-				PotentiometerRaw_To_Arm = 1.0 - PotentiometerRaw_To_Arm;
-
-			const char * const Prefix = csz_FRC2019_Robot_SpeedControllerDevices_Enum[index];
-			string ContructedName;
-			ContructedName = Prefix, ContructedName += "_Raw";
-			SmartDashboard::PutNumber(ContructedName.c_str(), raw_value);
-			ContructedName = Prefix, ContructedName += "Pot_Raw";
-			SmartDashboard::PutNumber(ContructedName.c_str(), PotentiometerRaw_To_Arm);
-			const double Tolerance = m_RobotProps.GetArmProps().GetRotary_Pot_Properties().PotLimitTolerance;
-			//Potentiometer safety, if we lose wire connection it will be out of range in which case we turn on the safety (we'll see it turned on)
-			if (raw_value > HiRange + Tolerance || raw_value < LowRange - Tolerance)
-			{
-				std::string SmartLabel = csz_FRC2019_Robot_SpeedControllerDevices_Enum[index];
-				SmartLabel[0] -= 32; //Make first letter uppercase
-				ContructedName = SmartLabel + "Disable";
-				SmartDashboard::PutBoolean(ContructedName.c_str(), true);
-				//TODO see if we want this
-				//const bool mainSafetyLock = SmartDashboard::GetBoolean("SafetyLock_Arm") || SmartDashboard::GetBoolean("SafetyLock_Drive");
-				//if (!mainSafetyLock)
-				//	m_EventMap->Event_Map["Failed"].Fire();
-			}
-
-			//Now to compute the result... we start with the normalized value and give it the appropriate offset and scale
-			//the offset is delegated in script in the final scale units, and the scale is the total range in radians
-			result = PotentiometerRaw_To_Arm;
-			//get scale
-			const Ship_1D_Props &shipprops = m_RobotProps.GetArmProps().GetShip_1D_Props();
-			//SmartDashboard::PutNumber("Arm_ScaleTest",shipprops.MaxRange-shipprops.MinRange);
-			result *= shipprops.MaxRange - shipprops.MinRange;  //compute the total distance in radians
-			result *= m_RobotProps.GetArmProps().GetRotaryProps().EncoderToRS_Ratio;
-			//get offset... Note: scale comes first since the offset is of that scale
-			result += m_RobotProps.GetArmProps().GetRotary_Pot_Properties().PotentiometerOffset;
-			#else
-			result=(m_Potentiometer.GetPotentiometerCurrentPosition()) + 0.0;
-			//Now to normalize it
-			const Ship_1D_Props &shipprops = m_RobotProps.GetArmProps().GetShip_1D_Props();
-			const double NormalizedResult = (result - shipprops.MinRange) / (shipprops.MaxRange - shipprops.MinRange);
-			const char * const Prefix = csz_FRC2019_Robot_SpeedControllerDevices_Enum[index];
-			std::string ContructedName;
-			ContructedName = Prefix, ContructedName += "_Raw";
-			SmartDashboard::PutNumber(ContructedName.c_str(), result);  //this one is a bit different as it is the selected units we use
-			ContructedName = Prefix, ContructedName += "Pot_Raw";
-			SmartDashboard::PutNumber(ContructedName.c_str(), NormalizedResult);
-			#endif
-		}
+			result = GetPotValue(index);
 		break;
 	}
 	return result;
 }
-#endif
 
 //Keeping around for any quick testing goals
 
