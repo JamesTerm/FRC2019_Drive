@@ -53,10 +53,6 @@ class FRC2019_Robot_Properties
 	protected:
 		frc::Control_Assignment_Properties m_ControlAssignmentProps;
 	private:
-		#ifndef _Win32
-		typedef Tank_Robot_Properties __super;
-		#endif
-
 		Tank_Robot2_Properties m_driveProps;
 		Rotary_Pot_Properties m_ArmProps;
 		Rotary_Properties m_ClawProps;
