@@ -197,7 +197,10 @@ public:
 		m_ModuleNumber(moduleNumber), m_Channel(channel) 
 	{	g_InstanceTester("AnalogChannel", channel);
 	}
-
+	void TimeChange(double dTime_s, double external_value) //only used in simulation
+	{	m_DefaultNumber = external_value;
+		display_number(external_value);  //also update smartdashboard
+	}
 	int16_t GetValue() {return (int16_t)get_number();}
 	int32_t GetAverageValue()  {return (int32_t)get_number();}
 	uint32_t GetChannel()  {return m_Channel;}
@@ -237,7 +240,7 @@ public:
 	//Note: Encoder allows two module numbers... we'll skip that support since double solenoid doesn't have it, and we can reuse 2C
 	//for both... we can change if needed
 	Encoder2(uint8_t ModuleNumber,UINT32 aChannel, UINT32 bChannel,const char *name);
-	void TimeChange(double dTime_s,double current_voltage); //only used in simulation
+	void TimeChange(double dTime_s,double adjustment_delta); //only used in simulation
 	double GetRate2(double dTime_s);
 	void Reset2();
 
@@ -460,6 +463,7 @@ class COMMON_API RobotControlCommon
 		__inline void Encoder_SetReverseDirection(size_t index,bool reverseDirection)   {IF_LUT(m_EncoderLUT) m_Encoders[m_EncoderLUT[index]]->SetReverseDirection(reverseDirection);}
 		#ifdef _Win32
 		__inline void Encoder_TimeChange(size_t index,double dTime_s,double adjustment_delta) { IF_LUT(m_EncoderLUT) m_Encoders[m_EncoderLUT[index]]->TimeChange(dTime_s,adjustment_delta);}
+		__inline void Analog_TimeChange(size_t index, double dTime_s, double external_value) { IF_LUT(m_AnalogInputLUT) m_AnalogInputs[m_AnalogInputLUT[index]]->TimeChange(dTime_s, external_value); }
 		#endif
 		__inline Encoder2 *Encoder_GetInstance(size_t index) {return LUT_VALID(m_EncoderLUT)?m_Encoders[m_EncoderLUT[index]] : NULL;}
 

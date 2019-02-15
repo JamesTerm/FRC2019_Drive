@@ -301,11 +301,12 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		//Base::EventMap* m_EventMap=nullptr;  <---TODO see if we need this
 
 	private:
+		double GetPotValue(size_t index);
 		//Note: these may be arrayed if we have more pots
 		KalmanFilter m_KalFilter_Arm;
 		Averager<double, 5> m_Averager_Arm;
 		#ifdef _Win32
-		Potentiometer_Tester2 m_Potentiometer; //simulate a real potentiometer for calibration testing
+		Potentiometer_AM2619_3590 m_Potentiometer; //simulate a real potentiometer for calibration testing
 		#endif
 		bool m_FirstRun = false;
 		bool m_ElevatorMin, m_ElevatorMax;

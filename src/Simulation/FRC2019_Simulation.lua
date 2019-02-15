@@ -193,16 +193,18 @@ MainRobot = {
 			predict_down=.200,
 			using_range=1,					--Warning Only use range if we have a potentiometer!
 
-			--These are in native units of the pot / encoder
-			pot_min_limit=232*4.215+5,
-			pot_max_limit=890*4.215+5,
+			--These are in native units of the pot
+			--For simulation, its estimated to take 15.56 turns to go full range, and the pot has 16.66 available so we utilize about 93% of the pot
+			--So .934 * the pot range of 4054 = 3787.15, so this should be the distance between min and mix
+			pot_min_limit=145,
+			pot_max_limit=3787.15+145,
 			pot_range_flipped='n',
 
 			--These min/max in inch units
 			max_range= 61.5,  --confirmed range
 			--Note the sketch used -43.33, but tests on actual assembly show -46.12
 			min_range= 0,
-			pot_offset=0,
+			pot_offset=0,  --this will vary with the limit switch and elevator slop
 			starting_position=6,
 			use_aggressive_stop = 'yes',
 			forward_deadzone=0.37,
