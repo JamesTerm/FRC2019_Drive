@@ -108,6 +108,9 @@
     <ClCompile Include="..\..\main\cpp\TankDrive\Tank_Robot.cpp">
       <Filter>TankDrive</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\main\cpp\TankDrive\Tank_Robot2.cpp">
+      <Filter>TankDrive</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main\cpp\Base\Base_Includes.h">
@@ -201,6 +204,9 @@
       <Filter>Common\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\main\cpp\TankDrive\Tank_Robot.h">
+      <Filter>TankDrive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\TankDrive\Tank_Robot2.h">
       <Filter>TankDrive</Filter>
     </ClInclude>
   </ItemGroup>

@@ -151,7 +151,7 @@ void Robot::OperatorControl()
 		#else
 		m_Robot.Update(0.01);  //It's best to use sythetic time for simulation to step through code
 		#endif
-		m_drive->Update();
+		//m_drive->Update();
 		//using this from test runs from robo wranglers code
 		Wait(0.010);
 	}

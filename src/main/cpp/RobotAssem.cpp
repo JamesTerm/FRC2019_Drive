@@ -34,7 +34,7 @@
 #endif
 #include "Common/Debug.h"
 #include "Common/Robot_Control_Common.h"
-#include "TankDrive/Tank_Robot.h"
+#include "TankDrive/Tank_Robot2.h"
 
 #include "FRC2019_Robot.h"
 #include "Common/SmartDashboard.h"
@@ -174,7 +174,8 @@ public:
 		m_Joystick(3,0),m_JoyBinder(m_Joystick), m_Collection(Collection)
 	{
 		m_LuaPath = RobotLua;
-		#if 1
+		//We'll skip this for now
+		#if 0
 		//Hook in our own PWMSpeedController allocator here
 		m_Control.SetExternalPWMSpeedControllerHook(
 		[&](size_t module, size_t Channel, const char *Name, const char*Type,bool &DoNotCreate)

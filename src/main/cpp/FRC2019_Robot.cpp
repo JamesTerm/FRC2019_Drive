@@ -35,7 +35,7 @@
 #endif
 #include "Common/Debug.h"
 #include "Common/Robot_Control_Common.h"
-#include "TankDrive/Tank_Robot.h"
+#include "TankDrive/Tank_Robot2.h"
 //This was depreciated and integrated ... stubbed out
 // #include "TankDrive/src/Tank_Robot_Control.h"
 //This isn't needed
@@ -629,16 +629,18 @@ FRC2019_Robot::FRC2019_Robot(const char EntityName[],FRC2019_Control_Interface *
 {
 }
 
-void FRC2019_Robot::Initialize(Entity2D_Kind::EventMap& em, const Entity_Properties *props)
+void FRC2019_Robot::Initialize(Entity2D_Kind::EventMap& em, const FRC2019_Robot_Properties *props)
 {
-	__super::Initialize(em,props);
+	__super::Initialize(em);
 	m_RobotControl->Initialize(props);
 
-	const FRC2019_Robot_Properties *RobotProps=dynamic_cast<const FRC2019_Robot_Properties *>(props);
+	const FRC2019_Robot_Properties *RobotProps=props;
+	assert(RobotProps);
 	m_RobotProps=*RobotProps;  //Copy all the properties (we'll need them for high and low gearing)
 
 	m_Arm.Initialize(em,RobotProps?&RobotProps->GetArmProps():NULL);
 	m_Claw.Initialize(em,RobotProps?&RobotProps->GetClawProps():NULL);
+	m_drive.Initialize(&RobotProps->GetDrive_Properties());
 }
 void FRC2019_Robot::ResetPos()
 {
@@ -689,6 +691,8 @@ void FRC2019_Robot::TimeChange(double dTime_s)
 	arm_entity.TimeChange(dTime_s);
 	Entity1D &claw_entity=m_Claw;  //This gets around keeping time change protected in derived classes
 	claw_entity.TimeChange(dTime_s);
+	//saving drive for last... other autonomous functionality can alter the drive before this point
+	m_drive.TimeChange(dTime_s);
 }
 
 void FRC2019_Robot::CloseDeploymentDoor(bool Close)
@@ -721,12 +725,13 @@ void FRC2019_Robot::BindAdditionalEventControls(bool Bind)
 	Ship_1D &ClawShip_Access=m_Claw;
 	ClawShip_Access.BindAdditionalEventControls(Bind);
 	//__super::BindAdditionalEventControls(Bind);
+	m_drive.BindAdditionalEventControls(Bind);
 }
 
 void FRC2019_Robot::BindAdditionalUIControls(bool Bind,void *joy,void *key)
 {
 	m_RobotProps.Get_RobotControls().BindAdditionalUIControls(Bind,joy,key);
-	//__super::BindAdditionalUIControls(Bind,joy,key);  //call super for more general control assignments
+	m_drive.BindAdditionalUIControls(Bind,joy,key);  //call drive for more control assignments
 }
 
 void FRC2019_Robot::StopAuton(bool isOn)
@@ -788,15 +793,15 @@ FRC2019_Robot_Properties::FRC2019_Robot_Properties() : m_RobotControls(&s_Contro
 	const double c_WheelDiameter=0.1524;  //6 inches
 	const double c_MotorToWheelGearRatio=12.0/36.0;
 
-	{
-		Tank_Robot_Props props=m_TankRobotProps; //start with super class settings
-		//Late assign this to override the initial default
-		props.WheelDimensions=Vec2D(0.4953,0.6985); //27.5 x 19.5 where length is in 5 inches in, and width is 3 on each side
-		props.WheelDiameter=c_WheelDiameter;
-		props.LeftPID[1]=props.RightPID[1]=1.0; //set the I's to one... so it should be 1,1,0
-		props.MotorToWheelGearRatio=c_MotorToWheelGearRatio;
-		m_TankRobotProps=props;
-	}
+	//{
+	//	Tank_Robot_Props props=m_TankRobotProps; //start with super class settings
+	//	//Late assign this to override the initial default
+	//	props.WheelDimensions=Vec2D(0.4953,0.6985); //27.5 x 19.5 where length is in 5 inches in, and width is 3 on each side
+	//	props.WheelDiameter=c_WheelDiameter;
+	//	props.LeftPID[1]=props.RightPID[1]=1.0; //set the I's to one... so it should be 1,1,0
+	//	props.MotorToWheelGearRatio=c_MotorToWheelGearRatio;
+	//	m_TankRobotProps=props;
+	//}
 
 	FRC2019_Robot_Props props;
 	//Note: setting defaults to arbitrary numbers to ensure lua is properly loaded
@@ -840,7 +845,7 @@ void FRC2019_Robot_Properties::LoadFromScript(Scripting::Script& script)
 			printf ("Version=%.2f\n",version);
 	}
 	m_ControlAssignmentProps.LoadFromScript(script);
-	__super::LoadFromScript(script);
+	m_driveProps.LoadFromScript(script);
 	err = script.GetFieldTable("robot_settings");
 	if (!err) 
 	{
@@ -998,7 +1003,7 @@ bool FRC2019_Robot_Control::GetIsSolenoidOpen(size_t index) const
 }
 
 
-FRC2019_Robot_Control::FRC2019_Robot_Control(bool UseSafety) : m_pTankRobotControl(&m_TankRobotControl)
+FRC2019_Robot_Control::FRC2019_Robot_Control(bool UseSafety)
 {
 	//depreciated once we had smart dashboard
 	//m_TankRobotControl.SetDisplayVoltage(false); //disable display there so we can do it here
@@ -1030,12 +1035,12 @@ void FRC2019_Robot_Control::Reset_Rotary(size_t index)
 	}
 }
 
-void FRC2019_Robot_Control::Initialize(const Entity_Properties *props)
+void FRC2019_Robot_Control::Initialize(const FRC2019_Robot_Properties *props)
 {
-	Tank_Drive_Control_Interface *tank_interface = m_pTankRobotControl;
-	tank_interface->Initialize(props);
+	//Tank_Drive_Control_Interface *tank_interface = m_pTankRobotControl;
+	//tank_interface->Initialize(props);
 
-	const FRC2019_Robot_Properties *robot_props=dynamic_cast<const FRC2019_Robot_Properties *>(props);
+	const FRC2019_Robot_Properties *robot_props=props;
 
 	//For now robot_props can be NULL since the swerve robot is borrowing it
 	if (robot_props)

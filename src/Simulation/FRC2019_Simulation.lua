@@ -31,15 +31,14 @@ MainRobot = {
 		--by default module is 1, so only really need it for 2
 		victor_sp =
 		{
-			-- id_1 = { name= "right_drive_1", channel=1}, 
-			-- id_2 = { name= "right_drive_2", channel=2}, 
-			-- id_3 = { name= "right_drive_3", channel=3}, 
-			-- id_4 = { name="left_drive_1", channel=4},
-			-- id_5 = { name="left_drive_2", channel=5},
-			-- id_6 = { name="left_drive_3", channel=6},
-			-- id_7= { name="arm", channel=7}
+			id_1 = { name= "right_drive_1", channel=1}, 
+			id_2 = { name= "right_drive_2", channel=2}, 
+			id_3 = { name= "right_drive_3", channel=3}, 
+			id_4 = { name="left_drive_1", channel=4},
+			id_5 = { name="left_drive_2", channel=5},
+			id_6 = { name="left_drive_3", channel=6},
+			id_7= { name="arm", channel=7}
 			--If we decide we need more power we can assign these
-			id_1= { name="arm", channel=7}
 		},
 		-- relay =
 		-- {
@@ -240,17 +239,18 @@ MainRobot = {
 	},
 	controls =
 	{
+		slotlist = {slot_1="developer"},
 		--slotlist = {slot_1="operator"},
-		slotlist = {slot_1="driver",slot_2="operator"},
+		--slotlist = {slot_1="driver",slot_2="operator"},
 		Joystick_1 =
 		{
 			control = "developer",
-			--Joystick_SetLeftVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
-			--Joystick_SetRightVelocity = {type="joystick_analog", key=5, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
+			Joystick_SetLeftVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
+			Joystick_SetRightVelocity = {type="joystick_analog", key=5, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
 			--Analog_Turn = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
 			--Joystick_SetCurrentSpeed_2 = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
-			Joystick_FieldCentric_XAxis = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
-			Joystick_FieldCentric_YAxis = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			--Joystick_FieldCentric_XAxis = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
+			--Joystick_FieldCentric_YAxis = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
 			Analog_Turn = {type="joystick_analog", key=5, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
 			FieldCentric_Enable = {type="joystick_button", key=4, on_off=false},
 
@@ -259,6 +259,10 @@ MainRobot = {
 			Turn_180 = {type="joystick_button", key=7, on_off=false},
 			
 			Arm_SetPosRest = {type="joystick_button", key=2, keyboard='l', on_off=false},
+			Arm_SetPosCargo1 = {type="keyboard", key='1', on_off=false},
+			Arm_SetPosCargo2 = {type="keyboard", key='2', on_off=false},
+			Arm_SetPosCargo3 = {type="keyboard", key='3', on_off=false},
+
 			Arm_SetPoshatch = {type="joystick_button", key=1, keyboard=';', on_off=false},
 			Arm_SetCurrentVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
 			Arm_IntakeDeploy={type="joystick_button", key=5, keyboard='i', on_off=true},
@@ -313,4 +317,4 @@ MainRobot = {
 	}
 }
 
-Robot2015 = MainRobot
+Robot2019 = MainRobot

@@ -1,7 +1,7 @@
 #pragma once
 
-
-class FRC2019_Control_Interface :	public Tank_Drive_Control_Interface,
+class FRC2019_Robot_Properties;
+class FRC2019_Control_Interface :	//public Tank_Drive_Control_Interface,
 									public Robot_Control_Interface,
 									public Rotary_Control_Interface
 {
@@ -10,7 +10,7 @@ public:
 	virtual void Robot_Control_TimeChange(double dTime_s)=0;
 	//We need to pass the properties to the Robot Control to be able to make proper conversions.
 	//The client code may cast the properties to obtain the specific data 
-	virtual void Initialize(const Entity_Properties *props)=0;
+	virtual void Initialize(const FRC2019_Robot_Properties *props)=0;
 	#ifdef Robot_TesterCode
 	virtual void BindAdditionalEventControls(bool Bind,GG_Framework::Base::EventMap *em,IEvent::HandlerList &ehl)=0;
 	#endif
@@ -35,7 +35,7 @@ public:
 	} Autonomous_Props;
 };
 
-class FRC2019_Robot_Properties : public Tank_Robot_Properties
+class FRC2019_Robot_Properties
 {
 	public:
 		FRC2019_Robot_Properties();
@@ -45,12 +45,19 @@ class FRC2019_Robot_Properties : public Tank_Robot_Properties
 		const Rotary_Properties &GetClawProps() const {return m_ClawProps;}
 		const FRC2019_Robot_Props &GetFRC2019RobotProps() const {return m_FRC2019RobotProps;}
 		FRC2019_Robot_Props &GetFRC2019RobotProps_rw() { return m_FRC2019RobotProps; }
+		const Tank_Robot2_Properties &GetDrive_Properties() const { return m_driveProps; }
 		const LUA_Controls_Properties &Get_RobotControls() const {return m_RobotControls;}
+		virtual const char *SetUpGlobalTable(Scripting::Script& script) { return script.GetGlobalTable("Robot2019"); }
+		//note derived class will populate these properties because of where it is in the script 
+		const frc::Control_Assignment_Properties &Get_ControlAssignmentProps() const { return m_ControlAssignmentProps; }
+	protected:
+		frc::Control_Assignment_Properties m_ControlAssignmentProps;
 	private:
 		#ifndef _Win32
 		typedef Tank_Robot_Properties __super;
 		#endif
 
+		Tank_Robot2_Properties m_driveProps;
 		Rotary_Pot_Properties m_ArmProps;
 		Rotary_Properties m_ClawProps;
 		FRC2019_Robot_Props m_FRC2019RobotProps;
@@ -86,20 +93,6 @@ const char * const csz_FRC2019_Robot_Solenoid_Enum[] =
 const char * const csz_FRC2019_Robot_BoolSensorDevices_Enum[] =
 {
 	"elevator_min","elevator_max"
-};
-
-//All common traits can be added here, this allows simulation to have access
-class RobotCommon
-{
-	private:
-		Entity2D_Kind::EventMap* m_eventMap;
-	protected:
-		virtual void Initialize(Entity2D_Kind::EventMap& em, const Entity_Properties *props = NULL) { m_eventMap = &em; }
-	public:
-		Entity2D_Kind::EventMap* GetEventMap() { return m_eventMap; }
-		//Robot implements... client code calls
-		virtual void BindAdditionalEventControls(bool Bind) =0;
-		virtual void BindAdditionalUIControls(bool Bind, void *joy, void *key) =0;
 };
 
 ///This is a specific robot that is a robot common and is composed of an arm, it provides addition methods to control the arm, and applies updates to
@@ -150,7 +143,7 @@ class FRC2019_Robot : public RobotCommon
 
 		FRC2019_Robot(const char EntityName[],FRC2019_Control_Interface *robot_control,bool UseEncoders=false);
 		IEvent::HandlerList ehl;
-		virtual void Initialize(Entity2D_Kind::EventMap& em, const Entity_Properties *props=NULL);
+		virtual void Initialize(Entity2D_Kind::EventMap& em, const FRC2019_Robot_Properties *props=NULL);
 		virtual void ResetPos();
 		virtual void TimeChange(double dTime_s);
 		void CloseDeploymentDoor(bool Close);
@@ -218,6 +211,7 @@ class FRC2019_Robot : public RobotCommon
 		virtual void BindAdditionalEventControls(bool Bind);
 		virtual void BindAdditionalUIControls(bool Bind, void *joy, void *key);
 	private:
+		Tank_Robot2 m_drive = this;  //we are agregatting instead of inheriting
 		FRC2019_Robot_Properties m_RobotProps;
 		#ifndef _Win32
 		typedef  RobotCommon __super;
@@ -250,10 +244,10 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		FRC2019_Control_Interface &AsControlInterface() { return *this; }
 		const FRC2019_Robot_Properties &GetRobotProps() const { return m_RobotProps; }
 		//Give access to set hooks in the drive as well
-		void SetDriveExternalPWMSpeedControllerHook(std::function<void *(size_t, size_t, const char *, const char*,bool &)> callback) 
-		{
-			m_TankRobotControl.SetExternalPWMSpeedControllerHook(callback);
-		}
+		//void SetDriveExternalPWMSpeedControllerHook(std::function<void *(size_t, size_t, const char *, const char*,bool &)> callback) 
+		//{
+		//	m_TankRobotControl.SetExternalPWMSpeedControllerHook(callback);
+		//}
 	protected: //from Robot_Control_Interface
 		virtual void UpdateVoltage(size_t index, double Voltage);
 		virtual bool GetBoolSensorState(size_t index) const;
@@ -261,12 +255,6 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 		virtual void OpenSolenoid(size_t index,bool Open) {CloseSolenoid(index,!Open);}
 		virtual bool GetIsSolenoidOpen(size_t index) const;
 
-	protected: //from Tank_Drive_Control_Interface
-		virtual void Reset_Encoders() {m_pTankRobotControl->Reset_Encoders();}
-		virtual void GetLeftRightVelocity(double &LeftVelocity,double &RightVelocity) {m_pTankRobotControl->GetLeftRightVelocity(LeftVelocity,RightVelocity);}
-		//Unfortunately the actual wheels are reversed (resolved here since this is this specific robot)
-		virtual void UpdateLeftRightVoltage(double LeftVoltage,double RightVoltage) {m_pTankRobotControl->UpdateLeftRightVoltage(RightVoltage,LeftVoltage);}
-		virtual void Tank_Drive_Control_TimeChange(double dTime_s) {m_pTankRobotControl->Tank_Drive_Control_TimeChange(dTime_s);}
 	protected: //from Rotary Interface
 		virtual void Reset_Rotary(size_t index=0); 
 		//pacify this by returning its current value
@@ -290,12 +278,12 @@ class FRC2019_Robot_Control : public frc::RobotControlCommon, public FRC2019_Con
 	protected: //from FRC2019_Control_Interface
 		//Will reset various members as needed (e.g. Kalman filters)
 		virtual void Robot_Control_TimeChange(double dTime_s);
-		virtual void Initialize(const Entity_Properties *props);
+		virtual void Initialize(const FRC2019_Robot_Properties *props);
 
 	protected:
 		FRC2019_Robot_Properties m_RobotProps;  //saves a copy of all the properties
-		Tank_Robot_Control m_TankRobotControl;
-		Tank_Drive_Control_Interface * const m_pTankRobotControl;  //This allows access to protected members
+		//Tank_Robot_Control m_TankRobotControl;
+		//Tank_Drive_Control_Interface * const m_pTankRobotControl;  //This allows access to protected members
 		frc::Compressor *m_Compressor=nullptr;
 		//frc::Accelerometer *m_RoboRIO_Accelerometer=nullptr;   <---for reference
 		//Base::EventMap* m_EventMap=nullptr;  <---TODO see if we need this

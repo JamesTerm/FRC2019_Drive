@@ -143,6 +143,7 @@
     <ClCompile Include="..\..\main\cpp\Common\UI_Controller.cpp" />
     <ClCompile Include="..\..\main\cpp\Common\Vehicle_Drive.cpp" />
     <ClCompile Include="..\..\main\cpp\TankDrive\Tank_Robot.cpp" />
+    <ClCompile Include="..\..\main\cpp\TankDrive\Tank_Robot2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main\cpp\Base\Base_Includes.h" />
@@ -176,6 +177,7 @@
     <ClInclude Include="..\..\main\cpp\Common\UI_Controller.h" />
     <ClInclude Include="..\..\main\cpp\Common\Vehicle_Drive.h" />
     <ClInclude Include="..\..\main\cpp\TankDrive\Tank_Robot.h" />
+    <ClInclude Include="..\..\main\cpp\TankDrive\Tank_Robot2.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SmartDashboard\SmartDashboard.vcxproj">
