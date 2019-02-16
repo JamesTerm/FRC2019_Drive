@@ -242,46 +242,45 @@ MainRobot = {
 		slotlist = {slot_1="developer"},
 		--slotlist = {slot_1="operator"},
 		--slotlist = {slot_1="driver",slot_2="operator"},
+		--slotlist = {slot_1="operator",slot_2="driver"},
 		Joystick_1 =
 		{
 			control = "developer",
 			Joystick_SetLeftVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
-			Joystick_SetRightVelocity = {type="joystick_analog", key=5, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
+			Joystick_SetRightVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
 			--Analog_Turn = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
 			--Joystick_SetCurrentSpeed_2 = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
 			--Joystick_FieldCentric_XAxis = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
 			--Joystick_FieldCentric_YAxis = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
-			Analog_Turn = {type="joystick_analog", key=5, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
-			FieldCentric_Enable = {type="joystick_button", key=4, on_off=false},
+			--FieldCentric_Enable = {type="joystick_button", key=4, on_off=false},
 
 			--scaled down to 0.5 to allow fine tuning and a good top acceleration speed (may change with the lua script tweaks)
 			POV_Turn =  {type="joystick_analog", key=8, is_flipped=false, multiplier=1.0, filter=0.0, curve_intensity=0.0},
-			Turn_180 = {type="joystick_button", key=7, on_off=false},
-			
-			Arm_SetPosRest = {type="joystick_button", key=2, keyboard='l', on_off=false},
-			Arm_SetPosCargo1 = {type="keyboard", key='1', on_off=false},
-			Arm_SetPosCargo2 = {type="keyboard", key='2', on_off=false},
-			Arm_SetPosCargo3 = {type="keyboard", key='3', on_off=false},
+			--Turn_180 = {type="joystick_button", key=7, on_off=false},
 
-			Arm_SetPoshatch = {type="joystick_button", key=1, keyboard=';', on_off=false},
-			Arm_SetCurrentVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
-			Arm_IntakeDeploy={type="joystick_button", key=5, keyboard='i', on_off=true},
+			Arm_SetPosRest = {type="joystick_button", key=5, keyboard='l', on_off=false},
+			Arm_SetPosCargo1 = {type="joystick_button", key=6, keyboard='1', on_off=false},
+			Arm_SetPosCargo2 = {type="joystick_button", key=7,keyboard='2', on_off=false},
+			Arm_SetPosCargo3 = {type="joystick_button", key=8,keyboard='3', on_off=false},
+
+			Arm_SetCurrentVelocity = {type="joystick_analog", key=5, is_flipped=false, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			Arm_IntakeDeploy={type="joystick_button", key=3, keyboard='i', on_off=true},
 			Arm_Advance={type="keyboard", key='k', on_off=true},
 			Arm_Retract={type="keyboard", key='j', on_off=true},
 			
-			--Claw_SetCurrentVelocity  --not used
-			Arm_HatchDeploy =	 {type="joystick_button", key=6, keyboard='h', on_off=true},
-			Arm_HatchGrabDeploy={type="joystick_button", key=3, keyboard='o', on_off=true},
-			Claw_Grip =		 {type="joystick_button", key=8, on_off=true},
-			--Claw_Squirt =	 {type="joystick_button", key=7, on_off=true},
-			Robot_CloseDoor= {type="joystick_button", key=9, keyboard='u', on_off=true}
+			Claw_SetCurrentVelocity = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			Arm_HatchDeploy =	 {type="joystick_button", key=2, keyboard='h', on_off=true},
+			Arm_HatchGrabDeploy={type="joystick_button", key=4, keyboard='o', on_off=true},
+			Claw_Grip =		 {type="keyboard", key='r', on_off=true},
+			Claw_Squirt =	 {type="keyboard", key='t', on_off=true},
+			Robot_CloseDoor= {type="joystick_button", key=1, keyboard='u', on_off=true}
 		},
 		
 		Joystick_2 =
 		{
 			control = "driver",
-			--Joystick_SetLeftVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
-			--Joystick_SetRightVelocity = {type="joystick_analog", key=4, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			Joystick_SetLeftVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			Joystick_SetRightVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
 			--Analog_Turn = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
 			--Joystick_SetCurrentSpeed_2 = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
 			-- Joystick_FieldCentric_XAxis = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
