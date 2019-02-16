@@ -1,0 +1,26 @@
+Working with time slices:
+
+I'll start this by saying that when a single CPU is running, it runs one instruction at a time.  Given this, the operating system can give the illusion of multi-tasking by offering time slices to each task also known as multithreading.
+
+Multithreading is a type of execution where one or more threads are populated within a process, for the desktop then there can be multiple processes and processes are usual per execution and can easily be divided among multiple CPU'saying
+
+For the scope of this article we only care about one process because what we can program on the RoboRIO is only an interface from one process, which could have multiple threads... or our entire loop can be a single controlled time slice.
+
+When multi-threading happens, the OS will do a context switch between different threads, and there is no set standard of the size of the context or any set standard guidelines to manipulate when this happens, even among the pros it is difficult when considering thread priorities.  Each thread with get a thread quantum, and the context switch actively switches from each thread within the process.
+
+The general rule of thumb is to avoid multithreading code at all costs unless
+1. Your code works with synchronous I/O... in which case it can call new created asynchronous methods
+2. Working directly with drivers or hardware  (WPI libraries do this work for us)
+3. I'm not going to say this reason because its beyond the scope of this (deals with complex code algorithms)
+
+Because of the nature of multithreading race conditions are possible especially on code which shares the same data among multiple tasks.  Special care must be taken to ensure the data is not clobbered, by thread synchronization techniques like critical sections and atomic volatile variable operations.
+
+When dealing with a single thread... as long the rules above do not apply (and they don't for what we do).  The entire loop can run on a single time slice, when this happens we can make assumptions and taylor the ordering of certain operations like so:
+
+1.  Update reading control devices
+2.  Update computations from these
+    a) we can order the subsystems when their time slice code gets called
+3.  Assign computations to output
+
+Given this... we achieve the same results of multithreading because its doing the same thing... but we control the thread context switch, because that is the loop itself.  When this happens no race conditions are possible because you know the exact order of when calls are made.
+
