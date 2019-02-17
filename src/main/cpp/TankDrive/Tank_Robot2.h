@@ -13,9 +13,17 @@ struct Tank_Robot2_Props
 	bool LeftEncoderReversed, RightEncoderReversed;
 	double WheelDiameter;
 	double VoltageScalar_Left, VoltageScalar_Right;		//Used to handle reversed voltage wiring
-	double MotorToWheelGearRatio;  //Used to interpolate RPS of the encoder to linear velocity
-	double LeftPID[3]; //p,i,d
-	double RightPID[3]; //p,i,d
+	struct gear_props
+	{
+		double MotorToWheelGearRatio;  //Used to interpolate RPS of the encoder to linear velocity
+		double LeftPID[3]; //p,i,d
+		double RightPID[3]; //p,i,d
+		//This cannot be avoided when working with encoders as they need to convert velocity
+		double MaxSpeed;
+	};
+	//We usually have one or 2 gears, for seasons with 1 gear... use high
+	gear_props high_gear;
+	gear_props low_gear;
 };
 
 const char * const csz_Tank_Robot2_SpeedControllerDevices_Enum[] =
@@ -63,31 +71,17 @@ private:
 	static ControlEvents s_ControlsEvents;
 	LUA_Controls_Properties m_RobotControls;
 };
-
+class Tank_Robot2_Control;
 //This manages all drive inputs and directs them to the speed controllers
 class Tank_Robot2
 {
 	public:
 		//For velocity [0] is port side (left), and and [1] is starboard (right)
 		using Vec2d = Framework::Base::Vec2d;
-		enum SpeedControllerDevices
-		{
-			eLeftDrive1,
-			eLeftDrive2,
-			eLeftDrive3,
-			eRightDrive1,
-			eRightDrive2,
-			eRightDrive3
-		};
-
-		static SpeedControllerDevices GetSpeedControllerDevices_Enum (const char *value)
-		{	return Enum_GetValue<SpeedControllerDevices> (value,csz_Tank_Robot2_SpeedControllerDevices_Enum,_countof(csz_Tank_Robot2_SpeedControllerDevices_Enum));
-		}
-
 		//I'm switching this up a bit... providing access to the parent class through a common type
-		Tank_Robot2(RobotCommon *robot) : m_pParent(robot) {}
+		Tank_Robot2(RobotCommon *robot);
 		//virtual ~Tank_Robot2();
-		virtual void Initialize(const Tank_Robot2_Properties *props) { m_TankRobotProps = props; }
+		virtual void Initialize(const Tank_Robot2_Properties *props);
 
 		//void Reset(bool ResetPosition=true);
 
@@ -118,9 +112,10 @@ protected:
 		#endif
 		RobotCommon * const m_pParent;
 		const Tank_Robot2_Properties *m_TankRobotProps; //cached in the Initialize from specific robot
+		std::shared_ptr<Tank_Robot2_Control> m_DriveControl;
 
 		//This velocity is captured from the controller in the form of left/right velocity, even FPS controls will be translated here
-		Vec2D m_Controller_Velocity;
+		Vec2d m_Controller_Velocity;
 		//This will be the velocity applied to the controller on a time change
 		Vec2d m_Velocity;
 	public:

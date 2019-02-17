@@ -57,21 +57,41 @@ private:
 	Averager<double, 4> m_Averager_EncoderLeft, m_Averager_EncodeRight;
 	//-----------------
 	const bool m_UseSafety;
+	bool m_IsLowGear = false;
 private:
 	//helper functions
+	__inline double GetMotorToWheelGearRatio() const
+	{
+		return m_IsLowGear ? m_TankRobotProps.low_gear.MotorToWheelGearRatio : m_TankRobotProps.high_gear.MotorToWheelGearRatio;
+	}
 	__inline double RPS_To_LinearVelocity(double RPS) const
 	{
-		return RPS * m_TankRobotProps.MotorToWheelGearRatio * M_PI * m_TankRobotProps.WheelDiameter;
+		return RPS * GetMotorToWheelGearRatio() * M_PI * m_TankRobotProps.WheelDiameter;
 	}
 	__inline double LinearVelocity_To_RPS(double Velocity) const
 	{
-		return (Velocity / (M_PI * m_TankRobotProps.WheelDiameter)) * (1.0 / m_TankRobotProps.MotorToWheelGearRatio);
+		return (Velocity / (M_PI * m_TankRobotProps.WheelDiameter)) * (1.0 / GetMotorToWheelGearRatio());
 	}
 
 protected: //from RobotControlCommon
+	enum SpeedControllerDevices
+	{
+		eLeftDrive1,
+		eLeftDrive2,
+		eLeftDrive3,
+		eRightDrive1,
+		eRightDrive2,
+		eRightDrive3
+	};
+
+	static SpeedControllerDevices GetSpeedControllerDevices_Enum(const char *value)
+	{
+		return Enum_GetValue<SpeedControllerDevices>(value, csz_Tank_Robot2_SpeedControllerDevices_Enum, _countof(csz_Tank_Robot2_SpeedControllerDevices_Enum));
+	}
+
 	virtual size_t RobotControlCommon_Get_PWMSpeedController_EnumValue(const char *name) const
 	{
-		return Tank_Robot2::GetSpeedControllerDevices_Enum(name);
+		return GetSpeedControllerDevices_Enum(name);
 	}
 	virtual size_t RobotControlCommon_Get_DigitalInput_EnumValue(const char *name) const { return (size_t)-1; }
 	virtual size_t RobotControlCommon_Get_AnalogInput_EnumValue(const char *name) const { return (size_t)-1; }
@@ -92,25 +112,25 @@ public:
 		{
 			RobotControlCommon_Initialize(robot_props->Get_ControlAssignmentProps());
 			m_RobotDrive = std::make_unique<RobotDrive2>(
-				PWMSpeedController_GetInstance(Tank_Robot2::eLeftDrive1), PWMSpeedController_GetInstance(Tank_Robot2::eLeftDrive2),
-				PWMSpeedController_GetInstance(Tank_Robot2::eRightDrive1), PWMSpeedController_GetInstance(Tank_Robot2::eRightDrive2),
-				PWMSpeedController_GetInstance(Tank_Robot2::eLeftDrive3), PWMSpeedController_GetInstance(Tank_Robot2::eRightDrive3));
+				PWMSpeedController_GetInstance(eLeftDrive1), PWMSpeedController_GetInstance(eLeftDrive2),
+				PWMSpeedController_GetInstance(eRightDrive1), PWMSpeedController_GetInstance(eRightDrive2),
+				PWMSpeedController_GetInstance(eLeftDrive3), PWMSpeedController_GetInstance(eRightDrive3));
 			SetSafety(m_UseSafety);
 			const double EncoderPulseRate = (1.0 / 360.0);
-			Encoder_SetDistancePerPulse(Tank_Robot2::eLeftDrive1, EncoderPulseRate), Encoder_SetDistancePerPulse(Tank_Robot2::eRightDrive1, EncoderPulseRate);
-			Encoder_Start(Tank_Robot2::eLeftDrive1), Encoder_Start(Tank_Robot2::eRightDrive1);
+			Encoder_SetDistancePerPulse(eLeftDrive1, EncoderPulseRate), Encoder_SetDistancePerPulse(eRightDrive1, EncoderPulseRate);
+			Encoder_Start(eLeftDrive1), Encoder_Start(eRightDrive1);
 		}
 		assert(robot_props);
 		//This will copy all the props
 		m_TankRobotProps = robot_props->GetTankRobotProps();
 		//Note: These reversed encoder properties require reboot of cRIO
 		//printf("Tank_Robot_Control::Initialize ReverseLeft=%d ReverseRight=%d\n",m_TankRobotProps.LeftEncoderReversed,m_TankRobotProps.RightEncoderReversed);
-		Encoder_SetReverseDirection(Tank_Robot2::eLeftDrive1, m_TankRobotProps.LeftEncoderReversed);
-		Encoder_SetReverseDirection(Tank_Robot2::eRightDrive1, m_TankRobotProps.RightEncoderReversed);
+		Encoder_SetReverseDirection(eLeftDrive1, m_TankRobotProps.LeftEncoderReversed);
+		Encoder_SetReverseDirection(eRightDrive1, m_TankRobotProps.RightEncoderReversed);
 	}
 	virtual ~Tank_Robot2_Control()
 	{
-		Encoder_Stop(Tank_Robot2::eLeftDrive1), Encoder_Stop(Tank_Robot2::eRightDrive1); 
+		Encoder_Stop(eLeftDrive1), Encoder_Stop(eRightDrive1); 
 		m_RobotDrive->SetSafetyEnabled(false);
 	}
 	
@@ -119,29 +139,34 @@ public:
 		m_dTime_s = dTime_s;
 		//For now just copy over whats in the drive, but later look into using the encoder simulator
 		#ifdef _Win32
-		const double MaxSpeed = 5.0;  //hard coded for now since this code is temporary
+		const double MaxSpeed = GetMaxSpeed();
 		float LeftVoltage, RightVoltage;
 		m_RobotDrive->GetLeftRightMotorOutputs(LeftVoltage, RightVoltage);
 		double velocity = LeftVoltage * MaxSpeed;
 		double rps = LinearVelocity_To_RPS(velocity) * dTime_s;
-		Encoder_TimeChange(Tank_Robot2::eLeftDrive1, dTime_s, rps);
+		Encoder_TimeChange(eLeftDrive1, dTime_s, rps);
 		velocity = RightVoltage * MaxSpeed;
 		rps = LinearVelocity_To_RPS(velocity) * dTime_s;
-		Encoder_TimeChange(Tank_Robot2::eRightDrive1, dTime_s, rps);
+		Encoder_TimeChange(eRightDrive1, dTime_s, rps);
 		#endif
 	}
 
-	virtual void Reset_Encoders();
+	virtual void Reset_Encoders()
+	{
+		m_KalFilter_EncodeLeft.Reset(), m_KalFilter_EncodeRight.Reset();
+		Encoder_SetReverseDirection(eLeftDrive1, m_TankRobotProps.LeftEncoderReversed);
+		Encoder_SetReverseDirection(eRightDrive1, m_TankRobotProps.RightEncoderReversed);
+	}
 	//Note: this returns linear velocity in meters per second
 	virtual void GetLeftRightVelocity(double &LeftVelocity, double &RightVelocity)
 	{
 		LeftVelocity = 0.0, RightVelocity = 0.0;
-		double LeftRate = Encoder_GetRate(Tank_Robot2::eLeftDrive1);
+		double LeftRate = Encoder_GetRate(eLeftDrive1);
 		LeftRate = m_KalFilter_EncodeLeft(LeftRate);
 		LeftRate = m_Averager_EncoderLeft.GetAverage(LeftRate);
 		LeftRate = IsZero(LeftRate) ? 0.0 : LeftRate;
 
-		double RightRate = Encoder_GetRate(Tank_Robot2::eRightDrive1);
+		double RightRate = Encoder_GetRate(eRightDrive1);
 		RightRate = m_KalFilter_EncodeRight(RightRate);
 		RightRate = m_Averager_EncodeRight.GetAverage(RightRate);
 		RightRate = IsZero(RightRate) ? 0.0 : RightRate;
@@ -180,6 +205,11 @@ public:
 			m_RobotDrive->SetSafetyEnabled(false);
 
 	}
+
+	__inline double GetMaxSpeed() const
+	{
+		return m_IsLowGear ? m_TankRobotProps.low_gear.MaxSpeed : m_TankRobotProps.high_gear.MaxSpeed;
+	}
 };
 
 
@@ -187,12 +217,28 @@ public:
  /*																Tank_Robot2															*/
 /***********************************************************************************************************************************/
 
+Tank_Robot2::Tank_Robot2(RobotCommon *robot) : m_pParent(robot) 
+{
+	//m_DriveControl = make_shared<Tank_Robot2_Control>();
+}
+
+void Tank_Robot2::Initialize(const Tank_Robot2_Properties *props) 
+{ 
+	m_TankRobotProps = props; 
+	//m_DriveControl->Initialize(props);
+}
 
 void Tank_Robot2::TimeChange(double dTime_s)
 {
 	SmartDashboard::PutNumber("LeftVoltage", m_Velocity[0]);
 	SmartDashboard::PutNumber("RightVoltage", m_Velocity[1]);
-	//TODO pass to speed controllers here
+	#if 0
+	//Compute voltage from velocity
+	const double left_voltage = m_Velocity[0] / m_DriveControl->GetMaxSpeed();
+	const double right_voltage = m_Velocity[0] / m_DriveControl->GetMaxSpeed();
+	//TODO PID here
+	m_DriveControl->UpdateLeftRightVoltage(left_voltage,right_voltage);
+	#endif
 }
 
 const char *csz_Joystick_SetLeftVelocity = "Joystick_SetLeftVelocity";
