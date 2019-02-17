@@ -8,6 +8,14 @@
 struct Tank_Robot2_Props
 {
 	bool ReverseSteering;  //This will fix if the wiring on voltage has been reversed (e.g. voltage to right turns left side)
+	//Different robots may have the encoders flipped or not which must represent the same direction of both treads
+	//for instance the hiking viking has both of these false, while the admiral has the right encoder reversed
+	bool LeftEncoderReversed, RightEncoderReversed;
+	double WheelDiameter;
+	double VoltageScalar_Left, VoltageScalar_Right;		//Used to handle reversed voltage wiring
+	double MotorToWheelGearRatio;  //Used to interpolate RPS of the encoder to linear velocity
+	double LeftPID[3]; //p,i,d
+	double RightPID[3]; //p,i,d
 };
 
 const char * const csz_Tank_Robot2_SpeedControllerDevices_Enum[] =
