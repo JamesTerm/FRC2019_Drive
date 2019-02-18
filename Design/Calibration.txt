@@ -47,6 +47,23 @@ robot_settings:
 ---------------
 This can be any setting needed and new ones can be added as you code.  Some settings have become well-defined and generic like those in the rotary systems, while others may be very specific only needed for one season.  It is also a place for autonomous if wanted.
 
+tank_drive:
+-----------
+One important thing to realize about tank drive is that there are 2 levels of direction variables
+1.  Axis direction, ensure up produces a positive voltage - Note: different controllers may vary
+    a) axis assignment- may differ from simulation to roboRIO as they slide the axis assignments down 
+2.  Physical direction, ensure up moves the wheels forward use voltage_multiply to fix
+    a) usually one side will be in reverse of the other because the motors are flipped;
+    b) It is possible to switch only one side by use of the _left or _right suffix, but this has never been needed yet
+
+...and for assignments:
+3.  Ensure the right axis is moving the right side of wheels, and same for left 
+    a) use reverse_steering if this is backwards, or
+    b) ensure the control assignments are correct
+...and for encoders
+4.  Ensure encoder direction goes positive when pushing up on axis use left_encoder_reversed and right_encoder_reversed
+
+One thing on the wiring is to ensure each motor that shares a gearbox is wired in the same direction, this can be done safely by disabling the other motors and pressing the axis in the same direction.  While it is possible to have double negative tweaking to accomplish positive results (that is just working with axis and wheel direction) it is highly recommended to use the smart dashboard to ensure each layer is in the correct direction.  If done properly it can all be configured correctly (in short of faulty wiring) before testing the robot!
 
 controls:
 ---------
