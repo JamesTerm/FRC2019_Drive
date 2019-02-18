@@ -174,6 +174,8 @@ public:
 		LeftVelocity = RPS_To_LinearVelocity(LeftRate);
 		RightVelocity = RPS_To_LinearVelocity(RightRate);
 		//Dout(m_TankRobotProps.Feedback_DiplayRow, "l=%.1f r=%.1f", LeftVelocity, RightVelocity);
+		SmartDashboard::PutNumber("LeftEncoder", LeftVelocity);
+		SmartDashboard::PutNumber("RightEncoder", RightVelocity);
 	}
 	virtual void UpdateLeftRightVoltage(double LeftVoltage, double RightVoltage)
 	{
@@ -210,6 +212,24 @@ public:
 	{
 		return m_IsLowGear ? m_TankRobotProps.low_gear.MaxSpeed : m_TankRobotProps.high_gear.MaxSpeed;
 	}
+
+	const char *HandlePWMHook_GetActiveName(const char *Name)
+	{
+		//printf("Drive: Get External PWMSpeedController %s[%d,%d]\n", Name, module, Channel);
+		SpeedControllerDevices motor = GetSpeedControllerDevices_Enum(Name);
+		//Translate our naming convention to the config naming convention
+		const char *ConfigNaming = nullptr;
+		switch (motor)
+		{
+		case eLeftDrive1:		ConfigNaming = "Left_0";		break;
+		case eLeftDrive2:		ConfigNaming = "Left_1";		break;
+		case eLeftDrive3:		ConfigNaming = "Left_2";		break;
+		case eRightDrive1:		ConfigNaming = "Right_0";		break;
+		case eRightDrive2:		ConfigNaming = "Right_1";		break;
+		case eRightDrive3:		ConfigNaming = "Right_2";		break;
+		}
+		return ConfigNaming;
+	}
 };
 
 
@@ -219,25 +239,30 @@ public:
 
 Tank_Robot2::Tank_Robot2(RobotCommon *robot) : m_pParent(robot) 
 {
-	//m_DriveControl = make_shared<Tank_Robot2_Control>();
+	m_DriveControl = make_shared<Tank_Robot2_Control>();
 }
 
 void Tank_Robot2::Initialize(const Tank_Robot2_Properties *props) 
 { 
 	m_TankRobotProps = props; 
-	//m_DriveControl->Initialize(props);
+	m_DriveControl->Initialize(props);
 }
 
 void Tank_Robot2::TimeChange(double dTime_s)
 {
-	SmartDashboard::PutNumber("LeftVoltage", m_Velocity[0]);
-	SmartDashboard::PutNumber("RightVoltage", m_Velocity[1]);
-	#if 0
-	//Compute voltage from velocity
-	const double left_voltage = m_Velocity[0] / m_DriveControl->GetMaxSpeed();
-	const double right_voltage = m_Velocity[0] / m_DriveControl->GetMaxSpeed();
+	SmartDashboard::PutNumber("LeftVoltage", m_Controller_Voltage[0]);
+	SmartDashboard::PutNumber("RightVoltage", m_Controller_Voltage[1]);
+	#if 1
+	const double left_voltage = m_Controller_Voltage[0];
+	const double right_voltage = m_Controller_Voltage[1];
 	//TODO PID here
+	m_Velocity[0] = m_Controller_Voltage[0] * m_DriveControl->GetMaxSpeed();
+	m_Velocity[1] = m_Controller_Voltage[1] * m_DriveControl->GetMaxSpeed();
+	double EncoderLeft, EncoderRight;
+	//Note: This call will implicitly update smart dashboard of its readings
+	m_DriveControl->GetLeftRightVelocity(EncoderLeft, EncoderRight);  
 	m_DriveControl->UpdateLeftRightVoltage(left_voltage,right_voltage);
+	m_DriveControl->Tank_Drive_Control_TimeChange(dTime_s);
 	#endif
 }
 
@@ -251,11 +276,11 @@ void Tank_Robot2::BindAdditionalEventControls(bool Bind)
 	{
 		em->EventValue_Map[csz_Joystick_SetLeftVelocity].Subscribe([&](double value)
 		{
-			m_Controller_Velocity[0] = m_Velocity[0] = value;
+			m_Controller_Voltage[0] =  value;
 		});
 		em->EventValue_Map[csz_Joystick_SetRightVelocity].Subscribe([&](double value)
 		{
-			m_Controller_Velocity[1] = m_Velocity[1] = value;
+			m_Controller_Voltage[1] =  value;
 		});
 	}
 }
@@ -265,6 +290,15 @@ void Tank_Robot2::BindAdditionalUIControls(bool Bind, void *joy, void *key)
 	m_TankRobotProps->Get_RobotControls().BindAdditionalUIControls(Bind, joy, key);
 }
 
+void Tank_Robot2::SetDriveExternalPWMSpeedControllerHook(std::function<void *(size_t, size_t, const char *, const char*, bool &)> callback)
+{
+	m_DriveControl->SetExternalPWMSpeedControllerHook(callback);
+}
+
+const char *Tank_Robot2::HandlePWMHook_GetActiveName(const char *Name)
+{
+	return m_DriveControl->HandlePWMHook_GetActiveName(Name);
+}
 
   /***********************************************************************************************************************************/
  /*													Tank_Robot2_Properties															*/
@@ -284,11 +318,116 @@ Tank_Robot2_Properties::ControlEvents Tank_Robot2_Properties::s_ControlsEvents;
 
 Tank_Robot2_Properties::Tank_Robot2_Properties() : m_RobotControls(&s_ControlsEvents)
 {
+	Tank_Robot2_Props props;
+	memset(&props, 0, sizeof(Tank_Robot2_Props));
+
+	//Late assign this to override the initial default
+	const double c_WheelDiameter = 0.1524;  //6 inches
+	props.WheelDiameter = c_WheelDiameter;
+	props.high_gear.LeftPID[0] = props.high_gear.RightPID[0] = 1.0; //set PIDs to a safe default of 1,0,0
+	props.high_gear.MotorToWheelGearRatio = 1.0;  //most-likely this will be overridden
+	props.VoltageScalar_Left = props.VoltageScalar_Right = 1.0;  //May need to be reversed
+	props.IsOpen = true;  //Always true by default until control is fully functional
+	props.HasEncoders = true;  //no harm in having passive reading of them
+	props.UseAggressiveStop = false;  //This is usually in coast for most cases from many teams
+	props.ReverseSteering = false;
+	props.LeftEncoderReversed = false;
+	props.RightEncoderReversed = false;
+	props.low_gear = props.high_gear;
+	m_TankRobotProps = props;
 }
 
 void Tank_Robot2_Properties::LoadFromScript(Scripting::Script& script)
 {
 	const char* err = NULL;
+	err = script.GetFieldTable("tank_drive");
+	if (!err)
+	{
+		double fValue;
+
+		err = script.GetField("wheel_diameter_in", NULL, NULL, &fValue);
+		if (!err)
+			m_TankRobotProps.WheelDiameter = Inches2Meters(fValue);
+		err = script.GetField("max_speed", NULL, NULL, &fValue);
+		if (!err)
+			m_TankRobotProps.high_gear.MaxSpeed = fValue;
+		err = script.GetField("max_speed_ft", NULL, NULL, &fValue);
+		if (!err)
+			m_TankRobotProps.high_gear.MaxSpeed = Feet2Meters(fValue);
+		script.GetField("encoder_to_wheel_ratio", NULL, NULL, &m_TankRobotProps.high_gear.MotorToWheelGearRatio);
+		double VoltageScalar;
+		err = script.GetField("voltage_multiply", NULL, NULL, &VoltageScalar);
+		if (!err)
+			m_TankRobotProps.VoltageScalar_Left = m_TankRobotProps.VoltageScalar_Right = VoltageScalar;
+		err = script.GetField("voltage_multiply_left", NULL, NULL, &m_TankRobotProps.VoltageScalar_Left);
+		err = script.GetField("voltage_multiply_right", NULL, NULL, &m_TankRobotProps.VoltageScalar_Right);
+
+		err = script.GetFieldTable("left_pid");
+		if (!err)
+		{
+			err = script.GetField("p", NULL, NULL, &m_TankRobotProps.high_gear.LeftPID[0]);
+			ASSERT_MSG(!err, err);
+			err = script.GetField("i", NULL, NULL, &m_TankRobotProps.high_gear.LeftPID[1]);
+			ASSERT_MSG(!err, err);
+			err = script.GetField("d", NULL, NULL, &m_TankRobotProps.high_gear.LeftPID[2]);
+			ASSERT_MSG(!err, err);
+			script.Pop();
+		}
+		err = script.GetFieldTable("right_pid");
+		if (!err)
+		{
+			err = script.GetField("p", NULL, NULL, &m_TankRobotProps.high_gear.RightPID[0]);
+			ASSERT_MSG(!err, err);
+			err = script.GetField("i", NULL, NULL, &m_TankRobotProps.high_gear.RightPID[1]);
+			ASSERT_MSG(!err, err);
+			err = script.GetField("d", NULL, NULL, &m_TankRobotProps.high_gear.RightPID[2]);
+			ASSERT_MSG(!err, err);
+			script.Pop();
+		}
+
+		string sTest;
+		err = script.GetField("is_closed", &sTest, NULL, NULL);
+		if (!err)
+		{
+			m_TankRobotProps.HasEncoders = true;
+			if ((sTest.c_str()[0] == 'n') || (sTest.c_str()[0] == 'N') || (sTest.c_str()[0] == '0'))
+				m_TankRobotProps.IsOpen = true;
+			else
+				m_TankRobotProps.IsOpen = false;
+		}
+		else
+		{
+			m_TankRobotProps.IsOpen = true;
+			m_TankRobotProps.HasEncoders = false;
+		}
+
+		err = script.GetField("use_aggressive_stop", &sTest, NULL, NULL);
+		if (!err)
+		{
+			if ((sTest.c_str()[0] == 'y') || (sTest.c_str()[0] == 'Y') || (sTest.c_str()[0] == '1'))
+				m_TankRobotProps.UseAggressiveStop = true;
+		}
+		err = script.GetField("reverse_steering", &sTest, NULL, NULL);
+		if (!err)
+		{
+			if ((sTest.c_str()[0] == 'y') || (sTest.c_str()[0] == 'Y') || (sTest.c_str()[0] == '1'))
+				m_TankRobotProps.ReverseSteering = true;
+		}
+		err = script.GetField("left_encoder_reversed", &sTest, NULL, NULL);
+		if (!err)
+		{
+			if ((sTest.c_str()[0] == 'y') || (sTest.c_str()[0] == 'Y') || (sTest.c_str()[0] == '1'))
+				m_TankRobotProps.LeftEncoderReversed = true;
+		}
+		err = script.GetField("right_encoder_reversed", &sTest, NULL, NULL);
+		if (!err)
+		{
+			if ((sTest.c_str()[0] == 'y') || (sTest.c_str()[0] == 'Y') || (sTest.c_str()[0] == '1'))
+				m_TankRobotProps.RightEncoderReversed = true;
+		}
+		script.Pop();
+	}
+
 	m_ControlAssignmentProps.LoadFromScript(script);
 	err = script.GetFieldTable("controls");
 	if (!err)

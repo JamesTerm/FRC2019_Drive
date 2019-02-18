@@ -147,6 +147,13 @@ class FRC2019_Robot : public RobotCommon
 		const FRC2019_Robot_Properties &GetRobotProps() const;
 		FRC2019_Robot_Props::Autonomous_Properties &GetAutonProps();
 
+		//Keep ability to share the drive resources with extenal allocators
+		void SetDriveExternalPWMSpeedControllerHook(std::function<void *(size_t, size_t, const char *, const char*,bool &)> callback) 
+		{	m_drive.SetDriveExternalPWMSpeedControllerHook(callback);
+		}
+		const char *HandlePWMHook_GetActiveName(const char *Name)
+		{	return m_drive.HandlePWMHook_GetActiveName(Name);
+		}
 		//TODO test roller using is angular to be true
 		class Robot_Claw : public Rotary_Velocity_Control
 		{

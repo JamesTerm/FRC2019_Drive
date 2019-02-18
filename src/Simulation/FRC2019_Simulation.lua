@@ -64,11 +64,11 @@ MainRobot = {
 		},
 		--encoder names must be the same name list from the victor (or other speed controls)
 		--These channels must be unique to digital input channels as well
-		-- digital_input_encoder =
-		-- {	
-		-- 	id_1 = { name= "left_drive_1",  a_channel=3, b_channel=4},
-		-- 	id_2 = { name="right_drive_1",  a_channel=1, b_channel=2},
-		-- },
+		digital_input_encoder =
+		{	
+			id_1 = { name= "left_drive_1",  a_channel=3, b_channel=4},
+			id_2 = { name="right_drive_1",  a_channel=1, b_channel=2},
+		},
 		compressor	=	{ relay=8, limit=14 },
 		accelerometer	=	{ gRange=1 }
 	},
@@ -98,6 +98,7 @@ MainRobot = {
 	tank_drive =
 	{
 		is_closed=0,
+		max_speed=HighGearSpeed,
 		show_pid_dump='no',
 		--we should turn this off in bench mark testing
 		use_aggressive_stop=1,  --we are in small area want to have responsive stop
@@ -116,21 +117,11 @@ MainRobot = {
 		drive_to_scale=0.50,
 		left_max_offset=0.0 , right_max_offset=0.0,   --Ensure both tread top speeds are aligned
 		--This is obtainer from encoder RPM's of 1069.2 and Wheel RPM's 427.68 (both high and low have same ratio)
-		encoder_to_wheel_ratio=0.5,			--example if encoder spins at 1069.2 multiply by this to get 427.68 (for the wheel rpm)
+		encoder_to_wheel_ratio=1.0,			--example if encoder spins at 1069.2 multiply by this to get 427.68 (for the wheel rpm)
 		voltage_multiply=1.0,				--May be reversed using -1.0
-		--Note: this is only used in simulation as 884 victors were phased out, but encoder simulators still use it
-		curve_voltage=
-		{t4=3.1199, t3=-4.4664, t2=2.2378, t1=0.1222, c=0},
-		force_voltage=
-		{t4=0, t3=0, t2=0, t1=0, c=1},
 		reverse_steering='no',
-		 left_encoder_reversed='no',
+		left_encoder_reversed='no',
 		right_encoder_reversed='no',
-		inv_max_accel = 1.0/15.0,  --solved empiracally
-		forward_deadzone_left  = 0.02,
-		forward_deadzone_right = 0.02,
-		reverse_deadzone_left  = 0.02,
-		reverse_deadzone_right = 0.02,
 		motor_specs =
 		{
 			wheel_mass=1.5,

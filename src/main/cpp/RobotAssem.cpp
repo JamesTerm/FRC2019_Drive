@@ -120,6 +120,24 @@ public:
 	{
 		const bool UseEncoders = false;
 		m_pRobot = new FRC2019_Robot("FRC2019_Robot", &m_Control, UseEncoders);
+		m_pRobot->SetDriveExternalPWMSpeedControllerHook(
+			[&](size_t module, size_t Channel, const char *Name, const char*Type, bool &DoNotCreate)
+		{
+			if (!m_Collection) return (void *)nullptr;  //support if I'm not going to use a collection
+			void *ret = nullptr;
+			//Translate our naming convention to the config naming convention
+			const char *ConfigNaming = m_pRobot->HandlePWMHook_GetActiveName(Name);
+			if (ConfigNaming)
+			{
+				VictorSPItem *item = m_Collection->GetVictor(ConfigNaming);
+				if (item)
+					ret = (void *)item->AsVictorSP();
+			}
+
+			if (!ret)
+				DoNotCreate = true;   //Let caller know to not create this, since we do not have a resource for it
+			return ret;
+		});
 		{
 			Framework::Scripting::Script script;
 			script.LoadScript(m_LuaPath.c_str(), true);
@@ -174,8 +192,7 @@ public:
 		m_Joystick(3,0),m_JoyBinder(m_Joystick), m_Collection(Collection)
 	{
 		m_LuaPath = RobotLua;
-		//We'll skip this for now
-		#if 0
+		#if 1
 		//Hook in our own PWMSpeedController allocator here
 		m_Control.SetExternalPWMSpeedControllerHook(
 		[&](size_t module, size_t Channel, const char *Name, const char*Type,bool &DoNotCreate)
@@ -192,35 +209,6 @@ public:
 				ret = SolenoidTest->AsDoubleSolenoid();
 			}
 			#endif
-			return ret;
-		});
-		m_Control.SetDriveExternalPWMSpeedControllerHook(
-			[&](size_t module, size_t Channel, const char *Name, const char*Type, bool &DoNotCreate)
-		{
-			if (!m_Collection) return (void *)nullptr;  //support if I'm not going to use a collection
-			void *ret = nullptr;
-			//printf("Drive: Get External PWMSpeedController %s[%d,%d]\n", Name, module, Channel);
-			Tank_Robot::SpeedControllerDevices motor = Tank_Robot::GetSpeedControllerDevices_Enum(Name);
-			//Translate our naming convention to the config naming convention
-			const char *ConfigNaming = nullptr;
-			switch (motor)
-			{
-			case Tank_Robot::eLeftDrive1:		ConfigNaming = "Left_0";		break;
-			case Tank_Robot::eLeftDrive2:		ConfigNaming = "Left_1";		break;
-			case Tank_Robot::eLeftDrive3:		ConfigNaming = "Left_2";		break;
-			case Tank_Robot::eRightDrive1:		ConfigNaming = "Right_0";		break;
-			case Tank_Robot::eRightDrive2:		ConfigNaming = "Right_1";		break;
-			case Tank_Robot::eRightDrive3:		ConfigNaming = "Right_2";		break;
-			}
-			if (ConfigNaming)
-			{
-				VictorSPItem *item = m_Collection->GetVictor(ConfigNaming);
-				if (item)
-					ret = (void *)item->AsVictorSP();
-			}
-
-			if (!ret)
-				DoNotCreate = true;   //Let caller know to not create this, since we do not have a resource for it
 			return ret;
 		});
 		#endif

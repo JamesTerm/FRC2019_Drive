@@ -7,6 +7,9 @@
 
 struct Tank_Robot2_Props
 {
+	bool HasEncoders;
+	bool IsOpen;
+	bool UseAggressiveStop;
 	bool ReverseSteering;  //This will fix if the wiring on voltage has been reversed (e.g. voltage to right turns left side)
 	//Different robots may have the encoders flipped or not which must represent the same direction of both treads
 	//for instance the hiking viking has both of these false, while the admiral has the right encoder reversed
@@ -19,7 +22,7 @@ struct Tank_Robot2_Props
 		double LeftPID[3]; //p,i,d
 		double RightPID[3]; //p,i,d
 		//This cannot be avoided when working with encoders as they need to convert velocity
-		double MaxSpeed;
+		double MaxSpeed;  //linear speed in meters per second
 	};
 	//We usually have one or 2 gears, for seasons with 1 gear... use high
 	gear_props high_gear;
@@ -97,10 +100,13 @@ class Tank_Robot2
 		Vec2d GetVelocity() const { return m_Velocity; }
 
 		//Use this method to determine if the drive is moving the controls
-		bool IsDriverMoving() { return m_Controller_Velocity.length2() > 0.0; }
+		bool IsDriverMoving() { return m_Controller_Voltage.length2() > 0.0; }
 		//This is where all joystick events are subscribed
 		virtual void BindAdditionalEventControls(bool Bind);
 		virtual void BindAdditionalUIControls(bool Bind, void *joy, void *key);
+
+		void SetDriveExternalPWMSpeedControllerHook(std::function<void *(size_t, size_t, const char *, const char*, bool &)> callback);
+		const char *HandlePWMHook_GetActiveName(const char *Name);
 protected:
 		const Tank_Robot2_Props &GetTankRobotProps() const {return m_TankRobotProps->GetTankRobotProps();}
 		//this may need to be overridden for robots that need it on for certain cases like 2012 needing it on for low gear
@@ -115,7 +121,7 @@ protected:
 		std::shared_ptr<Tank_Robot2_Control> m_DriveControl;
 
 		//This velocity is captured from the controller in the form of left/right velocity, even FPS controls will be translated here
-		Vec2d m_Controller_Velocity;
+		Vec2d m_Controller_Voltage;
 		//This will be the velocity applied to the controller on a time change
 		Vec2d m_Velocity;
 	public:
