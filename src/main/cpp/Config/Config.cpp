@@ -374,7 +374,7 @@ void Config::AllocateComponents(xml_node &root){
 void Config::AllocateDriverControls(xml_node &controls){
 	xml_node drive = controls.child("Driver");
 	if(!drive){
-		cout << "Drive Control definitions not found in config! Skipping..." < endl;
+		cout << "Drive Control definitions not found in config! Skipping..." << endl;
 		return;
 	}
 	int slot = drive.attribute("slot").as_int();
@@ -387,7 +387,35 @@ void Config::AllocateDriverControls(xml_node &controls){
 
 	xml_node AxisControls = controls.child("AxisControls");
 	if(AxisControls){
-		
+		for(xml_node axis = AxisControls.first_child(); axis; axis = axis.next_sibling()){
+			string name = axis.name();
+			xml_attribute channel = axis.attribute("channel");
+			if(channel){
+				bool reversed = axis.attribute("reversed").as_bool();
+				double deadZone;
+				double multiply;
+				xml_attribute deadZone_xml = axis.attribute("deadZone");
+				xml_attribute multiply_xml = axis.attribute("powerMultiplier");
+				if(!deadZone_xml){
+					cout << "No DeadZone detected for AxisControl " << name << ". Defaulting to 0.085. This may cause driving errors!" << endl;
+					deadZone = 0.085;
+				}
+				else 
+					deadZone = deadZone_xml.as_double();
+				if(!multiply){
+					cout << "No Power Multiplier detected for AxisControl " << name << ". Defaulting to 1.0. This may cause driving errors!" << endl;
+					multiply = 1.0;
+				}
+				else
+					multiply = multiply_xml.as_double();
+				AxisControl *tmp = new AxisControl(m_driveJoy, name, channel.as_double(), deadZone, reversed, multiply);
+				m_drive->AddControlDrive(tmp);
+				
+			}
+			else{
+				cout << "Failed to load AxisControl " << name << ". This may cause a fatal runtime error!" << endl;
+			}
+		}
 	}
 	else{
 		cout << "Axis Control Driver definitions not found! Skipping..." << endl;

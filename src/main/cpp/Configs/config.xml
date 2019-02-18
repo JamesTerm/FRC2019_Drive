@@ -44,7 +44,9 @@
     <Controls>
         <!-- Driver Controller, slot should always be 0 -->
         <Driver slot="0">
-            
+            <AxisControls>
+                
+            </AxisControls>
         </Driver>
     </Controls>
 </Robot>
