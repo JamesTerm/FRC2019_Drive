@@ -31,15 +31,14 @@ MainRobot = {
 		--by default module is 1, so only really need it for 2
 		victor_sp =
 		{
-			-- id_1= { name="arm", channel=7}
-			-- id_2 = { name= "right_drive_1", channel=1}, 
-			-- id_3 = { name= "right_drive_2", channel=2}, 
-			-- id_4 = { name= "right_drive_3", channel=3}, 
-			-- id_5 = { name="left_drive_1", channel=4},
-			-- id_6 = { name="left_drive_2", channel=5},
-			-- id_7 = { name="left_drive_3", channel=6},
+			id_1 = { name= "right_drive_1", channel=1}, 
+			id_2 = { name= "right_drive_2", channel=2}, 
+			id_3 = { name= "right_drive_3", channel=3}, 
+			id_4 = { name="left_drive_1", channel=4},
+			id_5 = { name="left_drive_2", channel=5},
+			id_6 = { name="left_drive_3", channel=6},
+			id_7= { name="arm", channel=7}
 			--If we decide we need more power we can assign these
-			id_1= { name="arm", channel=7}
 		},
 		-- relay =
 		-- {
@@ -59,20 +58,17 @@ MainRobot = {
 			id_1 = { name="elevator_min",  channel=5},
 			id_2 = { name="elevator_max",  channel=6}
 		},
-		--analog names must be the same name list from the victor (or other speed controls)
 		analog_input =
 		{
 			id_1 = { name="arm_pot",  channel=2},
 		},
 		--encoder names must be the same name list from the victor (or other speed controls)
 		--These channels must be unique to digital input channels as well
-		-- digital_input_encoder =
-		-- {	
-		-- 	id_1 = { name= "left_drive_1",  a_channel=3, b_channel=4},
-		-- 	id_2 = { name="right_drive_1",  a_channel=1, b_channel=2},
-		-- },
-		--the relay and limit parameters are depreciated; however, keeping this line in will determine if the compressor is
-		--loaded.  TODO change parameters to one PCM_node_ID parameter, as this is currently just hardcoded in.
+		digital_input_encoder =
+		{	
+			id_1 = { name= "left_drive_1",  a_channel=3, b_channel=4},
+			id_2 = { name="right_drive_1",  a_channel=1, b_channel=2},
+		},
 		compressor	=	{ relay=8, limit=14 },
 		--accelerometer	=	{ gRange=1 }
 	},
@@ -102,6 +98,7 @@ MainRobot = {
 	tank_drive =
 	{
 		is_closed=0,
+		max_speed=HighGearSpeed,
 		show_pid_dump='no',
 		--we should turn this off in bench mark testing
 		use_aggressive_stop=1,  --we are in small area want to have responsive stop
@@ -120,21 +117,11 @@ MainRobot = {
 		drive_to_scale=0.50,
 		left_max_offset=0.0 , right_max_offset=0.0,   --Ensure both tread top speeds are aligned
 		--This is obtainer from encoder RPM's of 1069.2 and Wheel RPM's 427.68 (both high and low have same ratio)
-		encoder_to_wheel_ratio=0.5,			--example if encoder spins at 1069.2 multiply by this to get 427.68 (for the wheel rpm)
+		encoder_to_wheel_ratio=1.0,			--example if encoder spins at 1069.2 multiply by this to get 427.68 (for the wheel rpm)
 		voltage_multiply=1.0,				--May be reversed using -1.0
-		--Note: this is only used in simulation as 884 victors were phased out, but encoder simulators still use it
-		curve_voltage=
-		{t4=3.1199, t3=-4.4664, t2=2.2378, t1=0.1222, c=0},
-		force_voltage=
-		{t4=0, t3=0, t2=0, t1=0, c=1},
 		reverse_steering='no',
-		 left_encoder_reversed='no',
+		left_encoder_reversed='no',
 		right_encoder_reversed='no',
-		inv_max_accel = 1.0/15.0,  --solved empiracally
-		forward_deadzone_left  = 0.02,
-		forward_deadzone_right = 0.02,
-		reverse_deadzone_left  = 0.02,
-		reverse_deadzone_right = 0.02,
 		motor_specs =
 		{
 			wheel_mass=1.5,
@@ -196,16 +183,18 @@ MainRobot = {
 			predict_down=.200,
 			using_range=0,					--Warning Only use range if we have a potentiometer!
 
-			--These are in native units of the pot / encoder
-			pot_min_limit=232*4.215+5,
-			pot_max_limit=890*4.215+5,
+			--These are in native units of the pot
+			--For simulation, its estimated to take 15.56 turns to go full range, and the pot has 16.66 available so we utilize about 93% of the pot
+			--So .934 * the pot range of 4054 = 3787.15, so this should be the distance between min and mix
+			pot_min_limit=145,
+			pot_max_limit=3787.15+145,
 			pot_range_flipped='n',
 
 			--These min/max in inch units
 			max_range= 61.5,  --confirmed range
 			--Note the sketch used -43.33, but tests on actual assembly show -46.12
 			min_range= 0,
-			pot_offset=0,
+			pot_offset=0,  --this will vary with the limit switch and elevator slop
 			starting_position=6,
 			use_aggressive_stop = 'yes',
 			forward_deadzone=0.37,
@@ -246,39 +235,41 @@ MainRobot = {
 		Joystick_1 =
 		{
 			control = "developer",
-			--Joystick_SetLeftVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
-			--Joystick_SetRightVelocity = {type="joystick_analog", key=5, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
+			Joystick_SetLeftVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
+			Joystick_SetRightVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=3.0},
 			--Analog_Turn = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
 			--Joystick_SetCurrentSpeed_2 = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
-			Joystick_FieldCentric_XAxis = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
-			Joystick_FieldCentric_YAxis = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
-			Analog_Turn = {type="joystick_analog", key=5, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
-			FieldCentric_Enable = {type="joystick_button", key=4, on_off=false},
+			--Joystick_FieldCentric_XAxis = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
+			--Joystick_FieldCentric_YAxis = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			--FieldCentric_Enable = {type="joystick_button", key=4, on_off=false},
 
 			--scaled down to 0.5 to allow fine tuning and a good top acceleration speed (may change with the lua script tweaks)
 			POV_Turn =  {type="joystick_analog", key=8, is_flipped=false, multiplier=1.0, filter=0.0, curve_intensity=0.0},
-			Turn_180 = {type="joystick_button", key=7, on_off=false},
-			
-			Arm_SetPosRest = {type="joystick_button", key=2, keyboard='l', on_off=false},
-			Arm_SetPoshatch = {type="joystick_button", key=1, keyboard=';', on_off=false},
-			Arm_SetCurrentVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
-			Arm_IntakeDeploy={type="joystick_button", key=5, keyboard='i', on_off=true},
+			--Turn_180 = {type="joystick_button", key=7, on_off=false},
+
+			Arm_SetPosRest = {type="joystick_button", key=5, keyboard='l', on_off=false},
+			Arm_SetPosCargo1 = {type="joystick_button", key=6, keyboard='1', on_off=false},
+			Arm_SetPosCargo2 = {type="joystick_button", key=7,keyboard='2', on_off=false},
+			Arm_SetPosCargo3 = {type="joystick_button", key=8,keyboard='3', on_off=false},
+
+			Arm_SetCurrentVelocity = {type="joystick_analog", key=5, is_flipped=false, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			Arm_IntakeDeploy={type="joystick_button", key=3, keyboard='i', on_off=true},
 			Arm_Advance={type="keyboard", key='k', on_off=true},
 			Arm_Retract={type="keyboard", key='j', on_off=true},
 			
-			--Claw_SetCurrentVelocity  --not used
-			Arm_HatchDeploy =	 {type="joystick_button", key=6, keyboard='h', on_off=true},
-			Arm_HatchGrabDeploy={type="joystick_button", key=3, keyboard='o', on_off=true},
-			Claw_Grip =		 {type="joystick_button", key=8, on_off=true},
-			--Claw_Squirt =	 {type="joystick_button", key=7, on_off=true},
-			Robot_CloseDoor= {type="joystick_button", key=9, keyboard='u', on_off=true}
+			Claw_SetCurrentVelocity = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			Arm_HatchDeploy =	 {type="joystick_button", key=2, keyboard='h', on_off=true},
+			Arm_HatchGrabDeploy={type="joystick_button", key=4, keyboard='o', on_off=true},
+			Claw_Grip =		 {type="keyboard", key='r', on_off=true},
+			Claw_Squirt =	 {type="keyboard", key='t', on_off=true},
+			Robot_CloseDoor= {type="joystick_button", key=1, keyboard='u', on_off=true}
 		},
 		
 		Joystick_2 =
 		{
 			control = "driver",
-			--Joystick_SetLeftVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
-			--Joystick_SetRightVelocity = {type="joystick_analog", key=4, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			Joystick_SetLeftVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			Joystick_SetRightVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
 			--Analog_Turn = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
 			--Joystick_SetCurrentSpeed_2 = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
 			-- Joystick_FieldCentric_XAxis = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
@@ -314,4 +305,4 @@ MainRobot = {
 	}
 }
 
-Robot2015 = MainRobot
+Robot2019 = MainRobot
