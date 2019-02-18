@@ -118,10 +118,10 @@ MainRobot = {
 		left_max_offset=0.0 , right_max_offset=0.0,   --Ensure both tread top speeds are aligned
 		--This is obtainer from encoder RPM's of 1069.2 and Wheel RPM's 427.68 (both high and low have same ratio)
 		encoder_to_wheel_ratio=1.0,			--example if encoder spins at 1069.2 multiply by this to get 427.68 (for the wheel rpm)
-		voltage_multiply=1.0,				--May be reversed using -1.0
+		voltage_multiply=-1.0,				--May be reversed using -1.0
 		reverse_steering='no',
-		left_encoder_reversed='no',
-		right_encoder_reversed='no',
+		left_encoder_reversed=1,
+		right_encoder_reversed=0,
 		motor_specs =
 		{
 			wheel_mass=1.5,
@@ -231,6 +231,7 @@ MainRobot = {
 	controls =
 	{
 		slotlist = {slot_1="developer"},
+		--slotlist = {slot_1="driver"},
 		--slotlist = {slot_1="operator"},
 		--slotlist = {slot_1="driver",slot_2="operator"},
 		--slotlist = {slot_1="operator",slot_2="driver"},
@@ -271,7 +272,7 @@ MainRobot = {
 		{
 			control = "driver",
 			Joystick_SetLeftVelocity = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
-			Joystick_SetRightVelocity = {type="joystick_analog", key=2, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
+			Joystick_SetRightVelocity = {type="joystick_analog", key=5, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
 			--Analog_Turn = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},
 			--Joystick_SetCurrentSpeed_2 = {type="joystick_analog", key=1, is_flipped=true, multiplier=1.0, filter=0.1, curve_intensity=0.0},
 			-- Joystick_FieldCentric_XAxis = {type="joystick_analog", key=0, is_flipped=false, multiplier=1.0, filter=0.3, curve_intensity=1.0},

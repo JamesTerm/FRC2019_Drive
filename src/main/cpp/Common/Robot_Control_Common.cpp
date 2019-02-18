@@ -502,7 +502,7 @@ Encoder2::Encoder2(uint8_t ModuleNumber,UINT32 aChannel, UINT32 bChannel,const c
 void Encoder2::TimeChange(double dTime_s,double adjustment_delta)
 {
 	m_LastTime=dTime_s;
-	m_Distance+=adjustment_delta;
+	m_Distance+=(adjustment_delta * m_ValueScalar);
 	display_number(m_Distance);
 }
 void Encoder2::Reset2()
@@ -534,7 +534,7 @@ void Encoder2::SetMinRate(double minRate) {}
 void Encoder2::SetDistancePerPulse(double distancePerPulse) {}
 void Encoder2::SetReverseDirection(bool reverseDirection) 
 {
-	m_ValueScalar?1.0:-1.0;
+	m_ValueScalar= reverseDirection?-1.0:1.0;
 }
 #endif //_Win32
 

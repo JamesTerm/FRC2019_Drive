@@ -142,10 +142,10 @@ public:
 		const double MaxSpeed = GetMaxSpeed();
 		float LeftVoltage, RightVoltage;
 		m_RobotDrive->GetLeftRightMotorOutputs(LeftVoltage, RightVoltage);
-		double velocity = LeftVoltage * MaxSpeed;
+		double velocity = LeftVoltage * MaxSpeed * m_TankRobotProps.VoltageScalar_Left;
 		double rps = LinearVelocity_To_RPS(velocity) * dTime_s;
 		Encoder_TimeChange(eLeftDrive1, dTime_s, rps);
-		velocity = RightVoltage * MaxSpeed;
+		velocity = RightVoltage * MaxSpeed * m_TankRobotProps.VoltageScalar_Right;
 		rps = LinearVelocity_To_RPS(velocity) * dTime_s;
 		Encoder_TimeChange(eRightDrive1, dTime_s, rps);
 		#endif
