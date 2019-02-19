@@ -15,6 +15,8 @@ Email: cooper.ryan@centaurisoftware.co, dylantrwatson@gmail.com
 #define SRC_CONFIG_CONFIG_H_
 
 #include <iostream>
+#include <stdio.h>
+#include <string.h>
 
 #include "ActiveCollection.h"
 #include "../Systems/Drive.h"
@@ -41,7 +43,8 @@ private:
 	Joystick *m_operatorJoy;
 	ActiveCollection *m_activeCollection;
 	Drive *m_drive;
-	bool getAttribute(xml_node &node, const char_t* attr);
+	vector<char*> getBindingStringList(string bindings);
+	bool setBindingsToControl(vector<string> bindings, ControlItem *control);
 };
 
 }

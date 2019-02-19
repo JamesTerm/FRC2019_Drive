@@ -410,7 +410,15 @@ void Config::AllocateDriverControls(xml_node &controls){
 					multiply = multiply_xml.as_double();
 				AxisControl *tmp = new AxisControl(m_driveJoy, name, channel.as_double(), deadZone, reversed, multiply);
 				m_drive->AddControlDrive(tmp);
-				
+				xml_attribute bindings = axis.attribute("bindings");
+				if(bindings){
+					string bind_string = bindings.as_string();
+					vector<char*> bind_vector = getBindingStringList(bind_string);
+					setBindingsToControl(bind_vector, tmp);
+				}
+				else{
+					cout << "Control bindings not found for " << name << ". Did you intend to bind this control to anything?" << endl;
+				}
 			}
 			else{
 				cout << "Failed to load AxisControl " << name << ". This may cause a fatal runtime error!" << endl;
@@ -452,6 +460,43 @@ void Config::AllocateComponentsDep(){
 	rightDrive->AddComponent(right_0);
 	rightDrive->AddComponent(right_1);
 	ToggleTest->AddComponent(SolenoidTest);
+}
+
+vector<char*> Config::getBindingStringList(string bindings){
+	vector<char*> tmp;
+	vector<string> ret;
+	char * pch;
+	char * bindings_char = new char[bindings.length() + 1];
+	strcpy(bindings_char, bindings.c_str());
+	tmp.push_back(strtok(bindings_char, " ,"));
+	while(tmp.back() != NULL){
+		tmp.push_back(strtok(NULL, " ,"));				
+	}
+	tmp.pop_back();
+	for(int i = 0; i<(int)tmp.size(); i++){
+		
+	}
+	return ret;
+}
+
+bool Config::setBindingsToControl(vector<string> bindings, ControlItem *control){
+	bool success = true;
+	for(int i = 0; i<(int)bindings.size(); i++){
+		string binding = bindings[i];
+		OutputComponent *component;
+		try{
+			component = (OutputComponent*)(m_activeCollection->Get(binding));
+			control->AddComponent(component);
+			cout << "Allocated Component " << binding << " to Control " << control.name << endl;
+		}
+		catch(...){
+			cout << "Failed to bind component " << binding << " to the control " << control->name << ". This can cause fatal runtime errors!" << endl;
+			success = false;
+		}
+	}
+	if(!success)
+		cout << "One or more bindings failed to allocate for control " << control->name << ". Please check the Config!" << endl;
+	return success;
 }
 
 Config::~Config(){}
