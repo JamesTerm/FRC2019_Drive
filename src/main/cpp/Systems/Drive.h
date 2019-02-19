@@ -30,9 +30,14 @@ namespace System
 	        void Update();
 	        void AddControlDrive(ControlItem *control);
 	        void AddControlOperate(ControlItem *control);
-	        vector<ControlItem*> driveControlCollection;
-	        vector<ControlItem*> operateControlCollection;
-    };
+			void SetUseDrive(bool enable) { m_DisableDrive = !enable; }
+			void SetUseOperator(bool enable) { m_DisableOperator = !enable; }
+	private:
+			bool m_DisableDrive=false;
+			bool m_DisableOperator=false;
+			vector<ControlItem*> m_driveControlCollection;
+			vector<ControlItem*> m_operateControlCollection;
+	};
 } /* namespace Systems */
 
 #endif /* SYSTEMS_DRIVE_H_ */

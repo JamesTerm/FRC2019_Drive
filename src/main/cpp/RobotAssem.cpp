@@ -161,32 +161,10 @@ public:
 		//establish the first parent bind, before setting up the UI controller, and after instantiation of the robot
 		s_ParentBind(m_pParent, false);
 		#endif
-		#if 0
-		//To to bind the UI controller to the robot
-		AI_Base_Controller *controller = m_pRobot->GetController();
-		assert(controller);
-		m_pUI = new UI_Controller(&m_JoyBinder, controller);
-		//m_pUI = new UI_Controller(nullptr, controller);
-		if (controller->Try_SetUIController(m_pUI))
-		{
-			//Success... now to let the entity set things up
-			m_pUI->HookUpUI(true);
-		}
-		else
-		{
-			m_pUI->Set_AI_Base_Controller(NULL);   //no luck... flush ship association
-			assert(false);
-		}
-
-		//start in tele... if auton is handled it can be called explicitly
-		SmartDashboard::SetDefaultBoolean("Test_Auton", false);
-		SmartDashboard::SetDefaultNumber("AutonTest", 0.0);
-		#else
 		m_pRobot->AsRobotCommon()->BindAdditionalEventControls(true);
 		//Will look into this later
 		//m_FieldCentricDrive.BindAdditionalEventControls(true, em, ehl);
 		m_pRobot->AsRobotCommon()->BindAdditionalUIControls(true, &m_JoyBinder, &m_KeyboardBinder);
-		#endif
 	}
 	RobotAssem_Internal(RobotAssem *parent,const char *RobotLua, Configuration::ActiveCollection *Collection) : m_pParent(parent),
 		m_Joystick(3,0),m_JoyBinder(m_Joystick), m_Collection(Collection)
@@ -201,7 +179,7 @@ public:
 			void *ret = nullptr;
 			//TODO hook our active collection here
 			//printf("Robot: Get External PWMSpeedController %s[%d,%d]\n",Name,module,Channel);
-			#if 0
+			#if 1
 			//This is temporary as long as the active configuration populates it
 			if (strcmp(Name, "wedge")==0)
 			{
@@ -241,6 +219,19 @@ public:
 		}
 	}
 	RobotCommon *GetRobot() { return m_pRobot; }
+
+	bool get_using_ac_drive()
+	{
+		return m_RobotProps.GetFRC2019RobotProps().using_ac_drive;
+	}
+	bool get_using_ac_operator()
+	{
+		return m_RobotProps.GetFRC2019RobotProps().using_ac_operator;
+	}
+	bool get_using_ac_elevator()
+	{
+		return m_RobotProps.GetFRC2019RobotProps().using_ac_elevator;
+	}
 };
 
 void RobotAssem::RobotAssem_init(const char *RobotLua, Configuration::ActiveCollection *Collection)
@@ -264,3 +255,18 @@ RobotCommon *RobotAssem::GetRobot()
 	return m_p_RobotAssem->GetRobot();
 }
 #endif
+
+bool RobotAssem::get_using_ac_drive()
+{
+	return m_p_RobotAssem->get_using_ac_drive();
+}
+
+bool RobotAssem::get_using_ac_operator()
+{
+	return m_p_RobotAssem->get_using_ac_operator();
+}
+
+bool RobotAssem::get_using_ac_elevator()
+{
+	return m_p_RobotAssem->get_using_ac_elevator();
+}

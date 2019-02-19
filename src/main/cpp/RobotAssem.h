@@ -13,6 +13,9 @@ public:
 	//Give simulation parent access to robot
 	RobotCommon *GetRobot();
 	#endif
+	bool get_using_ac_drive();
+	bool get_using_ac_operator();
+	bool get_using_ac_elevator();
 private:
 	std::shared_ptr<RobotAssem_Internal> m_p_RobotAssem; //a pointer to implementation idiom (using shared_ptr allows declaration to be hidden from destructor)
 };

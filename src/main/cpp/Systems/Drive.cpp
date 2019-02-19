@@ -20,19 +20,24 @@ Drive::Drive() { }
 
 void Drive::AddControlDrive(ControlItem *control)
 {
-	driveControlCollection.push_back(control);
+	m_driveControlCollection.push_back(control);
 }
 
 void Drive::AddControlOperate(ControlItem *control)
 {
-	operateControlCollection.push_back(control);
+	m_operateControlCollection.push_back(control);
 }
 
 void Drive::Update()
 {
-	for(int i=0; i<(int)driveControlCollection.size();i++)
-		(*driveControlCollection[i]).Update();
-
-	for(int i=0; i<(int)operateControlCollection.size();i++)
-		(*operateControlCollection[i]).Update();
+	if (!m_DisableDrive)
+	{
+		for (int i = 0; i < (int)m_driveControlCollection.size(); i++)
+			(*m_driveControlCollection[i]).Update();
+	}
+	if (!m_DisableOperator)
+	{
+		for (int i = 0; i < (int)m_operateControlCollection.size(); i++)
+			(*m_operateControlCollection[i]).Update();
+	}
 }

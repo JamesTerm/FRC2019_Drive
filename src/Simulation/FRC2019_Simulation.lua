@@ -140,6 +140,10 @@ MainRobot = {
 	},
 	robot_settings =
 	{
+		using_ac_drive =    0,  --True enables active configuration time slices for drive
+		using_ac_operator = 0, --True enables active configuration time slices for operator
+		using_ac_elevator = 0,
+
 		--These heights represent elevator height which correspond to height observed- Change as needed
 		hatch_deploy_time = 0.4,
 		cargo_deploy_time = 0.76,

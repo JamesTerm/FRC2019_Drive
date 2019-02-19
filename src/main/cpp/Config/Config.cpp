@@ -30,12 +30,13 @@ void Config::AllocateComponents(){
 	VictorSPItem *left_1 = new VictorSPItem("Left_1", 3, true);
 	VictorSPItem *right_0 = new VictorSPItem("Right_0", 0, false);
 	VictorSPItem *right_1 = new VictorSPItem("Right_1", 1, false);
-	//DoubleSolenoidItem *SolenoidTest = new DoubleSolenoidItem("SolenoidToggle", 1, 0, DoubleSolenoid::Value::kReverse, false);
+	DoubleSolenoidItem *SolenoidTest = new DoubleSolenoidItem("SolenoidToggle", 1, 0, DoubleSolenoid::Value::kReverse, false);
 
 	m_activeCollection->Add(left_0);
 	m_activeCollection->Add(left_1);
 	m_activeCollection->Add(right_0);
 	m_activeCollection->Add(right_1);
+	m_activeCollection->Add(SolenoidTest);
 
 	NavX *navx = new NavX();
 	m_activeCollection->Add(navx);
@@ -53,7 +54,7 @@ void Config::AllocateComponents(){
 	leftDrive->AddComponent(left_1);
 	rightDrive->AddComponent(right_0);
 	rightDrive->AddComponent(right_1);
-	//ToggleTest->AddComponent(SolenoidTest);
+	ToggleTest->AddComponent(SolenoidTest);
 	
 
 }

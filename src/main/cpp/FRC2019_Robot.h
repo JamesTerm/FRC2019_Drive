@@ -33,6 +33,11 @@ public:
 		//void ShowAutonParameters(); //This will show SmartDashboard variables if ShowParameters is true
 		bool ShowParameters;   //If true ShowAutonParameters will populate SmartDashboard with autonomous parameters
 	} Autonomous_Props;
+
+	//Manipulate time slice logic of which system to use with these
+	bool using_ac_drive = false;     
+	bool using_ac_operator = false;
+	bool using_ac_elevator = false;
 };
 
 class FRC2019_Robot_Properties

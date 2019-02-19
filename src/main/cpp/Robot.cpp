@@ -55,6 +55,8 @@ void Robot::RobotInit()
 	const char *RobotScript = "FRC2019Robot.lua";
 	#endif	
 	m_Robot.RobotAssem_init(RobotScript, m_activeCollection);
+	m_drive->SetUseDrive(m_Robot.get_using_ac_drive());
+	m_drive->SetUseOperator(m_Robot.get_using_ac_elevator());
 	m_inst = nt::NetworkTableInstance::GetDefault();		  //!Network tables
 	m_visionTable = m_inst.GetTable("VISION_2019");			  //!Vision network table
 	m_dashboardTable = m_inst.GetTable("DASHBOARD_TABLE");
@@ -151,7 +153,7 @@ void Robot::OperatorControl()
 		#else
 		m_Robot.Update(0.01);  //It's best to use sythetic time for simulation to step through code
 		#endif
-		//m_drive->Update();
+		m_drive->Update();
 		//using this from test runs from robo wranglers code
 		Wait(0.010);
 	}

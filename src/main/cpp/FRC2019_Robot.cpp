@@ -529,7 +529,8 @@ void FRC2019_Robot::Robot_Arm::TimeChange(double dTime_s)
 		SetCurrentLinearAcceleration(m_Advance?Accel:-Brake);
 
 	m_RobotArmManager->TimeChange(dTime_s);
-	__super::TimeChange(dTime_s);
+	if (!m_pParent->m_RobotProps.GetFRC2019RobotProps().using_ac_elevator)
+		__super::TimeChange(dTime_s);
 	}
 
 bool FRC2019_Robot::Robot_Arm::DidHitMinLimit() const
@@ -687,17 +688,21 @@ void FRC2019_Robot::TimeChange(double dTime_s)
 	//For the simulated code this must be first so the simulators can have the correct times
 	m_RobotControl->Robot_Control_TimeChange(dTime_s);
 	//__super::TimeChange(dTime_s);
-	Entity1D &arm_entity=m_Arm;  //This gets around keeping time change protected in derived classes
-	arm_entity.TimeChange(dTime_s);
-	Entity1D &claw_entity=m_Claw;  //This gets around keeping time change protected in derived classes
-	claw_entity.TimeChange(dTime_s);
+	if (!m_RobotProps.GetFRC2019RobotProps().using_ac_operator)
+	{
+		m_Arm.AsEntity1D().TimeChange(dTime_s);
+		m_Claw.AsEntity1D().TimeChange(dTime_s);
+	}
+
 	//saving drive for last... other autonomous functionality can alter the drive before this point
-	m_drive.TimeChange(dTime_s);
+	if (!m_RobotProps.GetFRC2019RobotProps().using_ac_drive)
+		m_drive.TimeChange(dTime_s);
 }
 
 void FRC2019_Robot::CloseDeploymentDoor(bool Close)
 {
-	m_RobotControl->CloseSolenoid(eWedgeDeploy,Close);
+	if (!m_RobotProps.GetFRC2019RobotProps().using_ac_operator)
+		m_RobotControl->CloseSolenoid(eWedgeDeploy,Close);
 }
 
 void FRC2019_Robot::BindAdditionalEventControls(bool Bind)
@@ -869,6 +874,10 @@ void FRC2019_Robot_Properties::LoadFromScript(Scripting::Script& script)
 		err = script.GetField("hatch_grab_deploy_time", NULL, NULL, &fValue);
 		if (!err)
 			props.hatch_grab_deploy_time = fValue;
+		std::string sTest;
+		err = SCRIPT_TEST_BOOL_YES_NoDefault(props.using_ac_drive,"using_ac_drive");
+		err = SCRIPT_TEST_BOOL_YES_NoDefault(props.using_ac_operator, "using_ac_operator");
+		err = SCRIPT_TEST_BOOL_YES_NoDefault(props.using_ac_elevator, "using_ac_elevator");
 
 		err = script.GetFieldTable("arm");
 		if (!err)
