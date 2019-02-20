@@ -36,6 +36,7 @@ public:
 	void LoadValues(xml_document &doc);
 	void AllocateComponents(xml_node &root);
 	void AllocateDriverControls(xml_node &controls);
+	void AllocateOperatorControls(xml_node &controls);
 	void AllocateComponentsDep();
 	virtual ~Config();
 private:
@@ -43,7 +44,7 @@ private:
 	Joystick *m_operatorJoy;
 	ActiveCollection *m_activeCollection;
 	Drive *m_drive;
-	vector<char*> getBindingStringList(string bindings);
+	vector<string> getBindingStringList(string bindings);
 	bool setBindingsToControl(vector<string> bindings, ControlItem *control);
 };
 

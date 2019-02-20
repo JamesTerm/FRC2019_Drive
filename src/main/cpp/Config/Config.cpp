@@ -44,7 +44,7 @@ using namespace frc;
 Config::Config(ActiveCollection *_activeCollection, Drive *_drive) {
 //? make doc a member variable?
 	xml_document doc;
-	xml_parse_result result = doc.load_file("config.xml");
+	xml_parse_result result = doc.load_file("C:/config.xml");
 	m_activeCollection = _activeCollection;
 	m_drive = _drive;
 	if (result)
@@ -161,6 +161,7 @@ void Config::LoadValues(xml_document &doc){
 	}
 
 	AllocateDriverControls(controls);
+	AllocateOperatorControls(controls);
 }
 
 void Config::AllocateComponents(xml_node &root){
@@ -195,15 +196,13 @@ void Config::AllocateComponents(xml_node &root){
 			else{
 				cout << "Failed to load VictorSP " << name << ". This may cause a fatal runtime error!" << endl;
 			}
-
-
 		}
 	}
 	else{
 		cout << "VictorSP definitions not found in config, skipping..." << endl;
 	}
 
-#pragma endregion VictorSP
+	#pragma endregion VictorSP
 
 	#pragma region VictorSPX
 
@@ -383,13 +382,11 @@ void Config::AllocateDriverControls(xml_node &controls){
 
 	#pragma region AxisControl
 	
-	//TODO: Support for multiple drive fits?
-
-	xml_node AxisControls = controls.child("AxisControls");
+	xml_node AxisControls = drive.child("AxisControls");
 	if(AxisControls){
 		for(xml_node axis = AxisControls.first_child(); axis; axis = axis.next_sibling()){
 			string name = axis.name();
-			xml_attribute channel = axis.attribute("channel");
+			xml_attribute channel = axis.attribute("axis");
 			if(channel){
 				bool reversed = axis.attribute("reversed").as_bool();
 				double deadZone;
@@ -413,7 +410,7 @@ void Config::AllocateDriverControls(xml_node &controls){
 				xml_attribute bindings = axis.attribute("bindings");
 				if(bindings){
 					string bind_string = bindings.as_string();
-					vector<char*> bind_vector = getBindingStringList(bind_string);
+					vector<string> bind_vector = getBindingStringList(bind_string);
 					setBindingsToControl(bind_vector, tmp);
 				}
 				else{
@@ -431,6 +428,234 @@ void Config::AllocateDriverControls(xml_node &controls){
 		
 
 	#pragma endregion AxisControl
+
+	#pragma region ButtonControl
+
+	xml_node ButtonControls = drive.child("ButtonControls");
+	if(ButtonControls){
+		for(xml_node button = ButtonControls.first_child(); button; button = button.next_sibling()){
+			string name = button.name();
+			xml_attribute channel = button.attribute("button");
+			if(channel){
+				bool reversed = button.attribute("reversed").as_bool();
+				double multiply;
+				xml_attribute multiply_xml = button.attribute("powerMultiplier");
+				bool actOnRelease = button.attribute("actOnRelease").as_bool();
+				bool isSolenoid = button.attribute("isSolenoid").as_bool();
+				if(!multiply){
+					cout << "No Power Multiplier detected for ButtonControl " << name << ". Defaulting to 1.0. This may cause driving errors!" << endl;
+					multiply = 1.0;
+				}
+				else
+					multiply = multiply_xml.as_double();
+				ButtonControl *tmp = new ButtonControl(m_driveJoy, name, channel.as_int(), actOnRelease, reversed, multiply, isSolenoid);
+				m_drive->AddControlDrive(tmp);
+				xml_attribute bindings = button.attribute("bindings");
+				if(bindings){
+					string bind_string = bindings.as_string();
+					vector<string> bind_vector = getBindingStringList(bind_string);
+					setBindingsToControl(bind_vector, tmp);
+				}
+				else{
+					cout << "Control bindings not found for " << name << ". Did you intend to bind this control to anything?" << endl;
+				}
+			}
+			else{
+				cout << "Failed to load ButtonControl " << name << ". This may cause a fatal runtime error!" << endl;
+			}
+		}
+	}
+	else{
+		cout << "Button Control Driver definitions not found! Skipping..." << endl;
+	}
+
+	#pragma endregion ButtonControl 
+
+	#pragma region ToggleButtonControl
+
+	xml_node ToggleButtonControls = drive.child("ToggleButtonControls");
+	if(ToggleButtonControls){
+		for(xml_node button = ToggleButtonControls.first_child(); button; button = button.next_sibling()){
+			string name = button.name();
+			xml_attribute channel = button.attribute("button");
+			if(channel){
+				bool reversed = button.attribute("reversed").as_bool();
+				double multiply;
+				xml_attribute multiply_xml = button.attribute("powerMultiplier");
+				bool isSwitchOnPress = button.attribute("isSwitchOnPress").as_bool();
+				bool isSolenoid = button.attribute("isSolenoid").as_bool();
+				if(!multiply){
+					cout << "No Power Multiplier detected for ToggleButtonControl " << name << ". Defaulting to 1.0. This may cause driving errors!" << endl;
+					multiply = 1.0;
+				}
+				else
+					multiply = multiply_xml.as_double();
+				ToggleButtonControl *tmp = new ToggleButtonControl(m_driveJoy, name, channel.as_int(), isSwitchOnPress, reversed, multiply, isSolenoid);
+				m_drive->AddControlDrive(tmp);
+				xml_attribute bindings = button.attribute("bindings");
+				if(bindings){
+					string bind_string = bindings.as_string();
+					vector<string> bind_vector = getBindingStringList(bind_string);
+					setBindingsToControl(bind_vector, tmp);
+				}
+				else{
+					cout << "Control bindings not found for " << name << ". Did you intend to bind this control to anything?" << endl;
+				}
+			}
+			else{
+				cout << "Failed to load ToggleButtonControl " << name << ". This may cause a fatal runtime error!" << endl;
+			}
+		}
+	}
+	else{
+		cout << "Toggle Button Control Driver definitions not found! Skipping..." << endl;
+	}	
+
+	#pragma endregion ToggleButtonControl
+}
+
+void Config::AllocateOperatorControls(xml_node &controls){
+	xml_node _operator = controls.child("Operator");
+	if(!_operator){
+		cout << "Operator Control definitions not found in config! Skipping..." << endl;
+		return;
+	}
+	int slot = _operator.attribute("slot").as_int();
+	cout << "Configured Operator Joystick at slot " << slot << endl;
+	m_operatorJoy = new Joystick(slot);
+
+	#pragma region AxisControl
+	
+	xml_node AxisControls = _operator.child("AxisControls");
+	if(AxisControls){
+		for(xml_node axis = AxisControls.first_child(); axis; axis = axis.next_sibling()){
+			string name = axis.name();
+			xml_attribute channel = axis.attribute("axis");
+			if(channel){
+				bool reversed = axis.attribute("reversed").as_bool();
+				double deadZone;
+				double multiply;
+				xml_attribute deadZone_xml = axis.attribute("deadZone");
+				xml_attribute multiply_xml = axis.attribute("powerMultiplier");
+				if(!deadZone_xml){
+					cout << "No DeadZone detected for AxisControl " << name << ". Defaulting to 0.085. This may cause driving errors!" << endl;
+					deadZone = 0.085;
+				}
+				else 
+					deadZone = deadZone_xml.as_double();
+				if(!multiply){
+					cout << "No Power Multiplier detected for AxisControl " << name << ". Defaulting to 1.0. This may cause driving errors!" << endl;
+					multiply = 1.0;
+				}
+				else
+					multiply = multiply_xml.as_double();
+				AxisControl *tmp = new AxisControl(m_operatorJoy, name, channel.as_double(), deadZone, reversed, multiply);
+				m_drive->AddControlOperate(tmp);
+				xml_attribute bindings = axis.attribute("bindings");
+				if(bindings){
+					string bind_string = bindings.as_string();
+					vector<string> bind_vector = getBindingStringList(bind_string);
+					setBindingsToControl(bind_vector, tmp);
+				}
+				else{
+					cout << "Control bindings not found for " << name << ". Did you intend to bind this control to anything?" << endl;
+				}
+			}
+			else{
+				cout << "Failed to load AxisControl " << name << ". This may cause a fatal runtime error!" << endl;
+			}
+		}
+	}
+	else{
+		cout << "Axis Control Operator definitions not found! Skipping..." << endl;
+	}
+		
+
+	#pragma endregion AxisControl
+
+	#pragma region ButtonControl
+
+	xml_node ButtonControls = _operator.child("ButtonControls");
+	if(ButtonControls){
+		for(xml_node button = ButtonControls.first_child(); button; button = button.next_sibling()){
+			string name = button.name();
+			xml_attribute channel = button.attribute("button");
+			if(channel){
+				bool reversed = button.attribute("reversed").as_bool();
+				double multiply;
+				xml_attribute multiply_xml = button.attribute("powerMultiplier");
+				bool actOnRelease = button.attribute("actOnRelease").as_bool();
+				bool isSolenoid = button.attribute("isSolenoid").as_bool();
+				if(!multiply){
+					cout << "No Power Multiplier detected for ButtonControl " << name << ". Defaulting to 1.0. This may cause driving errors!" << endl;
+					multiply = 1.0;
+				}
+				else
+					multiply = multiply_xml.as_double();
+				ButtonControl *tmp = new ButtonControl(m_operatorJoy, name, channel.as_int(), actOnRelease, reversed, multiply, isSolenoid);
+				m_drive->AddControlOperate(tmp);
+				xml_attribute bindings = button.attribute("bindings");
+				if(bindings){
+					string bind_string = bindings.as_string();
+					vector<string> bind_vector = getBindingStringList(bind_string);
+					setBindingsToControl(bind_vector, tmp);
+				}
+				else{
+					cout << "Control bindings not found for " << name << ". Did you intend to bind this control to anything?" << endl;
+				}
+			}
+			else{
+				cout << "Failed to load ButtonControl " << name << ". This may cause a fatal runtime error!" << endl;
+			}
+		}
+	}
+	else{
+		cout << "Button Control Operator definitions not found! Skipping..." << endl;
+	}
+
+	#pragma endregion ButtonControl 
+
+	#pragma region ToggleButtonControl
+
+	xml_node ToggleButtonControls = _operator.child("ToggleButtonControls");
+	if(ToggleButtonControls){
+		for(xml_node button = ToggleButtonControls.first_child(); button; button = button.next_sibling()){
+			string name = button.name();
+			xml_attribute channel = button.attribute("button");
+			if(channel){
+				bool reversed = button.attribute("reversed").as_bool();
+				double multiply;
+				xml_attribute multiply_xml = button.attribute("powerMultiplier");
+				bool isSwitchOnPress = button.attribute("isSwitchOnPress").as_bool();
+				bool isSolenoid = button.attribute("isSolenoid").as_bool();
+				if(!multiply){
+					cout << "No Power Multiplier detected for ToggleButtonControl " << name << ". Defaulting to 1.0. This may cause driving errors!" << endl;
+					multiply = 1.0;
+				}
+				else
+					multiply = multiply_xml.as_double();
+				ToggleButtonControl *tmp = new ToggleButtonControl(m_operatorJoy, name, channel.as_int(), isSwitchOnPress, reversed, multiply, isSolenoid);
+				m_drive->AddControlOperate(tmp);
+				xml_attribute bindings = button.attribute("bindings");
+				if(bindings){
+					string bind_string = bindings.as_string();
+					vector<string> bind_vector = getBindingStringList(bind_string);
+					setBindingsToControl(bind_vector, tmp);
+				}
+				else{
+					cout << "Control bindings not found for " << name << ". Did you intend to bind this control to anything?" << endl;
+				}
+			}
+			else{
+				cout << "Failed to load ToggleButtonControl " << name << ". This may cause a fatal runtime error!" << endl;
+			}
+		}
+	}
+	else{
+		cout << "Toggle Button Control Driver definitions not found! Skipping..." << endl;
+	}	
+
+	#pragma endregion ToggleButtonControl
 }
 
 //! DEPRECATED: Here only for reference
@@ -462,7 +687,7 @@ void Config::AllocateComponentsDep(){
 	ToggleTest->AddComponent(SolenoidTest);
 }
 
-vector<char*> Config::getBindingStringList(string bindings){
+vector<string> Config::getBindingStringList(string bindings){
 	vector<char*> tmp;
 	vector<string> ret;
 	char * pch;
@@ -474,7 +699,8 @@ vector<char*> Config::getBindingStringList(string bindings){
 	}
 	tmp.pop_back();
 	for(int i = 0; i<(int)tmp.size(); i++){
-		
+		string add(tmp[i]);
+		ret.push_back(add);
 	}
 	return ret;
 }
@@ -487,7 +713,7 @@ bool Config::setBindingsToControl(vector<string> bindings, ControlItem *control)
 		try{
 			component = (OutputComponent*)(m_activeCollection->Get(binding));
 			control->AddComponent(component);
-			cout << "Allocated Component " << binding << " to Control " << control.name << endl;
+			cout << "Allocated Component " << binding << " to Control " << control->name << endl;
 		}
 		catch(...){
 			cout << "Failed to bind component " << binding << " to the control " << control->name << ". This can cause fatal runtime errors!" << endl;
