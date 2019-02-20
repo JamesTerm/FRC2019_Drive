@@ -30,17 +30,10 @@ namespace Components
 				PDBChannel = 20;
 			}
 
-			VictorSPItem(string name, int channel, bool reversed, int _PDBChannel) : OutputComponent(name)
-			{
-					victor = new VictorSP(channel);
-					Reversed = reversed;
-					PDBChannel = _PDBChannel;
-			}
-
 			int GetPolarity();
 			string GetName();
-			int PDBChannel;
 			void Stop();
+			void SetPDBChannel(int val);
 			virtual void Set(double val) override;
 			virtual double Get() override;
 			//for reference
@@ -49,6 +42,7 @@ namespace Components
 		private:
 			VictorSP *victor;
 			bool Reversed;
+			int PDBChannel;
 			virtual void DefaultSet() override;
 			virtual void Set(DoubleSolenoid::Value value) override;
 	};

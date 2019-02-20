@@ -49,6 +49,10 @@ void VictorSPXItem::Set(double val){
 	}
 }
 
+void VictorSPXItem::SetPDBChannel(int val){
+	PDBChannel = val;
+}
+
 void VictorSPXItem::DefaultSet(){
 	cout << "WHY DID YOU CALL THE DEFAULT SET FOR A MOTOR RETARD -Watson" << endl;
 }

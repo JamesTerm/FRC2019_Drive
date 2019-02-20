@@ -30,7 +30,6 @@ namespace Controls
 	{
 		protected:
 			Joystick *joy;
-			string name;
 			bool reversed;
 			double powerMultiplier;
 			vector<OutputComponent*> components;
@@ -41,6 +40,7 @@ namespace Controls
 			virtual double Update() = 0;
 			void AddComponent(OutputComponent *component);
 			vector<string> GetComponents();
+			string name;
 			void SetToComponents(double val);
 			virtual ~ControlItem();
 	};

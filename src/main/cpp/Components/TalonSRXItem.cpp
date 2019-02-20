@@ -21,12 +21,14 @@ using namespace Components;
 
 TalonSRXItem::TalonSRXItem() {}
 
-TalonSRXItem::TalonSRXItem(int _channel, string _name, bool _reversed)
+TalonSRXItem::TalonSRXItem(int _channel, string _name, bool _reversed, bool enableEncoder)
 	: OutputComponent(_name){
 	channel = _channel;
 	reversed = _reversed;
 	talon = new TalonSRX(channel);
-	talon->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
+	encoderEnabled = enableEncoder;
+	if(enableEncoder)
+		talon->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
 }
 
 double TalonSRXItem::Get(){
@@ -36,7 +38,7 @@ double TalonSRXItem::Get(){
 }
 
 int TalonSRXItem::GetQuadraturePosition(){
-	return talon->GetSensorCollection().GetQuadraturePosition();
+	return encoderEnabled ? talon->GetSensorCollection().GetQuadraturePosition() : -1;
 }
 
 void TalonSRXItem::SetQuadraturePosition(int val){
@@ -56,6 +58,10 @@ void TalonSRXItem::Set(double val){
 		talon->Set(ControlMode::PercentOutput, 0);
 		inUse = false;
 	}
+}
+
+void TalonSRXItem::SetPDBChannel(int val){
+	PDBChannel = val;
 }
 
 void TalonSRXItem::DefaultSet(){
