@@ -44,7 +44,7 @@ using namespace frc;
 Config::Config(ActiveCollection *_activeCollection, Drive *_drive) {
 //? make doc a member variable?
 	xml_document doc;
-	xml_parse_result result = doc.load_file("C:/config.xml");
+	xml_parse_result result = doc.load_file("config.xml");
 	m_activeCollection = _activeCollection;
 	m_drive = _drive;
 	if (result)
@@ -182,7 +182,7 @@ void Config::AllocateComponents(xml_node &root){
 		for(xml_node victorSp = VictorSP.first_child(); victorSp; victorSp = victorSp.next_sibling()){
 			string name = victorSp.name();
 			xml_attribute channel = victorSp.attribute("channel");
-			bool reversed = victorSp.attribute("reversed");
+			bool reversed = victorSp.attribute("reversed").as_bool();
 			int pdbChannel = victorSp.attribute("pdbChannel") ? victorSp.attribute("pdbChannel").as_int() : -1;
 			if(channel){
 				VictorSPItem *tmp = new VictorSPItem(name, channel.as_int(), reversed);
@@ -399,7 +399,7 @@ void Config::AllocateDriverControls(xml_node &controls){
 				}
 				else 
 					deadZone = deadZone_xml.as_double();
-				if(!multiply){
+				if(!multiply_xml){
 					cout << "No Power Multiplier detected for AxisControl " << name << ". Defaulting to 1.0. This may cause driving errors!" << endl;
 					multiply = 1.0;
 				}
@@ -407,6 +407,7 @@ void Config::AllocateDriverControls(xml_node &controls){
 					multiply = multiply_xml.as_double();
 				AxisControl *tmp = new AxisControl(m_driveJoy, name, channel.as_double(), deadZone, reversed, multiply);
 				m_drive->AddControlDrive(tmp);
+				cout << "Added AxisControl " << name << ", Axis: " << channel << ", DeadZone: " << deadZone << ", Reversed: " << reversed << ", Power Multiplier: " << multiply << endl;
 				xml_attribute bindings = axis.attribute("bindings");
 				if(bindings){
 					string bind_string = bindings.as_string();
@@ -438,11 +439,12 @@ void Config::AllocateDriverControls(xml_node &controls){
 			xml_attribute channel = button.attribute("button");
 			if(channel){
 				bool reversed = button.attribute("reversed").as_bool();
+
 				double multiply;
 				xml_attribute multiply_xml = button.attribute("powerMultiplier");
 				bool actOnRelease = button.attribute("actOnRelease").as_bool();
 				bool isSolenoid = button.attribute("isSolenoid").as_bool();
-				if(!multiply){
+				if(!multiply_xml){
 					cout << "No Power Multiplier detected for ButtonControl " << name << ". Defaulting to 1.0. This may cause driving errors!" << endl;
 					multiply = 1.0;
 				}
@@ -450,6 +452,7 @@ void Config::AllocateDriverControls(xml_node &controls){
 					multiply = multiply_xml.as_double();
 				ButtonControl *tmp = new ButtonControl(m_driveJoy, name, channel.as_int(), actOnRelease, reversed, multiply, isSolenoid);
 				m_drive->AddControlDrive(tmp);
+				cout << "Added Button Control " << name << ", Button: " << channel << ", ActOnRelease: " << actOnRelease << ", Reversed: " << reversed << ", PowerMultiplier: " << multiply << ", IsSolenoid: " << isSolenoid << endl;
 				xml_attribute bindings = button.attribute("bindings");
 				if(bindings){
 					string bind_string = bindings.as_string();
@@ -484,7 +487,7 @@ void Config::AllocateDriverControls(xml_node &controls){
 				xml_attribute multiply_xml = button.attribute("powerMultiplier");
 				bool isSwitchOnPress = button.attribute("isSwitchOnPress").as_bool();
 				bool isSolenoid = button.attribute("isSolenoid").as_bool();
-				if(!multiply){
+				if(!multiply_xml){
 					cout << "No Power Multiplier detected for ToggleButtonControl " << name << ". Defaulting to 1.0. This may cause driving errors!" << endl;
 					multiply = 1.0;
 				}
@@ -543,7 +546,7 @@ void Config::AllocateOperatorControls(xml_node &controls){
 				}
 				else 
 					deadZone = deadZone_xml.as_double();
-				if(!multiply){
+				if(!multiply_xml){
 					cout << "No Power Multiplier detected for AxisControl " << name << ". Defaulting to 1.0. This may cause driving errors!" << endl;
 					multiply = 1.0;
 				}
@@ -586,7 +589,7 @@ void Config::AllocateOperatorControls(xml_node &controls){
 				xml_attribute multiply_xml = button.attribute("powerMultiplier");
 				bool actOnRelease = button.attribute("actOnRelease").as_bool();
 				bool isSolenoid = button.attribute("isSolenoid").as_bool();
-				if(!multiply){
+				if(!multiply_xml){
 					cout << "No Power Multiplier detected for ButtonControl " << name << ". Defaulting to 1.0. This may cause driving errors!" << endl;
 					multiply = 1.0;
 				}
@@ -628,7 +631,7 @@ void Config::AllocateOperatorControls(xml_node &controls){
 				xml_attribute multiply_xml = button.attribute("powerMultiplier");
 				bool isSwitchOnPress = button.attribute("isSwitchOnPress").as_bool();
 				bool isSolenoid = button.attribute("isSolenoid").as_bool();
-				if(!multiply){
+				if(!multiply_xml){
 					cout << "No Power Multiplier detected for ToggleButtonControl " << name << ". Defaulting to 1.0. This may cause driving errors!" << endl;
 					multiply = 1.0;
 				}
