@@ -2,6 +2,9 @@
 class RobotAssem_Internal; //forward declare... 
 class RobotCommon;
 
+//Temporary during the transition of using LUA
+//#define __UseXMLConfig__
+
 class RobotAssem
 {
 public:

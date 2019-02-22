@@ -114,6 +114,52 @@ private:
 	std::string m_LuaPath;  //keep a copy of the lua path
 
 	Configuration::ActiveCollection *m_Collection=nullptr;
+
+	void *PullFromAC_Drive(size_t module, size_t Channel, const char *Name, const char*Type, bool &DoNotCreate) const
+	{
+		if (!m_Collection) return (void *)nullptr;  //support if I'm not going to use a collection
+		void *ret = nullptr;
+		//Translate our naming convention to the config naming convention
+		const char *ConfigNaming = m_pRobot->HandlePWMHook_GetActiveName(Name);
+		if (ConfigNaming)
+		{
+			VictorSPItem *item = m_Collection->GetVictor(ConfigNaming);
+			if (item)
+				ret = (void *)item->AsVictorSP();
+		}
+
+		if (!ret)
+			DoNotCreate = true;   //Let caller know to not create this, since we do not have a resource for it
+		return ret;
+	}
+	void *PullFromAC(size_t module, size_t Channel, const char *Name, const char*Type, bool &DoNotCreate) const
+	{
+		if (!m_Collection) return (void *)nullptr;  //support if I'm not going to use a collection
+		void *ret = nullptr;
+		//TODO hook our active collection here
+		//printf("Robot: Get External PWMSpeedController %s[%d,%d]\n",Name,module,Channel);
+		#if 0
+		//This is temporary as long as the active configuration populates it
+		if (strcmp(Name, "wedge")==0)
+		{
+			DoubleSolenoidItem *SolenoidTest =dynamic_cast<DoubleSolenoidItem *>( m_Collection->Get("SolenoidToggle"));
+			ret = SolenoidTest->AsDoubleSolenoid();
+		}
+		#endif
+		return ret;
+	}
+	void *PushToAC(size_t module, size_t Channel, const char *Name, const char*Type, bool &DoNotCreate)
+	{
+		void *ret = nullptr;
+		if (strcmp(Type, "VictorSP") == 0)
+		{
+			VictorSPItem *item = new VictorSPItem(Name, (int)Channel, false);
+			m_Collection->Add(item);
+			ret = (void *)item->AsVictorSP();
+		}
+		//TODO support other types as needed, pneumatics can be set via event
+		return ret;
+	}
 public:
 	void InitRobot()
 	{
@@ -122,20 +168,11 @@ public:
 		m_pRobot->SetDriveExternalPWMSpeedControllerHook(
 			[&](size_t module, size_t Channel, const char *Name, const char*Type, bool &DoNotCreate)
 		{
-			if (!m_Collection) return (void *)nullptr;  //support if I'm not going to use a collection
-			void *ret = nullptr;
-			//Translate our naming convention to the config naming convention
-			const char *ConfigNaming = m_pRobot->HandlePWMHook_GetActiveName(Name);
-			if (ConfigNaming)
-			{
-				VictorSPItem *item = m_Collection->GetVictor(ConfigNaming);
-				if (item)
-					ret = (void *)item->AsVictorSP();
-			}
-
-			if (!ret)
-				DoNotCreate = true;   //Let caller know to not create this, since we do not have a resource for it
-			return ret;
+			#ifdef __UseXMLConfig__
+			return PullFromAC_Drive(module,Channel,Name,Type,DoNotCreate);
+			#else
+			return PushToAC(module, Channel, Name, Type, DoNotCreate);
+			#endif
 		});
 		{
 			Framework::Scripting::Script script;
@@ -174,19 +211,11 @@ public:
 		m_Control.SetExternalPWMSpeedControllerHook(
 		[&](size_t module, size_t Channel, const char *Name, const char*Type,bool &DoNotCreate)
 		{
-			if (!m_Collection) return (void *)nullptr;  //support if I'm not going to use a collection
-			void *ret = nullptr;
-			//TODO hook our active collection here
-			//printf("Robot: Get External PWMSpeedController %s[%d,%d]\n",Name,module,Channel);
-			#if 0
-			//This is temporary as long as the active configuration populates it
-			if (strcmp(Name, "wedge")==0)
-			{
-				DoubleSolenoidItem *SolenoidTest =dynamic_cast<DoubleSolenoidItem *>( m_Collection->Get("SolenoidToggle"));
-				ret = SolenoidTest->AsDoubleSolenoid();
-			}
+			#ifdef __UseXMLConfig__
+			return PullFromAC(module,Channel,Name,Type,DoNotCreate);
+			#else
+			return PushToAC(module, Channel, Name, Type, DoNotCreate);
 			#endif
-			return ret;
 		});
 		#endif
 		//We can call init now:

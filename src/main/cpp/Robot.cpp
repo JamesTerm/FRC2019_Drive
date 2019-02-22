@@ -45,7 +45,9 @@ void Robot::RobotInit()
 	Log::restartfile();
 	cout << "Program Version: " << VERSION << " Revision: " << REVISION << endl;
 	//CameraServer::GetInstance()->StartAutomaticCapture(0);
+	#ifdef __UseXMLConfig__
 	Config *config = new Config(m_activeCollection, m_drive); //!< Pointer to the configuration file of the robot
+	#endif
 	//Must have this for smartdashboard to work properly
 	SmartDashboard::init();
 	//Select which lua to load here
@@ -154,7 +156,10 @@ void Robot::OperatorControl()
 		#else
 		m_Robot.Update(0.01);  //It's best to use sythetic time for simulation to step through code
 		#endif
+		//Depreciated
+		#ifdef __UseXMLConfig__
 		m_drive->Update();
+		#endif
 		//using this from test runs from robo wranglers code
 		Wait(0.010);
 	}
