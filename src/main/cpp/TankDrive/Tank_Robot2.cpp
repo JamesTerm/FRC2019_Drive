@@ -48,7 +48,7 @@ using namespace std;
 class Tank_Robot2_Control : public frc::RobotControlCommon
 {
 private:
-	std::unique_ptr<frc::RobotDrive_SPX> m_RobotDrive;
+	std::unique_ptr<frc::RobotDrive_Interface> m_RobotDrive;
 
 	double m_dTime_s=0.0;  //Stamp the current time delta slice for other functions to use
 	Tank_Robot2_Props m_TankRobotProps; //cached in the Initialize from specific robot
@@ -110,11 +110,31 @@ public:
 		//Note: Initialize may be called multiple times so we'll only set this stuff up on first run
 		if (!m_RobotDrive)
 		{
-			RobotControlCommon_Initialize(robot_props->Get_ControlAssignmentProps());
-			m_RobotDrive = std::make_unique<RobotDrive_SPX>(
-				VictorSPX_GetInstance(eLeftDrive1), VictorSPX_GetInstance(eLeftDrive2),
-				VictorSPX_GetInstance(eRightDrive1), VictorSPX_GetInstance(eRightDrive2),
-				VictorSPX_GetInstance(eLeftDrive3), VictorSPX_GetInstance(eRightDrive3));
+			const frc::Control_Assignment_Properties &cap = robot_props->Get_ControlAssignmentProps();
+			RobotControlCommon_Initialize(cap);
+			//Now to determine if the lua specifies to use PWMSpeedController or VictorSPX, because SPX is not a kind of PWM it can not be solved inherited
+			//like with Victor and VictorSP; however, once it is resolved here all calls from m_RobotDrive will go to the appropriate implementation
+			//We'll look for one of the drive names it SPX... it can be either left or right... and we'll pick the first one from those
+			const char *csz_LeftDrive = csz_Tank_Robot2_SpeedControllerDevices_Enum[eLeftDrive1];
+			//unfortunately I have to copy the props because find_if doesn't like using a const iterator
+			Control_Assignment_Properties::Controls_1C Victors = cap.GetVictorSPXs();
+			auto pos = std::find_if(Victors.begin(), Victors.end(),[csz_LeftDrive](Control_Assignment_Properties::Control_Element_1C &m) -> bool
+				{
+					return strcmp(csz_LeftDrive,m.name.c_str())==0;
+				});
+			const bool is_victor_spx = (pos != Victors.end());
+			
+			if (is_victor_spx)
+				m_RobotDrive = std::make_unique<RobotDrive_SPX>(
+					VictorSPX_GetInstance(eLeftDrive1), VictorSPX_GetInstance(eLeftDrive2),
+					VictorSPX_GetInstance(eRightDrive1), VictorSPX_GetInstance(eRightDrive2),
+					VictorSPX_GetInstance(eLeftDrive3), VictorSPX_GetInstance(eRightDrive3));
+			else
+				m_RobotDrive = std::make_unique<RobotDrive2>(
+					PWMSpeedController_GetInstance(eLeftDrive1), PWMSpeedController_GetInstance(eLeftDrive2),
+					PWMSpeedController_GetInstance(eRightDrive1), PWMSpeedController_GetInstance(eRightDrive2),
+					PWMSpeedController_GetInstance(eLeftDrive3), PWMSpeedController_GetInstance(eRightDrive3));
+
 			SetSafety(m_UseSafety);
 			const double EncoderPulseRate = (1.0 / 360.0);
 			Encoder_SetDistancePerPulse(eLeftDrive1, EncoderPulseRate), Encoder_SetDistancePerPulse(eRightDrive1, EncoderPulseRate);
@@ -213,6 +233,7 @@ public:
 		return m_IsLowGear ? m_TankRobotProps.low_gear.MaxSpeed : m_TankRobotProps.high_gear.MaxSpeed;
 	}
 
+	//Depreciated:  only for XML configuration
 	const char *HandlePWMHook_GetActiveName(const char *Name)
 	{
 		//printf("Drive: Get External PWMSpeedController %s[%d,%d]\n", Name, module, Channel);

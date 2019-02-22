@@ -420,20 +420,47 @@ public:
 	virtual double GetZ() {return 0.0;}
 };
 #endif
+class RobotDrive_Interface
+{
+	public:
+		//Must have this
+		virtual ~RobotDrive_Interface() {}
+		enum MotorType
+		{
+			kFrontLeftMotor = 0,
+			kFrontRightMotor = 1,
+			kRearLeftMotor = 2,
+			kRearRightMotor = 3,
+			kCenterLeftMotor = 4,
+			kCenterRightMotor = 5
+		};
+		virtual void SetLeftRightMotorOutputs(float leftOutput, float rightOutput)=0;
+		virtual void GetLeftRightMotorOutputs(float &leftOutput, float &rightOutput) = 0;
+		virtual void SetInvertedMotor(MotorType motor, bool isInverted);
+		virtual void SetExpiration(float timeout);
+		virtual float GetExpiration();
+		virtual bool IsAlive();
+		virtual void StopMotor() = 0;
+		virtual bool IsSafetyEnabled();
+		virtual void SetSafetyEnabled(bool enabled);
+		virtual void GetDescription(char *desc) = 0;
+	protected:
+		float Limit(float num);
+		void Normalize(double *wheelSpeeds);
+		void RotateVector(double &x, double &y, double angle);
 
-class COMMON_API RobotDrive2
+		int32_t m_invertedMotors[6];
+		float m_sensitivity;
+		double m_maxOutput;
+		bool m_deleteSpeedControllers;
+
+		float m_LeftOutput, m_RightOutput;
+		bool m_IsEnabled = false;  //Use to determine if its been enabled for quick disable access
+};
+
+class COMMON_API RobotDrive2 : public RobotDrive_Interface
 {
 public:
-	enum MotorType
-	{
-		kFrontLeftMotor = 0,
-		kFrontRightMotor = 1,
-		kRearLeftMotor = 2,
-		kRearRightMotor = 3,
-		kCenterLeftMotor = 4,
-		kCenterRightMotor =5
-	};
-
 	RobotDrive2(PWMSpeedController *frontLeftMotor, PWMSpeedController *rearLeftMotor,PWMSpeedController *frontRightMotor, PWMSpeedController *rearRightMotor,
 		PWMSpeedController *centerLeftMotor=nullptr, PWMSpeedController *centerRightMotor=nullptr);
 	RobotDrive2(PWMSpeedController &frontLeftMotor, PWMSpeedController &rearLeftMotor,PWMSpeedController &frontRightMotor, PWMSpeedController &rearRightMotor);
@@ -443,27 +470,13 @@ public:
 	virtual void GetLeftRightMotorOutputs(float &leftOutput, float &rightOutput) //I added this one for convenience
 	{	leftOutput=m_LeftOutput,rightOutput=m_RightOutput;
 	}
-	void SetInvertedMotor(MotorType motor, bool isInverted);
-	void SetExpiration(float timeout);
-	float GetExpiration();
-	bool IsAlive();
 	void StopMotor();
-	bool IsSafetyEnabled();
-	void SetSafetyEnabled(bool enabled);
 	void GetDescription(char *desc);
 
 protected:
 	void InitRobotDrive();
-	float Limit(float num);
-	void Normalize(double *wheelSpeeds);
-	void RotateVector(double &x, double &y, double angle);
 
 	//static const int32_t kMaxNumberOfMotors = 4;
-
-	int32_t m_invertedMotors[6];
-	float m_sensitivity;
-	double m_maxOutput;
-	bool m_deleteSpeedControllers;
 	PWMSpeedController *m_frontLeftMotor;
 	PWMSpeedController *m_frontRightMotor;
 	PWMSpeedController *m_rearLeftMotor;
@@ -482,23 +495,11 @@ private:
 		if (m_centerRightMotor) motors++;
 		return motors;
 	}
-	float m_LeftOutput,m_RightOutput;
-	bool m_IsEnabled = false;  //Use to determine if its been enabled for quick disable access
 };
 
-class COMMON_API RobotDrive_SPX
+class COMMON_API RobotDrive_SPX : public RobotDrive_Interface
 {
 public:
-	enum MotorType
-	{
-		kFrontLeftMotor = 0,
-		kFrontRightMotor = 1,
-		kRearLeftMotor = 2,
-		kRearRightMotor = 3,
-		kCenterLeftMotor = 4,
-		kCenterRightMotor = 5
-	};
-
 	RobotDrive_SPX(VictorSPX *frontLeftMotor, VictorSPX *rearLeftMotor, VictorSPX *frontRightMotor, VictorSPX *rearRightMotor,
 		VictorSPX *centerLeftMotor = nullptr, VictorSPX *centerRightMotor = nullptr);
 	RobotDrive_SPX(VictorSPX &frontLeftMotor, VictorSPX &rearLeftMotor, VictorSPX &frontRightMotor, VictorSPX &rearRightMotor);
@@ -509,27 +510,13 @@ public:
 	{
 		leftOutput = m_LeftOutput, rightOutput = m_RightOutput;
 	}
-	void SetInvertedMotor(MotorType motor, bool isInverted);
-	void SetExpiration(float timeout);
-	float GetExpiration();
-	bool IsAlive();
 	void StopMotor();
-	bool IsSafetyEnabled();
-	void SetSafetyEnabled(bool enabled);
 	void GetDescription(char *desc);
 
 protected:
 	void InitRobotDrive();
-	float Limit(float num);
-	void Normalize(double *wheelSpeeds);
-	void RotateVector(double &x, double &y, double angle);
 
 	//static const int32_t kMaxNumberOfMotors = 4;
-
-	int32_t m_invertedMotors[6];
-	float m_sensitivity;
-	double m_maxOutput;
-	bool m_deleteSpeedControllers;
 	VictorSPX *m_frontLeftMotor;
 	VictorSPX *m_frontRightMotor;
 	VictorSPX *m_rearLeftMotor;
@@ -548,8 +535,6 @@ private:
 		if (m_centerRightMotor) motors++;
 		return motors;
 	}
-	float m_LeftOutput, m_RightOutput;
-	bool m_IsEnabled = false;  //Use to determine if its been enabled for quick disable access
 };
 
 

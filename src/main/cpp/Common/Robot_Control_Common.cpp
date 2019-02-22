@@ -696,7 +696,7 @@ void RobotDrive2::SetLeftRightMotorOutputs(float leftOutput, float rightOutput)
 	//CANJaguar::UpdateSyncGroup(syncGroup);  ah ha... sync group only works with CAN / Jaguar
 }
 
-float RobotDrive2::Limit(float num)
+float RobotDrive_Interface::Limit(float num)
 {
 	if (num > 1.0)
 	{
@@ -709,7 +709,7 @@ float RobotDrive2::Limit(float num)
 	return num;
 }
 
-void RobotDrive2::Normalize(double *wheelSpeeds)
+void RobotDrive_Interface::Normalize(double *wheelSpeeds)
 {
 	double maxMagnitude = fabs(wheelSpeeds[0]);
 	int32_t i;
@@ -727,7 +727,7 @@ void RobotDrive2::Normalize(double *wheelSpeeds)
 	}
 }
 
-void RobotDrive2::RotateVector(double &x, double &y, double angle)
+void RobotDrive_Interface::RotateVector(double &x, double &y, double angle)
 {
 	double cosA = cos(angle * (3.14159 / 180.0));
 	double sinA = sin(angle * (3.14159 / 180.0));
@@ -737,7 +737,7 @@ void RobotDrive2::RotateVector(double &x, double &y, double angle)
 	y = yOut;
 }
 
-void RobotDrive2::SetInvertedMotor(MotorType motor, bool isInverted)
+void RobotDrive_Interface::SetInvertedMotor(MotorType motor, bool isInverted)
 {
 	if (motor < 0 || motor > 3)
 	{
@@ -748,24 +748,24 @@ void RobotDrive2::SetInvertedMotor(MotorType motor, bool isInverted)
 	m_invertedMotors[motor] = isInverted ? -1 : 1;
 }
 
-void RobotDrive2::SetExpiration(float timeout){}
+void RobotDrive_Interface::SetExpiration(float timeout){}
 
-float RobotDrive2::GetExpiration()
+float RobotDrive_Interface::GetExpiration()
 {
 	return 0.0;
 }
 
-bool RobotDrive2::IsAlive()
+bool RobotDrive_Interface::IsAlive()
 {
 	return true;
 }
 
-bool RobotDrive2::IsSafetyEnabled()
+bool RobotDrive_Interface::IsSafetyEnabled()
 {
 	return true;
 }
 
-void RobotDrive2::SetSafetyEnabled(bool enabled) {}
+void RobotDrive_Interface::SetSafetyEnabled(bool enabled) {}
 
 void RobotDrive2::GetDescription(char *desc)
 {
@@ -884,77 +884,6 @@ void RobotDrive_SPX::SetLeftRightMotorOutputs(float leftOutput, float rightOutpu
 	#endif
 	//CANJaguar::UpdateSyncGroup(syncGroup);  ah ha... sync group only works with CAN / Jaguar
 }
-
-float RobotDrive_SPX::Limit(float num)
-{
-	if (num > 1.0)
-	{
-		return 1.0;
-	}
-	if (num < -1.0)
-	{
-		return -1.0;
-	}
-	return num;
-}
-
-void RobotDrive_SPX::Normalize(double *wheelSpeeds)
-{
-	double maxMagnitude = fabs(wheelSpeeds[0]);
-	int32_t i;
-	for (i=1; i<kMaxNumberOfMotors; i++)
-	{
-		double temp = fabs(wheelSpeeds[i]);
-		if (maxMagnitude < temp) maxMagnitude = temp;
-	}
-	if (maxMagnitude > 1.0)
-	{
-		for (i=0; i<kMaxNumberOfMotors; i++)
-		{
-			wheelSpeeds[i] = wheelSpeeds[i] / maxMagnitude;
-		}
-	}
-}
-
-void RobotDrive_SPX::RotateVector(double &x, double &y, double angle)
-{
-	double cosA = cos(angle * (3.14159 / 180.0));
-	double sinA = sin(angle * (3.14159 / 180.0));
-	double xOut = x * cosA - y * sinA;
-	double yOut = x * sinA + y * cosA;
-	x = xOut;
-	y = yOut;
-}
-
-void RobotDrive_SPX::SetInvertedMotor(MotorType motor, bool isInverted)
-{
-	if (motor < 0 || motor > 3)
-	{
-		//wpi_setWPIError(InvalidMotorIndex);
-		assert(false);
-		return;
-	}
-	m_invertedMotors[motor] = isInverted ? -1 : 1;
-}
-
-void RobotDrive_SPX::SetExpiration(float timeout){}
-
-float RobotDrive_SPX::GetExpiration()
-{
-	return 0.0;
-}
-
-bool RobotDrive_SPX::IsAlive()
-{
-	return true;
-}
-
-bool RobotDrive_SPX::IsSafetyEnabled()
-{
-	return true;
-}
-
-void RobotDrive_SPX::SetSafetyEnabled(bool enabled) {}
 
 void RobotDrive_SPX::GetDescription(char *desc)
 {
