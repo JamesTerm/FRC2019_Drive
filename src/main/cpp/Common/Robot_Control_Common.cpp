@@ -223,6 +223,12 @@ void Control_Assignment_Properties::LoadFromScript(Scripting::Script& script)
 			LoadControlElement_1C_Internal(script, m_PWMSpeedControllers, "VictorSP");
 			script.Pop();
 		}
+		err = script.GetFieldTable("victor_spx");
+		if (!err)
+		{
+			LoadControlElement_1C_Internal(script, m_PWMSpeedControllers, "VictorSPX");
+			script.Pop();
+		}
 		err = script.GetFieldTable("servo");
 		if (!err)
 		{
@@ -426,6 +432,19 @@ void RobotControlCommon::RobotControlCommon_Initialize(const Control_Assignment_
 					printf("new %s as %d\n", Name, Channel);
 					ret = new VictorSP((int)Channel);
 					#endif
+				}
+				else if (strcmp(Type, "VictorSPX") == 0)
+				{
+					#ifdef _Win32
+					std::string NameToUse = "VictorSPX_";  //I could assign Type, but I want to monitor the logic path
+					NameToUse += Name;
+					ret = new VictorSPX((uint32_t)Channel, NameToUse.c_str());  //adding name for UI
+					#else
+					//quick debug when things are not working
+					printf("new %s as %d\n", Name, Channel);
+					ret = new VictorSPX((int)Channel);
+					#endif
+
 				}
 				else
 				{

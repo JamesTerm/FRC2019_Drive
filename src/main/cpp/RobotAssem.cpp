@@ -157,6 +157,13 @@ private:
 			m_Collection->Add(item);
 			ret = (void *)item->AsVictorSP();
 		}
+		else if (strcmp(Type, "VictorSPX") == 0)
+		{
+			VictorSPXItem *item = new VictorSPXItem((int)Channel, Name, false);
+			m_Collection->Add(item);
+			ret = (void *)item->AsVictorSPX();
+		}
+
 		//TODO support other types as needed, pneumatics can be set via event
 		return ret;
 	}

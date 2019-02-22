@@ -147,6 +147,79 @@ public:
 	VictorSP& operator=(VictorSP&&) = default;
 };
 
+enum ErrorCode : int32_t
+{
+	OK = 0
+};
+
+enum FeedbackDevice
+{
+	//NOTE: None was removed as it doesn't exist in firmware
+	//TODO: Add None to firmware and add None back in
+	QuadEncoder = 0,
+	//1
+	Analog = 2,
+	//3
+	Tachometer = 4,
+	PulseWidthEncodedPosition = 8,
+
+	SensorSum = 9,
+	SensorDifference = 10,
+	RemoteSensor0 = 11,
+	RemoteSensor1 = 12,
+	//13
+	//14
+	SoftwareEmulatedSensor = 15,
+
+	CTRE_MagEncoder_Absolute = PulseWidthEncodedPosition,
+	CTRE_MagEncoder_Relative = QuadEncoder,
+};
+
+enum RemoteFeedbackDevice
+{
+	RemoteFeedbackDevice_None = -1,
+
+	RemoteFeedbackDevice_SensorSum = 9,
+	RemoteFeedbackDevice_SensorDifference = 10,
+	RemoteFeedbackDevice_RemoteSensor0 = 11,
+	RemoteFeedbackDevice_RemoteSensor1 = 12,
+	//13
+	//14
+	RemoteFeedbackDevice_SoftwareEmulatedSensor = 15,
+};
+enum class ControlMode
+{
+	PercentOutput = 0,
+	Position = 1,
+	Velocity = 2,
+	Current = 3,
+	Follower = 5,
+	MotionProfile = 6,
+	MotionMagic = 7,
+	MotionProfileArc = 10,
+
+	Disabled = 15,
+};
+
+//Note VictorSPX is CAN but putting it this way for now to save on code
+class VictorSPX : public PWMSpeedController
+{
+public:
+	VictorSPX(int channel) : PWMSpeedController(0, channel, "VictorSPX")  //Note: the name will need to be merged after construction
+	{
+	}
+	//for derived classes
+	VictorSPX(int channel, const char *name) : PWMSpeedController(0, channel, name)
+	{
+	}
+
+	void Set(ControlMode mode, double Value) { PWMSpeedController::Set(Value); }
+	virtual double GetMotorOutputPercent() { return 0.0; }
+	virtual ErrorCode ConfigSelectedFeedbackSensor(RemoteFeedbackDevice feedbackDevice, int pidIdx, int timeoutMs) { return OK; }
+	virtual ErrorCode ConfigSelectedFeedbackSensor(FeedbackDevice feedbackDevice, int pidIdx, int timeoutMs) { return OK; }
+};
+
+
 class Servo : public Control_1C_Element_UI
 {
 public:

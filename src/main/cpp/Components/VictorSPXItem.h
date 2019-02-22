@@ -36,6 +36,7 @@ public:
 	int PDBChannel;
 	virtual void DefaultSet() override;
 	virtual ~VictorSPXItem();
+	VictorSPX *AsVictorSPX() { return victor; }
 };
 }
 

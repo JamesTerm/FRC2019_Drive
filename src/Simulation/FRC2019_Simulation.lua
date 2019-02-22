@@ -29,7 +29,7 @@ MainRobot = {
 	control_assignments =
 	{
 		--by default module is 1, so only really need it for 2
-		victor_sp =
+		victor_spx =
 		{
 			id_1 = { name= "right_drive_1", channel=1}, 
 			id_2 = { name= "right_drive_2", channel=2}, 
@@ -39,8 +39,11 @@ MainRobot = {
 			--id_6 = { name= "right_drive_3", channel=6}, 
 			--id_7 = { name="arm", channel=7}
 			id_5 = { name="arm", channel=7},
-			id_6 = { name="roller", channel=8}
 			--If we decide we need more power we can assign these
+		},
+		victor_sp =
+		{
+			id_1 = { name="roller", channel=8}
 		},
 		-- relay =
 		-- {
