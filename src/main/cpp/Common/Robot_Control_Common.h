@@ -1,6 +1,10 @@
 #pragma once
 #include <functional>
 #include <memory>
+#ifndef _Win32
+#include <frc/WPILib.h>
+#include <ctre/Phoenix.h>
+#endif
 
 namespace frc
 {

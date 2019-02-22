@@ -23,6 +23,7 @@
 #include "../Common/UI_Controller.h"
 #ifndef _Win32
 #include <frc/WPILib.h>
+#include <ctre/Phoenix.h>
 #include "../Common/InOut_Interface.h"
 #else
 #include "../Common/Ship_1D.h"
