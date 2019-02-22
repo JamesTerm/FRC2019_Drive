@@ -195,6 +195,9 @@
     <None Include="..\FRC2019Robot.lua" />
     <None Include="..\FRC2019_Simulation.lua" />
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\config.xml" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

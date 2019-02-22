@@ -201,6 +201,95 @@ namespace cs
 {
 	class UsbCamera
 	{
+	public:
+		void SetExposureAuto() {}
+		bool SetResolution(int width, int height) {	return false; }
+		bool SetFPS(int fps) { return false; }
+	};
+	class AxisCamera
+	{
 
 	};
 }
+
+
+namespace frc {
+
+	/**
+	 * Singleton class for creating and keeping camera servers.
+	 *
+	 * Also publishes camera information to NetworkTables.
+	 */
+	class CameraServer {
+	public:
+		static constexpr uint16_t kBasePort = 1181;
+		static constexpr int kSize640x480 = 0;
+		static constexpr int kSize320x240 = 1;
+		static constexpr int kSize160x120 = 2;
+
+		static CameraServer* GetInstance()
+		{
+			static CameraServer cs;
+			return &cs;
+		}
+		cs::UsbCamera StartAutomaticCapture() 
+		{
+			static cs::UsbCamera instance;
+			return instance;
+		}
+		cs::UsbCamera StartAutomaticCapture(int dev)
+		{
+			static cs::UsbCamera instance;
+			return instance;
+		}
+
+		//cs::UsbCamera StartAutomaticCapture(const wpi::Twine& name, int dev);
+		//cs::UsbCamera StartAutomaticCapture(const wpi::Twine& name,	const wpi::Twine& path);
+		//void StartAutomaticCapture(const cs::VideoSource& camera);
+		//cs::AxisCamera AddAxisCamera(const wpi::Twine& host);
+		cs::AxisCamera AddAxisCamera(const char* host)
+		{
+			static cs::AxisCamera instance;
+			return instance;
+		}
+
+		cs::AxisCamera AddAxisCamera(const std::string& host)
+		{
+			static cs::AxisCamera instance;
+			return instance;
+		}
+
+		//cs::AxisCamera AddAxisCamera(wpi::ArrayRef<std::string> hosts);
+		//template <typename T>
+		//cs::AxisCamera AddAxisCamera(std::initializer_list<T> hosts);
+		//cs::AxisCamera AddAxisCamera(const wpi::Twine& name, const wpi::Twine& host);
+		//cs::AxisCamera AddAxisCamera(const wpi::Twine& name, const char* host);
+		//cs::AxisCamera AddAxisCamera(const wpi::Twine& name, const std::string& host);
+		//cs::AxisCamera AddAxisCamera(const wpi::Twine& name,
+		//	wpi::ArrayRef<std::string> hosts);
+		//template <typename T>
+		//cs::AxisCamera AddAxisCamera(const wpi::Twine& name,
+		//	std::initializer_list<T> hosts);
+		//cs::CvSink GetVideo();
+		//cs::CvSink GetVideo(const cs::VideoSource& camera);
+		//cs::CvSink GetVideo(const wpi::Twine& name);
+		//cs::CvSource PutVideo(const wpi::Twine& name, int width, int height);
+		//cs::MjpegServer AddServer(const wpi::Twine& name);
+		//cs::MjpegServer AddServer(const wpi::Twine& name, int port);
+		//void AddServer(const cs::VideoSink& server);
+		//void RemoveServer(const wpi::Twine& name);
+		//cs::VideoSink GetServer();
+		//cs::VideoSink GetServer(const wpi::Twine& name);
+		//void AddCamera(const cs::VideoSource& camera);
+		//void RemoveCamera(const wpi::Twine& name);
+		void SetSize(int size);
+
+	private:
+		CameraServer() {}
+		~CameraServer() {}
+
+		//struct Impl;
+		//std::unique_ptr<Impl> m_impl;
+	};
+
+}  // namespace frc

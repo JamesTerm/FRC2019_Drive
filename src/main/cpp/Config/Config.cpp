@@ -54,6 +54,10 @@ Config::Config(ActiveCollection *_activeCollection, Drive *_drive) {
 	}
 	else
 	{
+		//In simulation we should really get the message across
+		#ifdef _Win32
+		assert(false);  
+		#endif
 		cout << "XML Config parsed with errors" << endl;
 		cout << "Error description: " << result.description() << endl;
 		cout << "Error offset: " << result.offset << endl;;
@@ -405,7 +409,7 @@ void Config::AllocateDriverControls(xml_node &controls){
 				}
 				else
 					multiply = multiply_xml.as_double();
-				AxisControl *tmp = new AxisControl(m_driveJoy, name, channel.as_double(), deadZone, reversed, multiply);
+				AxisControl *tmp = new AxisControl(m_driveJoy, name, channel.as_int(), deadZone, reversed, multiply);
 				m_drive->AddControlDrive(tmp);
 				cout << "Added AxisControl " << name << ", Axis: " << channel << ", DeadZone: " << deadZone << ", Reversed: " << reversed << ", Power Multiplier: " << multiply << endl;
 				xml_attribute bindings = axis.attribute("bindings");
@@ -552,7 +556,7 @@ void Config::AllocateOperatorControls(xml_node &controls){
 				}
 				else
 					multiply = multiply_xml.as_double();
-				AxisControl *tmp = new AxisControl(m_operatorJoy, name, channel.as_double(), deadZone, reversed, multiply);
+				AxisControl *tmp = new AxisControl(m_operatorJoy, name, channel.as_int(), deadZone, reversed, multiply);
 				m_drive->AddControlOperate(tmp);
 				xml_attribute bindings = axis.attribute("bindings");
 				if(bindings){
@@ -696,7 +700,7 @@ void Config::AllocateComponentsDep(){
 vector<string> Config::getBindingStringList(string bindings){
 	vector<char*> tmp;
 	vector<string> ret;
-	char * pch;
+	//char * pch;   //unreferenced
 	char * bindings_char = new char[bindings.length() + 1];
 	strcpy(bindings_char, bindings.c_str());
 	tmp.push_back(strtok(bindings_char, " ,"));

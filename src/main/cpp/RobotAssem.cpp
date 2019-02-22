@@ -179,7 +179,7 @@ public:
 			void *ret = nullptr;
 			//TODO hook our active collection here
 			//printf("Robot: Get External PWMSpeedController %s[%d,%d]\n",Name,module,Channel);
-			#if 1
+			#if 0
 			//This is temporary as long as the active configuration populates it
 			if (strcmp(Name, "wedge")==0)
 			{

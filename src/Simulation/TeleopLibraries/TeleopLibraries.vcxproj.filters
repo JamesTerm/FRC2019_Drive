@@ -48,6 +48,9 @@
     <Filter Include="NetworkTables">
       <UniqueIdentifier>{c9dc9df5-c7bf-4269-988c-b1390c4d6b3b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Pugi">
+      <UniqueIdentifier>{e2d14228-a433-4ed0-99b3-201be2dc9d46}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\main\cpp\Components\DigitalInputItem.cpp">
@@ -112,6 +115,9 @@
     </ClCompile>
     <ClCompile Include="..\..\main\cpp\Util\Log.cpp">
       <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\main\cpp\Pugi\pugixml.cpp">
+      <Filter>Pugi</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -219,6 +225,12 @@
     </ClInclude>
     <ClInclude Include="NetworkTables\NetworkTableInstance.h">
       <Filter>NetworkTables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Pugi\pugiconfig.h">
+      <Filter>Pugi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\main\cpp\Pugi\pugixml.h">
+      <Filter>Pugi</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -221,12 +221,12 @@ public:
 		const char *ConfigNaming = nullptr;
 		switch (motor)
 		{
-		case eLeftDrive1:		ConfigNaming = "Left_0";		break;
-		case eLeftDrive2:		ConfigNaming = "Left_1";		break;
-		case eLeftDrive3:		ConfigNaming = "Left_2";		break;
-		case eRightDrive1:		ConfigNaming = "Right_0";		break;
-		case eRightDrive2:		ConfigNaming = "Right_1";		break;
-		case eRightDrive3:		ConfigNaming = "Right_2";		break;
+		case eLeftDrive1:		ConfigNaming = "left_0";		break;
+		case eLeftDrive2:		ConfigNaming = "left_1";		break;
+		case eLeftDrive3:		ConfigNaming = "left_2";		break;
+		case eRightDrive1:		ConfigNaming = "right_0";		break;
+		case eRightDrive2:		ConfigNaming = "right_1";		break;
+		case eRightDrive3:		ConfigNaming = "right_2";		break;
 		}
 		return ConfigNaming;
 	}
