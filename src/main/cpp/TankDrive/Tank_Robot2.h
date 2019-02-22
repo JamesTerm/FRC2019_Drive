@@ -43,10 +43,13 @@ private:
 protected:
 	virtual void Initialize(Entity2D_Kind::EventMap& em) { m_eventMap = &em; }
 public:
+	RobotCommon *AsRobotCommon() { return this; }
 	Entity2D_Kind::EventMap* GetEventMap() { return m_eventMap; }
 	//Robot implements... client code calls
 	virtual void BindAdditionalEventControls(bool Bind) = 0;
 	virtual void BindAdditionalUIControls(bool Bind, void *joy, void *key) = 0;
+	//override if autonomous wishes to access driver status
+	virtual bool IsDriverMoving() const { return false; }
 };
 
 
@@ -100,7 +103,9 @@ class Tank_Robot2
 		Vec2d GetVelocity() const { return m_Velocity; }
 
 		//Use this method to determine if the drive is moving the controls
-		bool IsDriverMoving() { return m_Controller_Voltage.length2() > 0.0; }
+		bool IsDriverMoving() const 
+			{ return m_Controller_Voltage.length2() > 0.0; 
+			}
 		//This is where all joystick events are subscribed
 		virtual void BindAdditionalEventControls(bool Bind);
 		virtual void BindAdditionalUIControls(bool Bind, void *joy, void *key);

@@ -55,7 +55,7 @@ void Robot::RobotInit()
 	#else
 	const char *RobotScript = "FRC2019Robot.lua";
 	#endif	
-	m_Robot.RobotAssem_init(RobotScript, m_activeCollection);
+	m_Robot.RobotAssem_init(RobotScript,&m_EventMap, m_activeCollection);
 	m_drive->SetUseDrive(m_Robot.get_using_ac_drive());
 	m_drive->SetUseOperator(m_Robot.get_using_ac_elevator());
 	m_inst = nt::NetworkTableInstance::GetDefault();		  //!Network tables

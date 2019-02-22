@@ -11,29 +11,40 @@ class EventV2_0
 public:
 	using function_signature = void();
 	using protocol = std::function<function_signature>;  //make this type available for client code
+	using packet = std::pair<size_t, protocol>;
 private:
-	using EventHandlerList = std::list<protocol>;
+	using EventHandlerList = std::list<packet>;
 	EventHandlerList m_handlerList;
 public:
 	__inline void Fire() const
 	{
 		for (auto &pos : m_handlerList)
-			pos();
+			pos.second();
 	}
 
+	//Use this simpler version if you do not intend to manually remove
+	//Removing is optional, because nothing is allocated cleanup will happen automatically
+	//Remove should be used if the event is still active while a particular listening client is unsubscribing
 	__inline void Subscribe(protocol callback)
 	{
-		m_handlerList.emplace_back(callback);
+		m_handlerList.emplace_back(std::make_pair(0, callback));
 	}
 
-	//It should be noted that using Remove is optional, because nothing is allocated cleanup will happen automatically
-	//Remove should be used if the event is still active while a particular listening client is unsubscribing
-	__inline void Remove(protocol callback)
+	//Use this method if you plan to remove:
+	//https://stackoverflow.com/questions/21328229/c11-compare-lambda-expression
+	//Because of the nature of lambda's being unique we need an ID to find the instance
+	__inline void Subscribe(size_t ID,protocol callback)
+	{
+		m_handlerList.emplace_back(std::make_pair(ID, callback));
+	}
+
+	__inline void Remove(size_t ID)
 	{
 		//EventHandlerList_iter pos;
 		auto pos = std::find_if(m_handlerList.begin(), m_handlerList.end(),
-			[callback](protocol &m) -> bool
-		{	return m.target<protocol>() == callback.target<protocol>();
+			[ID](packet &m) -> bool
+		{	
+			return (m.first == ID && ID!=0);
 		});
 		if (pos != m_handlerList.end())
 			m_handlerList.erase(pos);
@@ -51,30 +62,31 @@ class EventV2_parms
 public:
 	using function_signature = void(Args...);
 	using protocol = std::function<function_signature>;  //make this type available for client code
+	using packet = std::pair<size_t, protocol>;
 private:
-	using EventHandlerList = std::list<protocol>;
+	using EventHandlerList = std::list<packet>;
 	EventHandlerList m_handlerList;
 public:
 	__inline void Fire(Args... args) const
 	{
 		for (auto &pos : m_handlerList)
-			pos(args...);
+			pos.second(args...);
 	}
-
 	__inline void Subscribe(protocol callback)
 	{
-		m_handlerList.emplace_back(callback);
+		m_handlerList.emplace_back(std::make_pair(0, callback));
 	}
 
-	__inline void Remove(protocol callback)
+	__inline void Subscribe(size_t ID, protocol callback)
 	{
-		//a word about using template on target:
-		//https://stackoverflow.com/questions/48185015/using-stdfunctiontarget-correctly
-		//https://en.cppreference.com/w/cpp/language/dependent_name
-		//EventHandlerList_iter pos;
+		m_handlerList.emplace_back(std::make_pair(ID, callback));
+	}
+
+	__inline void Remove(size_t ID)
+	{
 		auto pos = std::find_if(m_handlerList.begin(), m_handlerList.end(),
-			[callback](protocol &m) -> bool
-			{	return m.template target<protocol>() == callback.template target<protocol>();
+			[ID](packet &m) -> bool
+			{	return (m.first == ID && ID!=0);
 			});
 		if (pos != m_handlerList.end())
 			m_handlerList.erase(pos);
@@ -643,7 +655,7 @@ private:
 	EventV2_0 m_EventV2_0;
 public:
 	using protocol = std::function<function_signature>;  //allow client to access
-
+	using packet = std::pair<size_t, protocol>;
 	__inline void Fire() const
 	{	m_Event0.Fire(), m_EventV2_0.Fire();
 	}
@@ -653,14 +665,27 @@ public:
 	{	m_EventV2_0.Subscribe(delegate);
 	}
 
+	__inline void Subscribe(size_t ID, protocol callback)
+	{
+		m_EventV2_0.Subscribe(ID, callback);
+	}
+	__inline void Subscribe(void *instance, protocol callback)
+	{
+		m_EventV2_0.Subscribe((size_t)instance, callback);
+	}
+
 	template<class T>
 	void Subscribe(IEvent::HandlerList& ehl, T& client, void (T::*delegate)())
 	{	m_Event0.Subscribe(ehl, client, delegate);
 	}
 
 	//Pick which remove, which correpsonds to which was used for subscribe
-	__inline void Remove(protocol delegate)
-	{	m_EventV2_0.Remove(delegate);
+	__inline void Remove(size_t ID)
+	{	m_EventV2_0.Remove(ID);
+	}
+	__inline void Remove(void *ID)
+	{
+		m_EventV2_0.Remove((size_t)ID);
 	}
 	template<class T>
 	void Remove(T& client, void (T::*delegate)())
@@ -677,7 +702,7 @@ private:
 	EventV2_parms<P1> m_EventV2_1;
 public:
 	using protocol = std::function<function_signature>;  //allow client to access
-
+	using packet = std::pair<size_t, protocol>;
 	__inline void Fire(P1 p1) const
 	{
 		m_Event1.Fire(p1), m_EventV2_1.Fire(p1);
@@ -688,6 +713,14 @@ public:
 	{
 		m_EventV2_1.Subscribe(delegate);
 	}
+	__inline void Subscribe(size_t ID, protocol callback)
+	{
+		m_EventV2_1.Subscribe(ID, callback);
+	}
+	__inline void Subscribe(void *instance, protocol callback)
+	{
+		m_EventV2_1.Subscribe((size_t)instance, callback);
+	}
 
 	template<class T>
 	void Subscribe(IEvent::HandlerList& ehl, T& client, void (T::*delegate)(P1 p1))
@@ -696,9 +729,13 @@ public:
 	}
 
 	//Pick which remove, which correpsonds to which was used for subscribe
-	__inline void Remove(protocol delegate)
+	__inline void Remove(size_t ID)
 	{
-		m_EventV2_1.Remove(delegate);
+		m_EventV2_1.Remove(ID);
+	}
+	__inline void Remove(void *ID)
+	{
+		m_EventV2_1.Remove((size_t)ID);
 	}
 	template<class T>
 	void Remove(T& client, void (T::*delegate)(P1 p1))

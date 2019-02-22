@@ -20,6 +20,7 @@
 #include "Util/Log.h"
 #include "Goals/FRC2019_Goals.h"
 #include "Goals/GoalSelector.h"
+#include "Base/EventMap.h"
 #include "RobotAssem.h"
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableEntry.h"
@@ -52,6 +53,7 @@ class Robot : public SampleRobot
         ActiveCollection *m_activeCollection; //!< Pointer to the only instantiation of the ActiveCollection Class in the program
         const string m_driveStraight = "drive";
         MultitaskGoal_ac* m_masterGoal;
+		Framework::Base::EventMap m_EventMap;  //This makes it possble to fire events to anywhere that accesses this object
 		RobotAssem m_Robot;
         nt::NetworkTableInstance m_inst; //!Network tables
         shared_ptr<NetworkTable> m_visionTable; //!Vision table

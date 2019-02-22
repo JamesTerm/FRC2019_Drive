@@ -109,9 +109,8 @@ private:
 	frc::Driver_Station_Joystick m_Joystick;
 	Framework::UI::JoyStick_Binder m_JoyBinder;
 	Framework::UI::KeyboardMouse_CB m_KeyboardBinder;
-	UI_Controller *m_pUI;
 
-	Framework::Base::EventMap m_EventMap;
+	Framework::Base::EventMap &m_EventMap;
 	std::string m_LuaPath;  //keep a copy of the lua path
 
 	Configuration::ActiveCollection *m_Collection=nullptr;
@@ -166,8 +165,8 @@ public:
 		//m_FieldCentricDrive.BindAdditionalEventControls(true, em, ehl);
 		m_pRobot->AsRobotCommon()->BindAdditionalUIControls(true, &m_JoyBinder, &m_KeyboardBinder);
 	}
-	RobotAssem_Internal(RobotAssem *parent,const char *RobotLua, Configuration::ActiveCollection *Collection) : m_pParent(parent),
-		m_Joystick(3,0),m_JoyBinder(m_Joystick), m_Collection(Collection)
+	RobotAssem_Internal(RobotAssem *parent,const char *RobotLua,Framework::Base::EventMap *pEventMap, Configuration::ActiveCollection *Collection) : m_pParent(parent),
+		m_Joystick(3,0),m_JoyBinder(m_Joystick),m_EventMap(*pEventMap), m_Collection(Collection)
 	{
 		m_LuaPath = RobotLua;
 		#if 1
@@ -199,13 +198,7 @@ public:
 		#ifdef _Win32
 		s_ParentBind(nullptr,true);
 		#endif
-		#if 0
-		delete m_pUI;
-		m_pUI = nullptr;
-		#else
 		m_pRobot->AsRobotCommon()->BindAdditionalEventControls(false);
-		//m_FieldCentricDrive.BindAdditionalEventControls(false, em, ehl);
-		#endif
 		delete m_pRobot;  //checks for null implicitly 
 		m_pRobot = nullptr;
 	}
@@ -220,23 +213,27 @@ public:
 	}
 	RobotCommon *GetRobot() { return m_pRobot; }
 
-	bool get_using_ac_drive()
+	bool get_using_ac_drive() const
 	{
 		return m_RobotProps.GetFRC2019RobotProps().using_ac_drive;
 	}
-	bool get_using_ac_operator()
+	bool get_using_ac_operator() const
 	{
 		return m_RobotProps.GetFRC2019RobotProps().using_ac_operator;
 	}
-	bool get_using_ac_elevator()
+	bool get_using_ac_elevator() const
 	{
 		return m_RobotProps.GetFRC2019RobotProps().using_ac_elevator;
 	}
+	bool IsDriverMoving() const
+	{
+		return m_pRobot->AsRobotCommon()->IsDriverMoving();
+	}
 };
 
-void RobotAssem::RobotAssem_init(const char *RobotLua, Configuration::ActiveCollection *Collection)
+void RobotAssem::RobotAssem_init(const char *RobotLua, Framework::Base::EventMap *pEventMap, Configuration::ActiveCollection *Collection)
 {
-	m_p_RobotAssem = std::make_shared<RobotAssem_Internal>(this, RobotLua, Collection);
+	m_p_RobotAssem = std::make_shared<RobotAssem_Internal>(this, RobotLua, pEventMap, Collection);
 	m_p_RobotAssem->Init_BindProperties();
 	#ifdef _Win32
 	//establish the second parent bind well after everything is set up
@@ -256,17 +253,22 @@ RobotCommon *RobotAssem::GetRobot()
 }
 #endif
 
-bool RobotAssem::get_using_ac_drive()
+bool RobotAssem::get_using_ac_drive() const
 {
 	return m_p_RobotAssem->get_using_ac_drive();
 }
 
-bool RobotAssem::get_using_ac_operator()
+bool RobotAssem::get_using_ac_operator() const
 {
 	return m_p_RobotAssem->get_using_ac_operator();
 }
 
-bool RobotAssem::get_using_ac_elevator()
+bool RobotAssem::get_using_ac_elevator() const
 {
 	return m_p_RobotAssem->get_using_ac_elevator();
+}
+
+bool RobotAssem::IsDriverMoving() const
+{
+	return m_p_RobotAssem->IsDriverMoving();
 }

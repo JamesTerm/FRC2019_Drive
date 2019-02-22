@@ -47,7 +47,7 @@ std::string NetworkTable::GetString(std::string keyName, std::string defaultValu
 	#ifndef __HideValues__
 	return SmartDashboard::GetString(keyName, defaultValue);
 	#else
-	return false;
+	return defaultValue;
 	#endif
 }
 

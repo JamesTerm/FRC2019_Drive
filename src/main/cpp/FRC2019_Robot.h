@@ -101,7 +101,6 @@ const char * const csz_FRC2019_Robot_BoolSensorDevices_Enum[] =
 class FRC2019_Robot : public RobotCommon
 {
 	public:
-		RobotCommon *AsRobotCommon() { return this; }
 		enum SolenoidDevices
 		{
 			eWedgeDeploy,
@@ -215,9 +214,10 @@ class FRC2019_Robot : public RobotCommon
 		Robot_Claw &GetClaw() {return m_Claw;}
 		//Allow external code to switch the default goal
 		void SetTestAutonCallbackGoal(std::function<Goal *(FRC2019_Robot *Robot)> callback) { m_TestAutonGoalCallback = callback; }
-	protected:
+	protected:  //from RobotCommon
 		virtual void BindAdditionalEventControls(bool Bind);
 		virtual void BindAdditionalUIControls(bool Bind, void *joy, void *key);
+		virtual bool IsDriverMoving() const { return m_drive.IsDriverMoving(); }
 	private:
 		Tank_Robot2 m_drive = this;  //we are agregatting instead of inheriting
 		FRC2019_Robot_Properties m_RobotProps;
