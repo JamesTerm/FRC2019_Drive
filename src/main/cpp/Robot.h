@@ -53,7 +53,7 @@ class Robot : public SampleRobot
         ActiveCollection *m_activeCollection; //!< Pointer to the only instantiation of the ActiveCollection Class in the program
         const string m_driveStraight = "drive";
         MultitaskGoal_ac* m_masterGoal;
-		Framework::Base::EventMap m_EventMap;  //This makes it possble to fire events to anywhere that accesses this object
+		std::shared_ptr<Framework::Base::EventMap> m_EventMap;  //shared here to give more scope on exit
 		RobotAssem m_Robot;
         nt::NetworkTableInstance m_inst; //!Network tables
         shared_ptr<NetworkTable> m_visionTable; //!Vision table

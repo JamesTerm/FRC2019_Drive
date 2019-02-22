@@ -20,7 +20,10 @@ using namespace Configuration;
 /**
  * Default Constructor
 **/
-ActiveCollection::ActiveCollection(){}
+ActiveCollection::ActiveCollection()
+{
+	m_EventMap = std::make_shared<Framework::Base::EventMap>();
+}
 
 /**
  * Method to return a NativeComponent of a certain type and name

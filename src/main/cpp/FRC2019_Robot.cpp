@@ -645,7 +645,7 @@ void FRC2019_Robot::Initialize(Entity2D_Kind::EventMap& em, const FRC2019_Robot_
 }
 void FRC2019_Robot::ResetPos()
 {
-	//__super::ResetPos();
+	m_drive.ResetPos();
 	m_Arm.ResetPos();
 	m_Claw.ResetPos();
 }

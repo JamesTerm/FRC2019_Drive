@@ -112,6 +112,7 @@ class Tank_Robot2
 
 		void SetDriveExternalPWMSpeedControllerHook(std::function<void *(size_t, size_t, const char *, const char*, bool &)> callback);
 		const char *HandlePWMHook_GetActiveName(const char *Name);
+		virtual void ResetPos();
 protected:
 		const Tank_Robot2_Props &GetTankRobotProps() const {return m_TankRobotProps->GetTankRobotProps();}
 		//this may need to be overridden for robots that need it on for certain cases like 2012 needing it on for low gear
@@ -127,6 +128,7 @@ protected:
 
 		//This velocity is captured from the controller in the form of left/right velocity, even FPS controls will be translated here
 		Vec2d m_Controller_Voltage;
+		Vec2d m_External_Voltage;  //this is used by auton
 		//This will be the velocity applied to the controller on a time change
 		Vec2d m_Velocity;
 	public:

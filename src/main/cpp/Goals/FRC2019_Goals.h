@@ -37,6 +37,7 @@ public:
 
     m_activeCollection = activeCollection;
     m_currentTime = 0;
+	m_timeOut = timeOut;
   }
   virtual void Activate();
   virtual Goal::Goal_Status Process(double dTime);

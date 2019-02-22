@@ -259,9 +259,16 @@ public:
  /*																Tank_Robot2															*/
 /***********************************************************************************************************************************/
 
+void Tank_Robot2::ResetPos()
+{
+	//It is important that these are reset incase a switch between auton and tele leaves external set
+	m_Controller_Voltage = m_External_Voltage = Vec2d(0.0, 0.0);
+}
+
 Tank_Robot2::Tank_Robot2(RobotCommon *robot) : m_pParent(robot) 
 {
 	m_DriveControl = make_shared<Tank_Robot2_Control>();
+	//ResetPos();  //Should not need this
 }
 
 void Tank_Robot2::Initialize(const Tank_Robot2_Properties *props) 
@@ -275,8 +282,8 @@ void Tank_Robot2::TimeChange(double dTime_s)
 	SmartDashboard::PutNumber("LeftVoltage", m_Controller_Voltage[0]);
 	SmartDashboard::PutNumber("RightVoltage", m_Controller_Voltage[1]);
 	#if 1
-	const double left_voltage = m_Controller_Voltage[0];
-	const double right_voltage = m_Controller_Voltage[1];
+	const double left_voltage = m_Controller_Voltage[0]+m_External_Voltage[0];
+	const double right_voltage = m_Controller_Voltage[1]+m_External_Voltage[1];
 	//TODO PID here
 	m_Velocity[0] = m_Controller_Voltage[0] * m_DriveControl->GetMaxSpeed();
 	m_Velocity[1] = m_Controller_Voltage[1] * m_DriveControl->GetMaxSpeed();
@@ -290,6 +297,8 @@ void Tank_Robot2::TimeChange(double dTime_s)
 
 const char *csz_Joystick_SetLeftVelocity = "Joystick_SetLeftVelocity";
 const char *csz_Joystick_SetRightVelocity = "Joystick_SetRightVelocity";
+const char *csz_External_SetLeftVelocity = "External_SetLeftVelocity";
+const char *csz_External_SetRightVelocity = "External_SetRightVelocity";
 
 void Tank_Robot2::BindAdditionalEventControls(bool Bind)
 {
@@ -303,6 +312,14 @@ void Tank_Robot2::BindAdditionalEventControls(bool Bind)
 		em->EventValue_Map[csz_Joystick_SetRightVelocity].Subscribe([&](double value)
 		{
 			m_Controller_Voltage[1] =  value;
+		});
+		em->EventValue_Map[csz_External_SetLeftVelocity].Subscribe([&](double value)
+		{
+			m_External_Voltage[0] = value;
+		});
+		em->EventValue_Map[csz_External_SetRightVelocity].Subscribe([&](double value)
+		{
+			m_External_Voltage[1] = value;
 		});
 	}
 }

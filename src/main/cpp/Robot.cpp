@@ -25,6 +25,8 @@ Robot::Robot()
 {
 	m_drive = new Drive();
 	m_activeCollection = new ActiveCollection();
+	//extend the life of the active region's copy by adding a reference to this variable
+	m_EventMap = m_activeCollection->GetEventMap_Shared();
 }
 
 Robot::~Robot()
@@ -57,7 +59,7 @@ void Robot::RobotInit()
 	#else
 	const char *RobotScript = "FRC2019Robot.lua";
 	#endif	
-	m_Robot.RobotAssem_init(RobotScript,&m_EventMap, m_activeCollection);
+	m_Robot.RobotAssem_init(RobotScript,&m_activeCollection->GetEventMap(), m_activeCollection);
 	m_drive->SetUseDrive(m_Robot.get_using_ac_drive());
 	m_drive->SetUseOperator(m_Robot.get_using_ac_elevator());
 	m_inst = nt::NetworkTableInstance::GetDefault();		  //!Network tables
@@ -107,6 +109,7 @@ void Robot::Autonomous()
 	while (m_masterGoal->GetStatus() == Goal::eActive && _IsAutononomous() && !IsDisabled())
 	{
 		m_masterGoal->Process(dTime);
+		m_Robot.Update(dTime);  //Now that we use events we need to process the robots time slices
 		Wait(dTime);
 	}
 	m_masterGoal->~MultitaskGoal_ac();
@@ -147,15 +150,15 @@ void Robot::OperatorControl()
 	while (IsOperatorControl() && !IsDisabled())
 	{
 		const double CurrentTime = GetTime();
+		#ifndef _Win32
 		const double DeltaTime = CurrentTime - LastTime;
+		#else
+		const double DeltaTime=0.01;  //It's best to use sythetic time for simulation to step through code
+		#endif
 		LastTime = CurrentTime;
 		if (DeltaTime == 0.0) continue;  //never send 0 time
 		//printf("DeltaTime=%.2f\n",DeltaTime);
-		#ifndef _Win32
 		m_Robot.Update(DeltaTime);
-		#else
-		m_Robot.Update(0.01);  //It's best to use sythetic time for simulation to step through code
-		#endif
 		//Depreciated
 		#ifdef __UseXMLConfig__
 		m_drive->Update();
@@ -171,6 +174,29 @@ void Robot::OperatorControl()
  */
 void Robot::Test()
 {
+	const double TimeOut=10.0;
+	Goal_DriveWithTimer m_masterGoal(m_activeCollection, 0.5, 0.25, TimeOut);
+	double dTime = 0.010;
+	m_masterGoal.Activate();
+	double currentTime=0.0;
+	SmartDashboard::PutBoolean("AutoPilot", true);
+	while (IsTest() && !IsDisabled() && m_masterGoal.GetStatus()==Goal::eActive)
+	{
+		SmartDashboard::PutNumber("Timer", TimeOut - currentTime);
+		currentTime += dTime;
+		m_masterGoal.Process(dTime);
+		m_Robot.Update(dTime);  //Now that we use events we need to process the robots time slices
+		Wait(0.010);
+	}
+	//ensure we power off
+	SetDrive(0.0, 0.0, m_activeCollection);
+	SmartDashboard::PutBoolean("AutoPilot", false);
+	//just do nothing, except give time back to CPU
+	while (IsTest() && !IsDisabled())
+	{
+		m_Robot.Update(dTime);  //Now that we use events we need to process the robots time slices
+		Wait(0.010);
+	}
 }
 
 START_ROBOT_CLASS(Robot) //!< This identifies Robot as the main Robot starting class
