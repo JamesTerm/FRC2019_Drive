@@ -48,7 +48,7 @@ using namespace std;
 class Tank_Robot2_Control : public frc::RobotControlCommon
 {
 private:
-	std::unique_ptr<frc::RobotDrive2> m_RobotDrive;
+	std::unique_ptr<frc::RobotDrive_SPX> m_RobotDrive;
 
 	double m_dTime_s=0.0;  //Stamp the current time delta slice for other functions to use
 	Tank_Robot2_Props m_TankRobotProps; //cached in the Initialize from specific robot
@@ -111,10 +111,10 @@ public:
 		if (!m_RobotDrive)
 		{
 			RobotControlCommon_Initialize(robot_props->Get_ControlAssignmentProps());
-			m_RobotDrive = std::make_unique<RobotDrive2>(
-				PWMSpeedController_GetInstance(eLeftDrive1), PWMSpeedController_GetInstance(eLeftDrive2),
-				PWMSpeedController_GetInstance(eRightDrive1), PWMSpeedController_GetInstance(eRightDrive2),
-				PWMSpeedController_GetInstance(eLeftDrive3), PWMSpeedController_GetInstance(eRightDrive3));
+			m_RobotDrive = std::make_unique<RobotDrive_SPX>(
+				VictorSPX_GetInstance(eLeftDrive1), VictorSPX_GetInstance(eLeftDrive2),
+				VictorSPX_GetInstance(eRightDrive1), VictorSPX_GetInstance(eRightDrive2),
+				VictorSPX_GetInstance(eLeftDrive3), VictorSPX_GetInstance(eRightDrive3));
 			SetSafety(m_UseSafety);
 			const double EncoderPulseRate = (1.0 / 360.0);
 			Encoder_SetDistancePerPulse(eLeftDrive1, EncoderPulseRate), Encoder_SetDistancePerPulse(eRightDrive1, EncoderPulseRate);

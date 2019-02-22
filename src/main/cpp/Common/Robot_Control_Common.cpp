@@ -227,7 +227,7 @@ void Control_Assignment_Properties::LoadFromScript(Scripting::Script& script)
 		err = script.GetFieldTable("victor_spx");
 		if (!err)
 		{
-			LoadControlElement_1C_Internal(script, m_PWMSpeedControllers, "VictorSPX");
+			LoadControlElement_1C_Internal(script, m_VictorSPXs, "VictorSPX");
 			script.Pop();
 		}
 		err = script.GetFieldTable("servo");
@@ -456,6 +456,39 @@ void RobotControlCommon::RobotControlCommon_Initialize(const Control_Assignment_
 			return	ret;
 		}
 		);
+
+	Initialize_1C_LUT<VictorSPX, VictorSPX>(props.GetVictorSPXs(),m_VictorSPXs,m_VictorSPX_LUT,this,&RobotControlCommon::RobotControlCommon_Get_PWMSpeedController_EnumValue,
+		[&](size_t Module, size_t Channel, const char *Name, const char *Type,bool &DoNotCreate)
+		{
+			//Ok Explanation is needed here... first we try the external use case, if it returns a pointer we are good
+			void *ret = m_ExternalPWMSpeedController(Module,Channel,Name,Type,DoNotCreate);
+			//If not... we create the correct control based off of its type
+			if ((ret == nullptr)&&(DoNotCreate==false))
+			{
+				//Currently we have either Victor or VictorSP
+				if (strcmp(Type, "VictorSPX") == 0)
+				{
+					#ifdef _Win32
+					std::string NameToUse = "VictorSPX_";  //I could assign Type, but I want to monitor the logic path
+					NameToUse += Name;
+					ret = new VictorSPX((uint32_t)Channel, NameToUse.c_str());  //adding name for UI
+					#else
+					//quick debug when things are not working
+					printf("new %s as %d\n", Name, Channel);
+					ret = new VictorSPX((int)Channel);
+					#endif
+
+				}
+				else
+				{
+					assert(false); 
+					ret = nullptr;  //let it fall back to default implmentation 
+				}
+			}
+			return	ret;
+		}
+		);
+
 	//servos
 	Initialize_1C_LUT<Servo, Servo>(props.GetServos(),m_Servos,m_ServoLUT,this,&RobotControlCommon::RobotControlCommon_Get_PWMSpeedController_EnumValue, DefaultExternalControlHook);
 	//relays
@@ -747,6 +780,194 @@ void RobotDrive2::StopMotor()
 	if (m_rearRightMotor != NULL) m_rearRightMotor->Disable();
 }
 
+  /***********************************************************************************************************************************/
+ /*																RobotDrive_SPX														*/
+/***********************************************************************************************************************************/
+
+//const int32_t kMaxNumberOfMotors=6;
+
+void RobotDrive_SPX::InitRobotDrive() {
+	m_frontLeftMotor = NULL;
+	m_frontRightMotor = NULL;
+	m_rearRightMotor = NULL;
+	m_rearLeftMotor = NULL;
+	m_centerLeftMotor = NULL;
+	m_centerRightMotor = NULL;
+	m_sensitivity = 0.5;
+	m_maxOutput = 1.0;
+	m_LeftOutput=0.0,m_RightOutput=0.0;
+}
+
+RobotDrive_SPX::RobotDrive_SPX(VictorSPX *frontLeftMotor, VictorSPX *rearLeftMotor,
+						VictorSPX *frontRightMotor, VictorSPX *rearRightMotor,
+						VictorSPX *centerLeftMotor, VictorSPX *centerRightMotor)
+{
+	InitRobotDrive();
+	if (frontLeftMotor == NULL || rearLeftMotor == NULL || frontRightMotor == NULL || rearRightMotor == NULL)
+	{
+		//wpi_setWPIError(NullParameter);
+		//assert(false);
+		m_IsEnabled = false;
+		return;
+	}
+	else
+		m_IsEnabled = true;
+	m_frontLeftMotor = frontLeftMotor;
+	m_rearLeftMotor = rearLeftMotor;
+	m_frontRightMotor = frontRightMotor;
+	m_rearRightMotor = rearRightMotor;
+	m_centerLeftMotor = centerLeftMotor;
+	m_centerRightMotor = centerRightMotor;
+	for (int32_t i=0; i < kMaxNumberOfMotors; i++)
+	{
+		m_invertedMotors[i] = 1;
+	}
+	m_deleteSpeedControllers = false;
+}
+
+RobotDrive_SPX::RobotDrive_SPX(VictorSPX &frontLeftMotor, VictorSPX &rearLeftMotor,
+						VictorSPX &frontRightMotor, VictorSPX &rearRightMotor)
+{
+	InitRobotDrive();
+	m_frontLeftMotor = &frontLeftMotor;
+	m_rearLeftMotor = &rearLeftMotor;
+	m_frontRightMotor = &frontRightMotor;
+	m_rearRightMotor = &rearRightMotor;
+	for (int32_t i=0; i < kMaxNumberOfMotors; i++)
+	{
+		m_invertedMotors[i] = 1;
+	}
+	m_deleteSpeedControllers = false;
+}
+
+RobotDrive_SPX::~RobotDrive_SPX()
+{
+	if (m_deleteSpeedControllers)
+	{
+		delete m_frontLeftMotor;
+		delete m_rearLeftMotor;
+		delete m_frontRightMotor;
+		delete m_rearRightMotor;
+		delete m_centerLeftMotor;
+		delete m_centerRightMotor;
+	}
+}
+
+void RobotDrive_SPX::SetLeftRightMotorOutputs(float leftOutput, float rightOutput)
+{
+	if (!m_IsEnabled) return;
+	//this is added for convenience in simulation
+	m_LeftOutput=leftOutput,m_RightOutput=rightOutput;
+
+	assert(m_rearLeftMotor != NULL && m_rearRightMotor != NULL);
+
+	//syncGroup no longer used
+	//uint8_t syncGroup = 0x80;
+
+	m_frontLeftMotor->Set(ControlMode::PercentOutput, (float)(Limit(leftOutput) * m_invertedMotors[kFrontLeftMotor] * m_maxOutput));
+	m_rearLeftMotor->Set(ControlMode::PercentOutput, (float)(Limit(leftOutput) * m_invertedMotors[kRearLeftMotor] * m_maxOutput));
+
+	m_frontRightMotor->Set(ControlMode::PercentOutput, (float)(-Limit(rightOutput) * m_invertedMotors[kFrontRightMotor] * m_maxOutput));
+	m_rearRightMotor->Set(ControlMode::PercentOutput, (float)(-Limit(rightOutput) * m_invertedMotors[kRearRightMotor] * m_maxOutput));
+
+	if (m_centerLeftMotor)
+		m_centerLeftMotor->Set(ControlMode::PercentOutput, (float)(Limit(leftOutput) * m_invertedMotors[kCenterLeftMotor] * m_maxOutput));
+	if (m_centerRightMotor)
+		m_centerRightMotor->Set(ControlMode::PercentOutput, (float)(Limit(rightOutput) * m_invertedMotors[kCenterRightMotor] * m_maxOutput));
+
+	//TODO should eventually update to reflect this, but this shouldn't affect the functionality
+	#if 0
+	m_frontLeftMotor->Set(Limit(leftOutput) * m_maxOutput);
+	m_rearLeftMotor->Set(Limit(leftOutput) * m_maxOutput);
+	m_frontRightMotor->Set(-Limit(rightOutput) * m_maxOutput);
+	m_rearRightMotor->Set(-Limit(rightOutput) * m_maxOutput);
+	#endif
+	//CANJaguar::UpdateSyncGroup(syncGroup);  ah ha... sync group only works with CAN / Jaguar
+}
+
+float RobotDrive_SPX::Limit(float num)
+{
+	if (num > 1.0)
+	{
+		return 1.0;
+	}
+	if (num < -1.0)
+	{
+		return -1.0;
+	}
+	return num;
+}
+
+void RobotDrive_SPX::Normalize(double *wheelSpeeds)
+{
+	double maxMagnitude = fabs(wheelSpeeds[0]);
+	int32_t i;
+	for (i=1; i<kMaxNumberOfMotors; i++)
+	{
+		double temp = fabs(wheelSpeeds[i]);
+		if (maxMagnitude < temp) maxMagnitude = temp;
+	}
+	if (maxMagnitude > 1.0)
+	{
+		for (i=0; i<kMaxNumberOfMotors; i++)
+		{
+			wheelSpeeds[i] = wheelSpeeds[i] / maxMagnitude;
+		}
+	}
+}
+
+void RobotDrive_SPX::RotateVector(double &x, double &y, double angle)
+{
+	double cosA = cos(angle * (3.14159 / 180.0));
+	double sinA = sin(angle * (3.14159 / 180.0));
+	double xOut = x * cosA - y * sinA;
+	double yOut = x * sinA + y * cosA;
+	x = xOut;
+	y = yOut;
+}
+
+void RobotDrive_SPX::SetInvertedMotor(MotorType motor, bool isInverted)
+{
+	if (motor < 0 || motor > 3)
+	{
+		//wpi_setWPIError(InvalidMotorIndex);
+		assert(false);
+		return;
+	}
+	m_invertedMotors[motor] = isInverted ? -1 : 1;
+}
+
+void RobotDrive_SPX::SetExpiration(float timeout){}
+
+float RobotDrive_SPX::GetExpiration()
+{
+	return 0.0;
+}
+
+bool RobotDrive_SPX::IsAlive()
+{
+	return true;
+}
+
+bool RobotDrive_SPX::IsSafetyEnabled()
+{
+	return true;
+}
+
+void RobotDrive_SPX::SetSafetyEnabled(bool enabled) {}
+
+void RobotDrive_SPX::GetDescription(char *desc)
+{
+	sprintf(desc, "RobotDrive_SPX");
+}
+
+void RobotDrive_SPX::StopMotor()
+{
+	if (m_frontLeftMotor != NULL) m_frontLeftMotor->Set(ControlMode::PercentOutput, 0.0);
+	if (m_frontRightMotor != NULL) m_frontRightMotor->Set(ControlMode::PercentOutput, 0.0);
+	if (m_rearLeftMotor != NULL) m_rearLeftMotor->Set(ControlMode::PercentOutput, 0.0);
+	if (m_rearRightMotor != NULL) m_rearRightMotor->Set(ControlMode::PercentOutput, 0.0);
+}
 
 #ifdef _Win32
 

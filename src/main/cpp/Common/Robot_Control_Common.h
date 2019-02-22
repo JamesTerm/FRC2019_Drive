@@ -28,6 +28,7 @@ class COMMON_API Control_Assignment_Properties
 		virtual void LoadFromScript(Scripting::Script& script);
 
 		const Controls_1C &GetPWMSpeedControllers() const {return m_PWMSpeedControllers;}
+		const Controls_1C &GetVictorSPXs() const { return m_VictorSPXs; }
 		const Controls_1C &GetServos() const {return m_Servos;}
 		const Controls_1C &GetRelays() const {return m_Relays;}
 		const Controls_1C &GetDigitalInputs() const {return m_Digital_Inputs;}
@@ -37,7 +38,7 @@ class COMMON_API Control_Assignment_Properties
 		size_t GetCompressorRelay() {return m_Compressor_Relay;}
 		size_t GetCompressorLimit() {return m_Compressor_Limit;}
 	private:
-		Controls_1C m_PWMSpeedControllers,m_Servos,m_Relays,m_Digital_Inputs,m_Analog_Inputs;
+		Controls_1C m_PWMSpeedControllers,m_VictorSPXs,m_Servos,m_Relays,m_Digital_Inputs,m_Analog_Inputs;
 		Controls_2C m_Double_Solenoids,m_Encoders;
 		size_t m_Compressor_Relay=-1,m_Compressor_Limit=-1;
 };
@@ -201,19 +202,29 @@ enum class ControlMode
 	Disabled = 15,
 };
 
-//Note VictorSPX is CAN but putting it this way for now to save on code
-class VictorSPX : public PWMSpeedController
+class VictorSPX : public Control_1C_Element_UI
 {
+private:
+	uint8_t m_ModuleNumber;
+	uint32_t m_Channel;
+	double m_CurrentVoltage;
 public:
-	VictorSPX(int channel) : PWMSpeedController(0, channel, "VictorSPX")  //Note: the name will need to be merged after construction
+	VictorSPX(int channel) : Control_1C_Element_UI(0, channel, "VictorSPX"),m_ModuleNumber(0),m_Channel(channel)
 	{
 	}
 	//for derived classes
-	VictorSPX(int channel, const char *name) : PWMSpeedController(0, channel, name)
+	VictorSPX(int channel, const char *name) : Control_1C_Element_UI(0, channel, name), m_ModuleNumber(0), m_Channel(channel)
 	{
 	}
+	VictorSPX(uint8_t moduleNumber, uint32_t channel, const char *name) : Control_1C_Element_UI(0, channel, name), 
+		m_ModuleNumber(moduleNumber), m_Channel(channel)
+	{
+		g_InstanceTester("VictorSPX", channel);
+	}
 
-	void Set(ControlMode mode, double Value) { PWMSpeedController::Set(Value); }
+	void Set(ControlMode mode, double Value) 
+	{ m_CurrentVoltage = Value; display_number(Value); 
+	}
 	virtual double GetMotorOutputPercent() { return 0.0; }
 	virtual ErrorCode ConfigSelectedFeedbackSensor(RemoteFeedbackDevice feedbackDevice, int pidIdx, int timeoutMs) { return OK; }
 	virtual ErrorCode ConfigSelectedFeedbackSensor(FeedbackDevice feedbackDevice, int pidIdx, int timeoutMs) { return OK; }
@@ -475,6 +486,71 @@ private:
 	bool m_IsEnabled = false;  //Use to determine if its been enabled for quick disable access
 };
 
+class COMMON_API RobotDrive_SPX
+{
+public:
+	enum MotorType
+	{
+		kFrontLeftMotor = 0,
+		kFrontRightMotor = 1,
+		kRearLeftMotor = 2,
+		kRearRightMotor = 3,
+		kCenterLeftMotor = 4,
+		kCenterRightMotor = 5
+	};
+
+	RobotDrive_SPX(VictorSPX *frontLeftMotor, VictorSPX *rearLeftMotor, VictorSPX *frontRightMotor, VictorSPX *rearRightMotor,
+		VictorSPX *centerLeftMotor = nullptr, VictorSPX *centerRightMotor = nullptr);
+	RobotDrive_SPX(VictorSPX &frontLeftMotor, VictorSPX &rearLeftMotor, VictorSPX &frontRightMotor, VictorSPX &rearRightMotor);
+	virtual ~RobotDrive_SPX();
+
+	virtual void SetLeftRightMotorOutputs(float leftOutput, float rightOutput);
+	virtual void GetLeftRightMotorOutputs(float &leftOutput, float &rightOutput) //I added this one for convenience
+	{
+		leftOutput = m_LeftOutput, rightOutput = m_RightOutput;
+	}
+	void SetInvertedMotor(MotorType motor, bool isInverted);
+	void SetExpiration(float timeout);
+	float GetExpiration();
+	bool IsAlive();
+	void StopMotor();
+	bool IsSafetyEnabled();
+	void SetSafetyEnabled(bool enabled);
+	void GetDescription(char *desc);
+
+protected:
+	void InitRobotDrive();
+	float Limit(float num);
+	void Normalize(double *wheelSpeeds);
+	void RotateVector(double &x, double &y, double angle);
+
+	//static const int32_t kMaxNumberOfMotors = 4;
+
+	int32_t m_invertedMotors[6];
+	float m_sensitivity;
+	double m_maxOutput;
+	bool m_deleteSpeedControllers;
+	VictorSPX *m_frontLeftMotor;
+	VictorSPX *m_frontRightMotor;
+	VictorSPX *m_rearLeftMotor;
+	VictorSPX *m_rearRightMotor;
+	VictorSPX *m_centerLeftMotor;
+	VictorSPX *m_centerRightMotor;
+private:
+	int32_t GetNumMotors()
+	{
+		int motors = 0;
+		if (m_frontLeftMotor) motors++;
+		if (m_frontRightMotor) motors++;
+		if (m_rearLeftMotor) motors++;
+		if (m_rearRightMotor) motors++;
+		if (m_centerLeftMotor) motors++;
+		if (m_centerRightMotor) motors++;
+		return motors;
+	}
+	float m_LeftOutput, m_RightOutput;
+	bool m_IsEnabled = false;  //Use to determine if its been enabled for quick disable access
+};
 
 
 #define LUT_VALID(x) ((index<x.size()) && (x[index]!=(size_t)-1))
@@ -497,6 +573,14 @@ class COMMON_API RobotControlCommon
 		__inline PWMSpeedController *PWMSpeedController_GetInstance(size_t index) 
 		{
 			return LUT_VALID(m_PWMSpeedControllerLUT)?m_PWMSpeedControllers[m_PWMSpeedControllerLUT[index]] : NULL;
+		}
+
+		//VictorSPX methods
+		__inline double VictorSPX_GetCurrentPorV(size_t index) { return LUT_VALID(m_VictorSPX_LUT) ? m_VictorSPXs[m_VictorSPX_LUT[index]]->GetMotorOutputPercent() : 0.0; }
+		__inline void VictorSPX_UpdateVoltage(size_t index, double Voltage) { IF_LUT(m_VictorSPX_LUT) m_VictorSPXs[m_VictorSPX_LUT[index]]->Set(ControlMode::PercentOutput, Voltage); }
+		__inline VictorSPX *VictorSPX_GetInstance(size_t index)
+		{
+			return LUT_VALID(m_VictorSPX_LUT) ? m_VictorSPXs[m_VictorSPX_LUT[index]] : NULL;
 		}
 
 		//servo methods
@@ -565,6 +649,7 @@ class COMMON_API RobotControlCommon
 	private:
 		Control_Assignment_Properties m_Props;  //cache a copy of the assignment props
 		std::vector<PWMSpeedController *> m_PWMSpeedControllers;
+		std::vector<VictorSPX *> m_VictorSPXs;
 		std::vector<Servo * > m_Servos;
 		std::vector<Relay *> m_Relays;
 		std::vector<DigitalInput *> m_DigitalInputs;
@@ -572,7 +657,7 @@ class COMMON_API RobotControlCommon
 		std::vector<DoubleSolenoid *> m_DoubleSolenoids;
 		std::vector<Encoder2 *> m_Encoders;
 
-		Controls_LUT m_PWMSpeedControllerLUT,m_ServoLUT,m_RelayLUT,m_DigitalInputLUT,m_AnalogInputLUT,m_DoubleSolenoidLUT,m_EncoderLUT;
+		Controls_LUT m_PWMSpeedControllerLUT,m_VictorSPX_LUT,m_ServoLUT,m_RelayLUT,m_DigitalInputLUT,m_AnalogInputLUT,m_DoubleSolenoidLUT,m_EncoderLUT;
 		std::function<void *(size_t,size_t,const char *,const char *,bool &)> m_ExternalPWMSpeedController;
 };
 }
