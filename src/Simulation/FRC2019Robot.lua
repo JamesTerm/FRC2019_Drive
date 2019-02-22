@@ -39,6 +39,7 @@ MainRobot = {
 			--id_6 = { name= "right_drive_3", channel=6}, 
 			--id_7 = { name="arm", channel=7}
 			id_5 = { name="arm", channel=7},
+			id_6 = { name="roller", channel=8}
 			--If we decide we need more power we can assign these
 		},
 		-- relay =
