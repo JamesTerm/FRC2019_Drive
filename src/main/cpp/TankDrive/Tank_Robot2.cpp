@@ -255,6 +255,36 @@ public:
 };
 
 
+class DriveNotify
+{
+private:
+	Tank_Robot2 *m_pParent;
+	bool m_IsDriverMoving = false;  //keep track of last state
+public:
+	DriveNotify(Tank_Robot2 *Parent) : m_pParent(Parent)
+	{}
+	void TimeChange(double dTime_s)
+	{
+		const bool current_state = m_pParent->IsDriverMoving();
+		//now to do a valve operation check... only fires an event when there is change
+		if (current_state != m_IsDriverMoving)
+		{
+			Entity2D_Kind::EventMap *em = m_pParent->GetEventMap();
+			em->EventOnOff_Map["IsDriverMoving"].Fire(current_state);
+			//SmartDashboard::PutBoolean("IsDriverMoving", current_state);
+			//printf("IsMoving=%d\n",current_state);
+			m_IsDriverMoving = current_state;
+		}
+	}
+};
+struct Tank_Robot2_Ancillary
+{
+	Tank_Robot2_Ancillary(Tank_Robot2 *Parent) : m_pParent(Parent), driveNotify(Parent)
+	{}
+	Tank_Robot2 *m_pParent;
+	DriveNotify driveNotify;
+};
+
   /***********************************************************************************************************************************/
  /*																Tank_Robot2															*/
 /***********************************************************************************************************************************/
@@ -268,6 +298,7 @@ void Tank_Robot2::ResetPos()
 Tank_Robot2::Tank_Robot2(RobotCommon *robot) : m_pParent(robot) 
 {
 	m_DriveControl = make_shared<Tank_Robot2_Control>();
+	m_Ancillary = make_shared<Tank_Robot2_Ancillary>(this);
 	//ResetPos();  //Should not need this
 }
 
@@ -293,6 +324,7 @@ void Tank_Robot2::TimeChange(double dTime_s)
 	m_DriveControl->UpdateLeftRightVoltage(left_voltage,right_voltage);
 	m_DriveControl->Tank_Drive_Control_TimeChange(dTime_s);
 	#endif
+	m_Ancillary->driveNotify.TimeChange(dTime_s);
 }
 
 const char *csz_Joystick_SetLeftVelocity = "Joystick_SetLeftVelocity";

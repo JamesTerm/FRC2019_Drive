@@ -106,18 +106,8 @@ void Robot::Autonomous()
 	{
 		m_dashboardTable->PutString("AUTON_FOUND", "UNDEFINED AUTON OR POSITION SELECTED");
 	}
-	//It can work this way with a callback... or you can pass Robot down and call it from there
-	Goal_ControllerOverride *co_goal = new Goal_ControllerOverride(*m_EventMap);
-	co_goal->SetIsDrivingCallback([&]
-		{
-		bool ret = false;
-		//TODO ac drive implementation... Dylan this else is for you.  ;)
-		if (!m_Robot.get_using_ac_drive())
-			ret=m_Robot.IsDriverMoving();
-		return ret;
-		});
 	m_masterGoal->AddGoal(new Goal_TimeOut(m_activeCollection, 15.0));
-	m_masterGoal->AddGoal(co_goal);
+	m_masterGoal->AddGoal(new Goal_ControllerOverride(*m_EventMap));
 	m_masterGoal->Activate();
 	double dTime = 0.010;
 	double current_time = 0.0;

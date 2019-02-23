@@ -78,6 +78,7 @@ private:
 	LUA_Controls_Properties m_RobotControls;
 };
 class Tank_Robot2_Control;
+struct Tank_Robot2_Ancillary;
 //This manages all drive inputs and directs them to the speed controllers
 class Tank_Robot2
 {
@@ -113,6 +114,7 @@ class Tank_Robot2
 		void SetDriveExternalPWMSpeedControllerHook(std::function<void *(size_t, size_t, const char *, const char*, bool &)> callback);
 		const char *HandlePWMHook_GetActiveName(const char *Name);
 		virtual void ResetPos();
+		Entity2D_Kind::EventMap *GetEventMap() { return m_pParent->GetEventMap(); }
 protected:
 		const Tank_Robot2_Props &GetTankRobotProps() const {return m_TankRobotProps->GetTankRobotProps();}
 		//this may need to be overridden for robots that need it on for certain cases like 2012 needing it on for low gear
@@ -125,6 +127,7 @@ protected:
 		RobotCommon * const m_pParent;
 		const Tank_Robot2_Properties *m_TankRobotProps; //cached in the Initialize from specific robot
 		std::shared_ptr<Tank_Robot2_Control> m_DriveControl;
+		std::shared_ptr<Tank_Robot2_Ancillary> m_Ancillary;
 
 		//This velocity is captured from the controller in the form of left/right velocity, even FPS controls will be translated here
 		Vec2d m_Controller_Voltage;

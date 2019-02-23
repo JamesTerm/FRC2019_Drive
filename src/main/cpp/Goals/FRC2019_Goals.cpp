@@ -109,17 +109,12 @@ void Goal_ControllerOverride::Activate()
 
 void Goal_ControllerOverride::TestDriver()
 {
-	if (m_IsDrivingCallback)
+	if (m_IsDriveInUse)
 	{
-		//fire event
-		if (m_IsDrivingCallback())
-		{
-			m_EventMap.Event_Map["DriverDetected"].Fire();
-			m_Status = eCompleted;
-		}
+		//since we listened to just one event this is a bit redundant added for consistency
+		m_EventMap.Event_Map["DriverDetected"].Fire();  
+		m_Status = eCompleted;
 	}
-	else
-		m_Status = eFailed;
 }
 
 void Goal_ControllerOverride::TestOperator()
@@ -151,7 +146,7 @@ Goal::Goal_Status Goal_ControllerOverride::Process(double dTime)
 }
 
 
-void Goal_ControllerOverride::SetOperatorCallbacks(bool bind)
+void Goal_ControllerOverride::SetCallbacks(bool bind)
 {
 	std::function<void()> oe = [&] 
 	{
@@ -166,8 +161,15 @@ void Goal_ControllerOverride::SetOperatorCallbacks(bool bind)
 		if (val>0.0)
 			m_IsOperatorInUse = true;
 	};
+
+	std::function<void(bool)> de_on_off = [&](bool on)
+	{
+		m_IsDriveInUse = on;
+	};
+
 	if (bind)
 	{
+		m_EventMap.EventOnOff_Map["IsDriverMoving"].Subscribe(this, de_on_off);
 		m_EventMap.Event_Map["Arm_SetPosRest"].Subscribe(this,oe);
 		m_EventMap.Event_Map["Arm_SetPosCargo1"].Subscribe(this, oe);
 		m_EventMap.Event_Map["Arm_SetPosCargo2"].Subscribe(this, oe);
@@ -182,6 +184,7 @@ void Goal_ControllerOverride::SetOperatorCallbacks(bool bind)
 	}
 	else
 	{
+		m_EventMap.EventOnOff_Map["IsDriverMoving"].Remove(this);
 		m_EventMap.Event_Map["Arm_SetPosRest"].Remove(this);
 		m_EventMap.Event_Map["Arm_SetPosCargo1"].Remove(this);
 		m_EventMap.Event_Map["Arm_SetPosCargo2"].Remove(this);
