@@ -102,8 +102,8 @@ void Robot::Autonomous()
 	{
 		m_dashboardTable->PutString("AUTON_FOUND", "UNDEFINED AUTON OR POSITION SELECTED");
 	}
-	//m_masterGoal->AddGoal(new Goal_TimeOut(m_activeCollection, 15.0)); //!Disabled for testing!!
-	//m_masterGoal->AddGoal(new Goal_WaitThenDrive(m_activeCollection, .5, .5, 3, 5));
+	m_masterGoal->AddGoal(new Goal_TimeOut(m_activeCollection, 15.0));
+	m_masterGoal->AddGoal(new Goal_ControllerOverride(2));
 	m_masterGoal->Activate();
 	double dTime = 0.010;
 	while (m_masterGoal->GetStatus() == Goal::eActive && _IsAutononomous() && !IsDisabled())

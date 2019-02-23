@@ -100,6 +100,38 @@ void Goal_DriveWithTimer::Terminate()
 }
 #pragma endregion
 
+#pragma region ControllerOverride
+/***********************Goal_ControllerOverride***********************/
+void Goal_ControllerOverride::Activate()
+{
+    m_Status = eActive;
+}
+
+Goal::Goal_Status Goal_ControllerOverride::Process(double dTime)
+{
+    if(eActive)
+    {
+        if(m_controller == 0)
+        {
+            //TODO: Check driver controller
+        }
+        else if(m_controller == 1)
+        {
+            //TODO: Check operator controller
+        }
+        else
+        {
+            //TODO: Check both controllersks
+        }
+    }
+    else
+    {
+        return m_Status;
+    }
+    
+}
+#pragma endregion
+
 #pragma region FeedbackLoopGoals
 /***********************Goal_Turn***********************/
 void Goal_Turn::Activate()

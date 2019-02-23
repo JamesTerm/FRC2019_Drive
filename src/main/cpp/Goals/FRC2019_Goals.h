@@ -78,6 +78,33 @@ private:
 };
 #pragma endregion
 
+#pragma region ControllerOverride
+/* Goal_ControllerOverride
+ *  Test if driver or operator or both are pressing controls, if so, fail.
+ *  0 = driver, 1 = operator, 2 = both
+ * 
+ * This Goal will mostly be added into multitask goals to check if failed while other goals are also running.
+ */
+class Goal_ControllerOverride : public AtomicGoal
+{
+  public:
+    Goal_ControllerOverride()
+    {
+      m_controller = 2;
+    }
+    //0 = driver, 1 = operator, 2 = both
+    Goal_ControllerOverride(int controller)
+    {
+      m_controller = controller;
+    }
+    virtual void Activate();
+    virtual Goal::Goal_Status Process(double dTime);
+    virtual void Terminate();
+  private:
+    int m_controller;
+};
+#pragma endregion
+
 //Goals that use data to determine completion go here
 #pragma region FeedbackLoopGoals
 /* Goal_Turn
