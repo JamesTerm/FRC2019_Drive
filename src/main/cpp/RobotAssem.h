@@ -19,7 +19,6 @@ public:
 	bool get_using_ac_drive() const;
 	bool get_using_ac_operator() const;
 	bool get_using_ac_elevator() const;
-	bool IsDriverMoving() const;
 private:
 	std::shared_ptr<RobotAssem_Internal> m_p_RobotAssem; //a pointer to implementation idiom (using shared_ptr allows declaration to be hidden from destructor)
 };

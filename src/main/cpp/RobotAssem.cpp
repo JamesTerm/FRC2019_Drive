@@ -261,10 +261,6 @@ public:
 	{
 		return m_RobotProps.GetFRC2019RobotProps().using_ac_elevator;
 	}
-	bool IsDriverMoving() const
-	{
-		return m_pRobot->AsRobotCommon()->IsDriverMoving();
-	}
 };
 
 void RobotAssem::RobotAssem_init(const char *RobotLua, Framework::Base::EventMap *pEventMap, Configuration::ActiveCollection *Collection)
@@ -302,9 +298,4 @@ bool RobotAssem::get_using_ac_operator() const
 bool RobotAssem::get_using_ac_elevator() const
 {
 	return m_p_RobotAssem->get_using_ac_elevator();
-}
-
-bool RobotAssem::IsDriverMoving() const
-{
-	return m_p_RobotAssem->IsDriverMoving();
 }

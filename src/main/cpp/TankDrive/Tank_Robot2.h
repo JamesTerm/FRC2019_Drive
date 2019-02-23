@@ -48,8 +48,6 @@ public:
 	//Robot implements... client code calls
 	virtual void BindAdditionalEventControls(bool Bind) = 0;
 	virtual void BindAdditionalUIControls(bool Bind, void *joy, void *key) = 0;
-	//override if autonomous wishes to access driver status
-	virtual bool IsDriverMoving() const { return false; }
 };
 
 
