@@ -107,29 +107,94 @@ void Goal_ControllerOverride::Activate()
     m_Status = eActive;
 }
 
+void Goal_ControllerOverride::TestDriver()
+{
+	if (m_IsDrivingCallback)
+	{
+		//fire event
+		if (m_IsDrivingCallback())
+		{
+			m_EventMap.Event_Map["DriverDetected"].Fire();
+			m_Status = eCompleted;
+		}
+	}
+	else
+		m_Status = eFailed;
+}
+
+void Goal_ControllerOverride::TestOperator()
+{
+	if (m_IsOperatorInUse)
+	{
+		m_EventMap.Event_Map["OperatorDetected"].Fire();
+		m_Status = eCompleted;
+	}
+}
+
+//Setup to remain active until an override is detected... in which case it can fire an event and change to completed status
 Goal::Goal_Status Goal_ControllerOverride::Process(double dTime)
 {
     if(eActive)
     {
-        if(m_controller == 0)
-        {
-            //TODO: Check driver controller
-        }
-        else if(m_controller == 1)
-        {
-            //TODO: Check operator controller
-        }
+		if (m_controller == 0)
+			TestDriver();
+		else if (m_controller == 1)
+			TestOperator();
         else
         {
-            //TODO: Check both controllersks
+			TestDriver();
+			if (m_Status==eActive)
+				TestOperator();
         }
     }
-    else
-    {
-        return m_Status;
-    }
-    
+	return m_Status;
 }
+
+
+void Goal_ControllerOverride::SetOperatorCallbacks(bool bind)
+{
+	std::function<void()> oe = [&] 
+	{
+		m_IsOperatorInUse=true; 
+	};
+	std::function<void(bool)> oe_on_off = [&](bool on)
+	{
+		m_IsOperatorInUse = true;
+	};
+	std::function<void(double)> oe_val = [&](double val)
+	{
+		if (val>0.0)
+			m_IsOperatorInUse = true;
+	};
+	if (bind)
+	{
+		m_EventMap.Event_Map["Arm_SetPosRest"].Subscribe(this,oe);
+		m_EventMap.Event_Map["Arm_SetPosCargo1"].Subscribe(this, oe);
+		m_EventMap.Event_Map["Arm_SetPosCargo2"].Subscribe(this, oe);
+		m_EventMap.Event_Map["Arm_SetPosCargo3"].Subscribe(this, oe);
+		m_EventMap.EventValue_Map["Arm_SetCurrentVelocity"].Subscribe(this, oe_val);
+		m_EventMap.EventOnOff_Map["Arm_IntakeDeploy"].Subscribe(this, oe_on_off);
+		//note skipping keyboard, but could indeed listen to them as well
+		m_EventMap.EventValue_Map["Claw_SetCurrentVelocity"].Subscribe(this, oe_val);
+		m_EventMap.EventOnOff_Map["Arm_HatchDeploy"].Subscribe(this, oe_on_off);
+		m_EventMap.EventOnOff_Map["Arm_HatchGrabDeploy"].Subscribe(this, oe_on_off);
+		m_EventMap.EventOnOff_Map["Robot_CloseDoor"].Subscribe(this, oe_on_off);
+	}
+	else
+	{
+		m_EventMap.Event_Map["Arm_SetPosRest"].Remove(this);
+		m_EventMap.Event_Map["Arm_SetPosCargo1"].Remove(this);
+		m_EventMap.Event_Map["Arm_SetPosCargo2"].Remove(this);
+		m_EventMap.Event_Map["Arm_SetPosCargo3"].Remove(this);
+		m_EventMap.EventValue_Map["Arm_SetCurrentVelocity"].Remove(this);
+		m_EventMap.EventOnOff_Map["Arm_IntakeDeploy"].Remove(this);
+		m_EventMap.EventValue_Map["Claw_SetCurrentVelocity"].Remove(this);
+		m_EventMap.EventOnOff_Map["Arm_HatchDeploy"].Remove(this);
+		m_EventMap.EventOnOff_Map["Arm_HatchGrabDeploy"].Remove(this);
+		m_EventMap.EventOnOff_Map["Robot_CloseDoor"].Remove(this);
+	}
+}
+
 #pragma endregion
 
 #pragma region FeedbackLoopGoals

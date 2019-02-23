@@ -88,20 +88,31 @@ private:
 class Goal_ControllerOverride : public AtomicGoal
 {
   public:
-    Goal_ControllerOverride()
-    {
-      m_controller = 2;
+    void SetOperatorCallbacks(bool bind);
+    Goal_ControllerOverride(Framework::Base::EventMap &em) : m_EventMap(em)
+    {	m_controller = 2;
+		SetOperatorCallbacks(true);
     }
     //0 = driver, 1 = operator, 2 = both
-    Goal_ControllerOverride(int controller)
-    {
-      m_controller = controller;
+    Goal_ControllerOverride(Framework::Base::EventMap &em,int controller) : m_EventMap(em)
+    {	m_controller = controller;
+		SetOperatorCallbacks(true);
     }
+	~Goal_ControllerOverride()
+	{	SetOperatorCallbacks(false);
+	}
     virtual void Activate();
     virtual Goal::Goal_Status Process(double dTime);
-    virtual void Terminate();
+    //virtual void Terminate();
+
+	void SetIsDrivingCallback(std::function<bool(void)> callback) { m_IsDrivingCallback = callback; }
   private:
+	void TestDriver();
+	void TestOperator();
+	Framework::Base::EventMap &m_EventMap;
     int m_controller;
+	bool m_IsOperatorInUse = false;
+	std::function<bool(void)> m_IsDrivingCallback=nullptr;  //not going to pacify this... it will fail if one is not provided
 };
 #pragma endregion
 

@@ -94,24 +94,43 @@ void Robot::Autonomous()
 	m_masterGoal = new MultitaskGoal_ac(m_activeCollection, false);
 
 	cout << "Autonomous Started." << endl;
+	#if 1
+	string autoSelected = SmartDashboard::GetString("AutonTest", "NONE");
 	//string autoSelected = SmartDashboard::GetString("Auto Selector", m_driveStraight);
+	#else
 	string autoSelected = m_dashboardTable->GetString("AUTON_SELECTION", m_driveStraight);
+	#endif
 	string positionSelected = m_dashboardTable->GetString("POSITION_SELECTION", "NONE"); //if it is none, then just drive straight
 	cout << autoSelected << endl;
 	if (!SelectAuton(m_activeCollection, m_masterGoal, autoSelected, positionSelected))
 	{
 		m_dashboardTable->PutString("AUTON_FOUND", "UNDEFINED AUTON OR POSITION SELECTED");
 	}
+	//It can work this way with a callback... or you can pass Robot down and call it from there
+	Goal_ControllerOverride *co_goal = new Goal_ControllerOverride(*m_EventMap);
+	co_goal->SetIsDrivingCallback([&]
+		{
+		bool ret = false;
+		//TODO ac drive implementation... Dylan this else is for you.  ;)
+		if (!m_Robot.get_using_ac_drive())
+			ret=m_Robot.IsDriverMoving();
+		return ret;
+		});
 	m_masterGoal->AddGoal(new Goal_TimeOut(m_activeCollection, 15.0));
-	m_masterGoal->AddGoal(new Goal_ControllerOverride(2));
+	m_masterGoal->AddGoal(co_goal);
 	m_masterGoal->Activate();
 	double dTime = 0.010;
+	double current_time = 0.0;
+	SmartDashboard::PutBoolean("AutoPilot", true);
 	while (m_masterGoal->GetStatus() == Goal::eActive && _IsAutononomous() && !IsDisabled())
 	{
 		m_masterGoal->Process(dTime);
-		m_Robot.Update(dTime);  //Now that we use events we need to process the robots time slices
+		SmartDashboard::PutNumber("Timer", 15.0 - current_time);
+		current_time += dTime;
+		m_Robot.Update(dTime);
 		Wait(dTime);
 	}
+	SmartDashboard::PutBoolean("AutoPilot", false);
 	m_masterGoal->~MultitaskGoal_ac();
 	cout << "goal loop complete" << endl;
 	cout << m_activeCollection->GetNavX()->GetAngle() << endl;

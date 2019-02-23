@@ -5,11 +5,14 @@
 static bool SelectAuton(ActiveCollection *activeCollection, MultitaskGoal_ac *goal, string autonSelected, string positionSelected)
 {
     bool isFound = true;
-    if(autonSelected == "DEBUG")
-    {
-        goal->AddGoal(new Goal_VisionAlign(activeCollection,new VisionTarget(320,20),140.0)); //!120 sec timeout for DEBUG only
-        return true;
-    }
+	if (autonSelected == "DEBUG")
+	{
+		goal->AddGoal(new Goal_VisionAlign(activeCollection, new VisionTarget(320, 20), 140.0)); //!120 sec timeout for DEBUG only
+		return true;
+	}
+	else if (autonSelected == "NONE")
+		return true;
+
     if(positionSelected == "Level 1 Left")
     {
         if(autonSelected == "DriveStraight")
