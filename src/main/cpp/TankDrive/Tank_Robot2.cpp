@@ -411,21 +411,22 @@ public:
 	}
 };
 
+const char *csz_Joystick_SetCurrentSpeed = "Joystick_SetCurrentSpeed";
+const char *csz_Joystick_Analog_Turn = "Joystick_Analog_Turn";
+
 class Tank_Robot2_AcradeDrive
 {
 private:
 	Tank_Robot2 *m_pParent;
-	double Forward_Voltage;  //range -1 to 1 where positive is forward
-	double Right_Voltage;  //range -1 to 1 where positive is clockwise
+	double m_Forward_Voltage=0.0;  //range -1 to 1 where positive is forward
+	double m_Right_Voltage=0.0;  //range -1 to 1 where positive is clockwise
 public:
 	Tank_Robot2_AcradeDrive(Tank_Robot2 *Parent) : m_pParent(Parent)
 	{}
 	void Reset()
 	{
-		Forward_Voltage = Right_Voltage = 0.0;
+		m_Forward_Voltage = m_Right_Voltage = 0.0;
 	}
-	const char *csz_Joystick_SetCurrentSpeed = "Joystick_SetCurrentSpeed";
-	const char *csz_Joystick_Analog_Turn = "Joystick_Analog_Turn";
 
 	void BindAdditionalEventControls(bool Bind)
 	{
@@ -434,11 +435,11 @@ public:
 		{
 			em->EventValue_Map[csz_Joystick_SetCurrentSpeed].Subscribe([&](double value)
 			{
-				Forward_Voltage = value;
+				m_Forward_Voltage = value;
 			});
 			em->EventValue_Map[csz_Joystick_Analog_Turn].Subscribe([&](double value)
 			{
-				Right_Voltage = value;
+				m_Right_Voltage = value;
 			});
 		}
 	}
@@ -451,8 +452,14 @@ public:
 	//Note this should happen before applying the PID
 	Vec2d TimeChange(double dTime_s, double LeftVoltage, double RightVoltage)
 	{
-		const double AdjustedLeftVoltage = LeftVoltage;
-		const double AdjustedRightVoltage = RightVoltage;
+		double AdjustedLeftVoltage = LeftVoltage;
+		double AdjustedRightVoltage = RightVoltage;
+		//Base the rotation blend strench on how much forward is used
+		const double RCW_Blend = fabs(m_Right_Voltage * (1.0-fabs(m_Forward_Voltage)* 0.5) );
+		const double FWD_Blend = 1.0 - RCW_Blend;  //setup forward scalar
+		//We blend the rotation with the linear, this way neither function will saturate and they both of equal influence no matter what variation
+		AdjustedRightVoltage += m_Forward_Voltage * FWD_Blend + (m_Right_Voltage * RCW_Blend);
+		AdjustedLeftVoltage += m_Forward_Voltage * FWD_Blend - (m_Right_Voltage * RCW_Blend);
 		return Vec2d(AdjustedLeftVoltage, AdjustedRightVoltage);
 	}
 };
@@ -488,7 +495,7 @@ Tank_Robot2::Tank_Robot2(RobotCommon *robot) : m_pParent(robot)
 {
 	m_DriveControl = make_shared<Tank_Robot2_Control>();
 	m_Ancillary = make_shared<Tank_Robot2_Ancillary>(this);
-	//ResetPos();  //Should not need this
+	ResetPos();  //may need this
 }
 
 void Tank_Robot2::Initialize(const Tank_Robot2_Properties *props) 
@@ -508,7 +515,7 @@ void Tank_Robot2::TimeChange(double dTime_s)
 	m_DriveControl->GetLeftRightVelocity(EncoderLeft, EncoderRight);  //we still want to read encoders if present
 	AdjustedVoltage = m_Ancillary->driveArcade.TimeChange(dTime_s, left_voltage, right_voltage);
 	//all PID here
-	AdjustedVoltage = m_Ancillary->drivePID.TimeChange(dTime_s, left_voltage, right_voltage, EncoderLeft, EncoderRight);
+	AdjustedVoltage = m_Ancillary->drivePID.TimeChange(dTime_s, AdjustedVoltage[0], AdjustedVoltage[1], EncoderLeft, EncoderRight);
 	SmartDashboard::PutNumber("LeftVoltage", AdjustedVoltage[0]);
 	SmartDashboard::PutNumber("RightVoltage", AdjustedVoltage[1]);
 	m_DriveControl->UpdateLeftRightVoltage(AdjustedVoltage[0],AdjustedVoltage[1]);
@@ -568,7 +575,7 @@ const char *Tank_Robot2::HandlePWMHook_GetActiveName(const char *Name)
 //declared as global to avoid allocation on stack each iteration
 const char * const g_Tank_Robot2_Controls_Events[] =
 {
-	csz_Joystick_SetLeftVelocity,csz_Joystick_SetRightVelocity
+	csz_Joystick_SetLeftVelocity,csz_Joystick_SetRightVelocity,csz_Joystick_SetCurrentSpeed,csz_Joystick_Analog_Turn
 };
 
 const char *Tank_Robot2_Properties::ControlEvents::LUA_Controls_GetEvents(size_t index) const
