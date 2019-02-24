@@ -9,6 +9,7 @@ struct Tank_Robot2_Props
 {
 	bool HasEncoders;
 	bool IsOpen;
+	bool PID_Console_Dump;
 	bool UseAggressiveStop;
 	bool ReverseSteering;  //This will fix if the wiring on voltage has been reversed (e.g. voltage to right turns left side)
 	//Different robots may have the encoders flipped or not which must represent the same direction of both treads
@@ -97,10 +98,6 @@ class Tank_Robot2
 		//I probably do not need this, depends on how to manage a gear change
 		//void UpdateTankProps(const Tank_Robot_Props &TankProps);
 
-		//Use this method to override the current velocity
-		void SetVelocity(const Vec2d &velocity) { m_Velocity = velocity; }
-		Vec2d GetVelocity() const { return m_Velocity; }
-
 		//Use this method to determine if the drive is moving the controls
 		bool IsDriverMoving() const 
 			{ return m_Controller_Voltage.length2() > 0.0; 
@@ -130,8 +127,6 @@ protected:
 		//This velocity is captured from the controller in the form of left/right velocity, even FPS controls will be translated here
 		Vec2d m_Controller_Voltage;
 		Vec2d m_External_Voltage;  //this is used by auton
-		//This will be the velocity applied to the controller on a time change
-		Vec2d m_Velocity;
 	public:
 };
 

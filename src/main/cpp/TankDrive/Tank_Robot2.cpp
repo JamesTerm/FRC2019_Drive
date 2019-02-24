@@ -277,12 +277,154 @@ public:
 		}
 	}
 };
+
+class Tank_Robot2_PID
+{
+private:
+	PIDController2 m_PIDController_Left, m_PIDController_Right;
+	double m_CalibratedScaler_Left=1.0, m_CalibratedScaler_Right=1.0; //used for calibration (in coast mode)
+	double m_ErrorOffset_Left=0.0, m_ErrorOffset_Right=0.0; //used for calibration in brake (a.k.a. aggressive stop) mode
+	bool m_UsingEncoders=false;
+	//This will be the velocity applied to the controller on a time change
+	Vec2d m_Velocity;
+	double m_PreviousLeftVelocity=0.0, m_PreviousRightVelocity=0.0; //used to compute acceleration
+	Tank_Robot2_Props m_TankRobotProps;  //copy the properties for ease of access
+	//we'll listen for gear changes to avoid needing access to robot control
+	bool m_IsLowGear = false;
+public:
+	Tank_Robot2_PID() :
+		m_PIDController_Left(0.0, 0.0, 0.0), m_PIDController_Right(0.0, 0.0, 0.0)  //these will be overridden in properties
+	{
+	}
+	//depreciated
+	void SetVelocity(const Vec2d &velocity) { m_Velocity = velocity; }
+	Vec2d GetVelocity() const { return m_Velocity; }
+
+	__inline double GetMaxSpeed() const
+	{
+		return m_IsLowGear ? m_TankRobotProps.low_gear.MaxSpeed : m_TankRobotProps.high_gear.MaxSpeed;
+	}
+
+	void Reset()
+	{
+		const double MaxSpeed = GetMaxSpeed();
+		m_PIDController_Left.Reset(), m_PIDController_Right.Reset();
+		if (m_IsLowGear)
+		{
+			m_PIDController_Left.SetPID(m_TankRobotProps.low_gear.LeftPID[0], m_TankRobotProps.low_gear.LeftPID[1], m_TankRobotProps.low_gear.LeftPID[2]);
+			m_PIDController_Right.SetPID(m_TankRobotProps.low_gear.RightPID[0], m_TankRobotProps.low_gear.RightPID[1], m_TankRobotProps.low_gear.RightPID[2]);
+		}
+		else
+		{
+			m_PIDController_Left.SetPID(m_TankRobotProps.high_gear.LeftPID[0], m_TankRobotProps.high_gear.LeftPID[1], m_TankRobotProps.high_gear.LeftPID[2]);
+			m_PIDController_Right.SetPID(m_TankRobotProps.high_gear.RightPID[0], m_TankRobotProps.high_gear.RightPID[1], m_TankRobotProps.high_gear.RightPID[2]);
+		}
+		//ensure teleop has these set properly
+		m_CalibratedScaler_Left = m_CalibratedScaler_Right = MaxSpeed;
+		m_ErrorOffset_Left = m_ErrorOffset_Right = 0.0;
+		m_PreviousLeftVelocity = m_PreviousRightVelocity = 0.0;
+
+		const double OutputRange = MaxSpeed * 0.875;  //create a small range
+		const double InputRange = 20.0;  //create a large enough number that can divide out the voltage and small enough to recover quickly
+		m_PIDController_Left.SetInputRange(-MaxSpeed, MaxSpeed);
+		m_PIDController_Left.SetOutputRange(-InputRange, OutputRange);
+		m_PIDController_Left.Enable();
+		m_PIDController_Right.SetInputRange(-MaxSpeed, MaxSpeed);
+		m_PIDController_Right.SetOutputRange(-InputRange, OutputRange);
+		m_PIDController_Right.Enable();
+		m_CalibratedScaler_Left = m_CalibratedScaler_Right = MaxSpeed;
+		m_ErrorOffset_Left = m_ErrorOffset_Right = 0.0;
+	}
+
+	void SetUseEncoders(bool UseEncoders)
+	{
+		if (!UseEncoders)
+		{
+			if (m_UsingEncoders)
+			{
+				//first disable it
+				m_UsingEncoders = false;
+				printf("Disabling encoders for drive\n");
+				//Now to reset stuff
+				Reset();
+				//m_EncoderGlobalVelocity = Vec2d(0.0, 0.0);
+			}
+		}
+		else
+		{
+			if (!m_UsingEncoders)
+			{
+				m_UsingEncoders = true;
+				printf("Enabling encoders for drive\n");
+				//setup the initial value with the encoders value
+				Reset();
+			}
+		}
+	}
+
+	void Initialize(const Tank_Robot2_Properties *props)
+	{
+		const Tank_Robot2_Properties *RobotProps = props;
+		//This will copy all the props
+		m_TankRobotProps = RobotProps->GetTankRobotProps();
+		m_IsLowGear = false;  //start out high until we know otherwise
+		Reset();
+		//This can be dynamically called so we always call it
+		SetUseEncoders(!m_TankRobotProps.IsOpen);
+	}
+
+	//adjust the controller voltage given the current voltage and the encoder's velocity, returns the adjusted voltage in Vec2d
+	Vec2d TimeChange(double dTime_s,double LeftVoltage,double RightVoltage, double Encoder_LeftVelocity,double Encoder_RightVelocity)
+	{
+		const double MaxSpeed = GetMaxSpeed();
+		const double LeftVelocity = LeftVoltage * MaxSpeed;
+		const double RightVelocity = RightVoltage * MaxSpeed;
+		const bool UseAggressiveStop = m_TankRobotProps.UseAggressiveStop;
+		if (m_UsingEncoders)
+		{
+			if (!UseAggressiveStop)
+			{
+				double control_left = 0.0, control_right = 0.0;
+				//only adjust calibration when both velocities are in the same direction, or in the case where the encoder is stopped which will
+				//allow the scaler to normalize if it need to start up again.
+				if (((LeftVelocity * Encoder_LeftVelocity) > 0.0) || IsZero(Encoder_LeftVelocity))
+				{
+					control_left = -m_PIDController_Left(fabs(LeftVelocity), fabs(Encoder_LeftVelocity), dTime_s);
+					m_CalibratedScaler_Left = MaxSpeed + control_left;
+				}
+				if (((RightVelocity * Encoder_RightVelocity) > 0.0) || IsZero(Encoder_RightVelocity))
+				{
+					control_right = -m_PIDController_Right(fabs(RightVelocity), fabs(Encoder_RightVelocity), dTime_s);
+					m_CalibratedScaler_Right = MaxSpeed + control_right;
+				}
+			}
+			else
+			{
+				m_ErrorOffset_Left = m_PIDController_Left(LeftVelocity, Encoder_LeftVelocity, dTime_s);
+				m_ErrorOffset_Right = m_PIDController_Right(RightVelocity, Encoder_RightVelocity, dTime_s);
+			}
+		}
+		if (m_TankRobotProps.PID_Console_Dump)
+		{
+			//fow now just use the smart dashboard
+			SmartDashboard::PutNumber("PID_left_EO", m_ErrorOffset_Left);
+			SmartDashboard::PutNumber("PID_left_CS", m_CalibratedScaler_Left);
+			SmartDashboard::PutNumber("PID_Right_EO", m_ErrorOffset_Right);
+			SmartDashboard::PutNumber("PID_Right_CS", m_CalibratedScaler_Right);
+		}
+		const double AdjustedLeftVoltage = (LeftVelocity + m_ErrorOffset_Left) / m_CalibratedScaler_Left;
+		const double AdjustedRightVoltage = (RightVelocity + m_ErrorOffset_Right) / m_CalibratedScaler_Right;
+		return Vec2d(AdjustedLeftVoltage, AdjustedRightVoltage);
+	}
+};
+
 struct Tank_Robot2_Ancillary
 {
-	Tank_Robot2_Ancillary(Tank_Robot2 *Parent) : m_pParent(Parent), driveNotify(Parent)
+	Tank_Robot2_Ancillary(Tank_Robot2 *Parent) : m_pParent(Parent),driveNotify(Parent)
 	{}
 	Tank_Robot2 *m_pParent;
 	DriveNotify driveNotify;
+	Tank_Robot2_PID drivePID;
 };
 
   /***********************************************************************************************************************************/
@@ -293,6 +435,8 @@ void Tank_Robot2::ResetPos()
 {
 	//It is important that these are reset incase a switch between auton and tele leaves external set
 	m_Controller_Voltage = m_External_Voltage = Vec2d(0.0, 0.0);
+	m_DriveControl->Reset_Encoders();
+	m_Ancillary->drivePID.Reset();
 }
 
 Tank_Robot2::Tank_Robot2(RobotCommon *robot) : m_pParent(robot) 
@@ -306,24 +450,23 @@ void Tank_Robot2::Initialize(const Tank_Robot2_Properties *props)
 { 
 	m_TankRobotProps = props; 
 	m_DriveControl->Initialize(props);
+	m_Ancillary->drivePID.Initialize(props);
 }
 
 void Tank_Robot2::TimeChange(double dTime_s)
 {
 	SmartDashboard::PutNumber("LeftVoltage", m_Controller_Voltage[0]);
 	SmartDashboard::PutNumber("RightVoltage", m_Controller_Voltage[1]);
-	#if 1
 	const double left_voltage = m_Controller_Voltage[0]+m_External_Voltage[0];
 	const double right_voltage = m_Controller_Voltage[1]+m_External_Voltage[1];
-	//TODO PID here
-	m_Velocity[0] = m_Controller_Voltage[0] * m_DriveControl->GetMaxSpeed();
-	m_Velocity[1] = m_Controller_Voltage[1] * m_DriveControl->GetMaxSpeed();
+	Vec2D AdjustedVoltage(left_voltage, right_voltage);  //written this way to monitor differences
 	double EncoderLeft, EncoderRight;
 	//Note: This call will implicitly update smart dashboard of its readings
-	m_DriveControl->GetLeftRightVelocity(EncoderLeft, EncoderRight);  
-	m_DriveControl->UpdateLeftRightVoltage(left_voltage,right_voltage);
+	m_DriveControl->GetLeftRightVelocity(EncoderLeft, EncoderRight);  //we still want to read encoders if present
+	//all PID here
+	AdjustedVoltage = m_Ancillary->drivePID.TimeChange(dTime_s, left_voltage, right_voltage, EncoderLeft, EncoderRight);
+	m_DriveControl->UpdateLeftRightVoltage(AdjustedVoltage[0],AdjustedVoltage[1]);
 	m_DriveControl->Tank_Drive_Control_TimeChange(dTime_s);
-	#endif
 	m_Ancillary->driveNotify.TimeChange(dTime_s);
 }
 
@@ -400,6 +543,7 @@ Tank_Robot2_Properties::Tank_Robot2_Properties() : m_RobotControls(&s_ControlsEv
 	props.VoltageScalar_Left = props.VoltageScalar_Right = 1.0;  //May need to be reversed
 	props.IsOpen = true;  //Always true by default until control is fully functional
 	props.HasEncoders = true;  //no harm in having passive reading of them
+	props.PID_Console_Dump = false;
 	props.UseAggressiveStop = false;  //This is usually in coast for most cases from many teams
 	props.ReverseSteering = false;
 	props.LeftEncoderReversed = false;
@@ -419,6 +563,9 @@ void Tank_Robot2_Properties::LoadFromScript(Scripting::Script& script)
 		err = script.GetField("wheel_diameter_in", NULL, NULL, &fValue);
 		if (!err)
 			m_TankRobotProps.WheelDiameter = Inches2Meters(fValue);
+
+		//TODO move these into a GearProps function to get props for low and high gear
+
 		err = script.GetField("max_speed", NULL, NULL, &fValue);
 		if (!err)
 			m_TankRobotProps.high_gear.MaxSpeed = fValue;
@@ -471,7 +618,12 @@ void Tank_Robot2_Properties::LoadFromScript(Scripting::Script& script)
 			m_TankRobotProps.IsOpen = true;
 			m_TankRobotProps.HasEncoders = false;
 		}
-
+		err = script.GetField("show_pid_dump", &sTest, NULL, NULL);
+		if (!err)
+		{
+			if ((sTest.c_str()[0] == 'y') || (sTest.c_str()[0] == 'Y') || (sTest.c_str()[0] == '1'))
+				m_TankRobotProps.PID_Console_Dump = true;
+		}
 		err = script.GetField("use_aggressive_stop", &sTest, NULL, NULL);
 		if (!err)
 		{
