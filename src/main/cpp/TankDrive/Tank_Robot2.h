@@ -116,9 +116,6 @@ protected:
 		//virtual bool GetUseAgressiveStop() const;
 
 	private:
-		#ifndef _Win32
-		typedef  Ship_Tester __super;
-		#endif
 		RobotCommon * const m_pParent;
 		const Tank_Robot2_Properties *m_TankRobotProps; //cached in the Initialize from specific robot
 		std::shared_ptr<Tank_Robot2_Control> m_DriveControl;

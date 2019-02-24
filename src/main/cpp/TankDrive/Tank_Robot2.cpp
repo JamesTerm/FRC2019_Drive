@@ -411,13 +411,65 @@ public:
 	}
 };
 
+class Tank_Robot2_AcradeDrive
+{
+private:
+	Tank_Robot2 *m_pParent;
+	double Forward_Voltage;  //range -1 to 1 where positive is forward
+	double Right_Voltage;  //range -1 to 1 where positive is clockwise
+public:
+	Tank_Robot2_AcradeDrive(Tank_Robot2 *Parent) : m_pParent(Parent)
+	{}
+	void Reset()
+	{
+		Forward_Voltage = Right_Voltage = 0.0;
+	}
+	const char *csz_Joystick_SetCurrentSpeed = "Joystick_SetCurrentSpeed";
+	const char *csz_Joystick_Analog_Turn = "Joystick_Analog_Turn";
+
+	void BindAdditionalEventControls(bool Bind)
+	{
+		Entity2D_Kind::EventMap *em = m_pParent->GetEventMap();
+		if (Bind)
+		{
+			em->EventValue_Map[csz_Joystick_SetCurrentSpeed].Subscribe([&](double value)
+			{
+				Forward_Voltage = value;
+			});
+			em->EventValue_Map[csz_Joystick_Analog_Turn].Subscribe([&](double value)
+			{
+				Right_Voltage = value;
+			});
+		}
+	}
+
+	//adjust the controller voltage given the current voltage adjusted voltage in Vec2d
+	//We work with the existing voltage, as this makes it possible to work as a pass thru if this control is not used
+	//A pass thru is more efficient than branching because it allows the CPU to precache, and adds take no time at all
+	//It is possible for tank steering and arcade to work at the same time, since they are added together clip operation occur down stream
+	//so we needn't do them here (In reality this is not an issue since in practice the controls are mutually exclusive)
+	//Note this should happen before applying the PID
+	Vec2d TimeChange(double dTime_s, double LeftVoltage, double RightVoltage)
+	{
+		const double AdjustedLeftVoltage = LeftVoltage;
+		const double AdjustedRightVoltage = RightVoltage;
+		return Vec2d(AdjustedLeftVoltage, AdjustedRightVoltage);
+	}
+};
+
 struct Tank_Robot2_Ancillary
 {
-	Tank_Robot2_Ancillary(Tank_Robot2 *Parent) : m_pParent(Parent),driveNotify(Parent)
+	Tank_Robot2_Ancillary(Tank_Robot2 *Parent) : m_pParent(Parent),driveNotify(Parent),driveArcade(Parent)
 	{}
 	Tank_Robot2 *m_pParent;
 	DriveNotify driveNotify;
 	Tank_Robot2_PID drivePID;
+	Tank_Robot2_AcradeDrive driveArcade;
+	void Reset()
+	{
+		drivePID.Reset();
+		driveArcade.Reset();
+	}
 };
 
   /***********************************************************************************************************************************/
@@ -429,7 +481,7 @@ void Tank_Robot2::ResetPos()
 	//It is important that these are reset incase a switch between auton and tele leaves external set
 	m_Controller_Voltage = m_External_Voltage = Vec2d(0.0, 0.0);
 	m_DriveControl->Reset_Encoders();
-	m_Ancillary->drivePID.Reset();
+	m_Ancillary->Reset();
 }
 
 Tank_Robot2::Tank_Robot2(RobotCommon *robot) : m_pParent(robot) 
@@ -454,6 +506,7 @@ void Tank_Robot2::TimeChange(double dTime_s)
 	double EncoderLeft, EncoderRight;
 	//Note: This call will implicitly update smart dashboard of its readings
 	m_DriveControl->GetLeftRightVelocity(EncoderLeft, EncoderRight);  //we still want to read encoders if present
+	AdjustedVoltage = m_Ancillary->driveArcade.TimeChange(dTime_s, left_voltage, right_voltage);
 	//all PID here
 	AdjustedVoltage = m_Ancillary->drivePID.TimeChange(dTime_s, left_voltage, right_voltage, EncoderLeft, EncoderRight);
 	SmartDashboard::PutNumber("LeftVoltage", AdjustedVoltage[0]);
@@ -490,6 +543,7 @@ void Tank_Robot2::BindAdditionalEventControls(bool Bind)
 			m_External_Voltage[1] = value;
 		});
 	}
+	m_Ancillary->driveArcade.BindAdditionalEventControls(Bind);
 }
 
 void Tank_Robot2::BindAdditionalUIControls(bool Bind, void *joy, void *key)
