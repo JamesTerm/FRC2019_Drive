@@ -1,11 +1,5 @@
 <xml version="1.0">
 <dashboard>
-	<widget field="PID_left_CS" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="282" y="431"/>
-	</widget>
-	<widget field="PID_Right_CS" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="513" y="436"/>
-	</widget>
 	<widget field="PID_Right_EO" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
 		<location x="510" y="408"/>
 	</widget>

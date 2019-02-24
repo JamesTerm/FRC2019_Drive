@@ -282,7 +282,6 @@ class Tank_Robot2_PID
 {
 private:
 	PIDController2 m_PIDController_Left, m_PIDController_Right;
-	double m_CalibratedScaler_Left=1.0, m_CalibratedScaler_Right=1.0; //used for calibration (in coast mode)
 	double m_ErrorOffset_Left=0.0, m_ErrorOffset_Right=0.0; //used for calibration in brake (a.k.a. aggressive stop) mode
 	bool m_UsingEncoders=false;
 	//This will be the velocity applied to the controller on a time change
@@ -320,7 +319,6 @@ public:
 			m_PIDController_Right.SetPID(m_TankRobotProps.high_gear.RightPID[0], m_TankRobotProps.high_gear.RightPID[1], m_TankRobotProps.high_gear.RightPID[2]);
 		}
 		//ensure teleop has these set properly
-		m_CalibratedScaler_Left = m_CalibratedScaler_Right = MaxSpeed;
 		m_ErrorOffset_Left = m_ErrorOffset_Right = 0.0;
 		m_PreviousLeftVelocity = m_PreviousRightVelocity = 0.0;
 
@@ -332,7 +330,6 @@ public:
 		m_PIDController_Right.SetInputRange(-MaxSpeed, MaxSpeed);
 		m_PIDController_Right.SetOutputRange(-InputRange, OutputRange);
 		m_PIDController_Right.Enable();
-		m_CalibratedScaler_Left = m_CalibratedScaler_Right = MaxSpeed;
 		m_ErrorOffset_Left = m_ErrorOffset_Right = 0.0;
 	}
 
@@ -388,15 +385,13 @@ public:
 				//only adjust calibration when both velocities are in the same direction, or in the case where the encoder is stopped which will
 				//allow the scaler to normalize if it need to start up again.
 				if (((LeftVelocity * Encoder_LeftVelocity) > 0.0) || IsZero(Encoder_LeftVelocity))
-				{
-					control_left = -m_PIDController_Left(fabs(LeftVelocity), fabs(Encoder_LeftVelocity), dTime_s);
-					m_CalibratedScaler_Left = MaxSpeed + control_left;
-				}
+					m_ErrorOffset_Left = m_PIDController_Left(LeftVelocity, Encoder_LeftVelocity, dTime_s);
+				else
+					m_ErrorOffset_Left = 0.0;
 				if (((RightVelocity * Encoder_RightVelocity) > 0.0) || IsZero(Encoder_RightVelocity))
-				{
-					control_right = -m_PIDController_Right(fabs(RightVelocity), fabs(Encoder_RightVelocity), dTime_s);
-					m_CalibratedScaler_Right = MaxSpeed + control_right;
-				}
+					m_ErrorOffset_Right = m_PIDController_Right(RightVelocity, Encoder_RightVelocity, dTime_s);
+				else
+					m_ErrorOffset_Right = 0.0;
 			}
 			else
 			{
@@ -408,12 +403,10 @@ public:
 		{
 			//fow now just use the smart dashboard
 			SmartDashboard::PutNumber("PID_left_EO", m_ErrorOffset_Left);
-			SmartDashboard::PutNumber("PID_left_CS", m_CalibratedScaler_Left);
 			SmartDashboard::PutNumber("PID_Right_EO", m_ErrorOffset_Right);
-			SmartDashboard::PutNumber("PID_Right_CS", m_CalibratedScaler_Right);
 		}
-		const double AdjustedLeftVoltage = (LeftVelocity + m_ErrorOffset_Left) / m_CalibratedScaler_Left;
-		const double AdjustedRightVoltage = (RightVelocity + m_ErrorOffset_Right) / m_CalibratedScaler_Right;
+		const double AdjustedLeftVoltage = (LeftVelocity + m_ErrorOffset_Left) / MaxSpeed;
+		const double AdjustedRightVoltage = (RightVelocity + m_ErrorOffset_Right) / MaxSpeed;
 		return Vec2d(AdjustedLeftVoltage, AdjustedRightVoltage);
 	}
 };
@@ -455,8 +448,6 @@ void Tank_Robot2::Initialize(const Tank_Robot2_Properties *props)
 
 void Tank_Robot2::TimeChange(double dTime_s)
 {
-	SmartDashboard::PutNumber("LeftVoltage", m_Controller_Voltage[0]);
-	SmartDashboard::PutNumber("RightVoltage", m_Controller_Voltage[1]);
 	const double left_voltage = m_Controller_Voltage[0]+m_External_Voltage[0];
 	const double right_voltage = m_Controller_Voltage[1]+m_External_Voltage[1];
 	Vec2D AdjustedVoltage(left_voltage, right_voltage);  //written this way to monitor differences
@@ -465,6 +456,8 @@ void Tank_Robot2::TimeChange(double dTime_s)
 	m_DriveControl->GetLeftRightVelocity(EncoderLeft, EncoderRight);  //we still want to read encoders if present
 	//all PID here
 	AdjustedVoltage = m_Ancillary->drivePID.TimeChange(dTime_s, left_voltage, right_voltage, EncoderLeft, EncoderRight);
+	SmartDashboard::PutNumber("LeftVoltage", AdjustedVoltage[0]);
+	SmartDashboard::PutNumber("RightVoltage", AdjustedVoltage[1]);
 	m_DriveControl->UpdateLeftRightVoltage(AdjustedVoltage[0],AdjustedVoltage[1]);
 	m_DriveControl->Tank_Drive_Control_TimeChange(dTime_s);
 	m_Ancillary->driveNotify.TimeChange(dTime_s);
