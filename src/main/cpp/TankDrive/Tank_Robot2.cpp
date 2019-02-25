@@ -454,8 +454,8 @@ public:
 	{
 		double AdjustedLeftVoltage = LeftVoltage;
 		double AdjustedRightVoltage = RightVoltage;
-		//Base the rotation blend strench on how much forward is used
-		const double RCW_Blend = fabs(m_Right_Voltage * (1.0-fabs(m_Forward_Voltage)* 0.5) );
+		//Base the rotation blend strength on how much forward is used; The abs of m_Forward_Voltage is ensured to be <= 1.0
+		const double RCW_Blend = fabs(m_Right_Voltage * (1.0- (fabs(m_Forward_Voltage)<1.0?m_Forward_Voltage:1.0) * 0.5) );
 		const double FWD_Blend = 1.0 - RCW_Blend;  //setup forward scalar
 		//We blend the rotation with the linear, this way neither function will saturate and they both of equal influence no matter what variation
 		AdjustedRightVoltage += m_Forward_Voltage * FWD_Blend + (m_Right_Voltage * RCW_Blend);
