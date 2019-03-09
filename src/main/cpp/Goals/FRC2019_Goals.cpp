@@ -200,6 +200,38 @@ void Goal_ControllerOverride::SetCallbacks(bool bind)
 
 #pragma endregion
 
+void Goal_ElevatorControl::Activate()
+{
+    m_Status = eActive;
+}
+
+Goal::Goal_Status Goal_ElevatorControl::Process(double dTime)
+{
+    ActivateIfInactive(); //this goal will always be active
+    if(m_Status == eActive)
+    {
+        //TODO: buttons can set target to specific value and joystick can increase/decrease target
+        m_currentPos = m_potientiometer->Get();
+        error = (m_target - m_currentPos) / m_target;
+        integ += error * dTime;               //Right Riemann Sum integral
+        deriv = (error - errorPrior) / dTime; // rise/run slope
+        errorPrior = error;               //set errorPrior for next process call
+
+        m_power = bias + (kp * error) + (ki * integ) + (kd * deriv); //power is equal to P,I,D * k-values + bias
+
+        //SetElevator(m_power,m_activeCollection); //TODO this
+        return m_Status = eActive;
+    }
+    else
+    {
+        return m_Status;
+    }
+}
+
+void Goal_ElevatorControl::Terminate()
+{
+    //StopElevator(); //TODO this
+}
 #pragma region FeedbackLoopGoals
 /***********************Goal_Turn***********************/
 void Goal_Turn::Activate()
@@ -216,7 +248,7 @@ Goal::Goal_Status Goal_Turn::Process(double dTime)
         if (m_currentTime > m_timeOut)
         {
             Terminate();
-            cout << "no target" << endl;
+            //cout << "no target" << endl;
             //return m_Status = eFailed; //set m_Status to failed and return m_Status in one line
         }
 
@@ -272,6 +304,7 @@ Goal::Goal_Status Goal_DriveStraight::Process(double dTime)
 {
     if (m_Status = eActive)
     {
+		SmartDashboard::PutBoolean("DRIVE STRAIGHT STATUS", true);
         m_currentTime += dTime;
         if (m_currentTime > m_timeOut)
             return m_Status = eFailed;
@@ -299,6 +332,7 @@ Goal::Goal_Status Goal_DriveStraight::Process(double dTime)
     }
     else
     {
+		SmartDashboard::PutBoolean("DRIVE STRAIGHT STATUS", true);
         return m_Status;
     }
 }
@@ -370,20 +404,23 @@ void Goal_VisionAlign::Terminate()
 #pragma endregion
 
 #pragma region UtilGoals
+#if 0
 /***********************Goal_Hatch***********************/
 void Goal_Hatch::Activate()
 {
     m_Status = eActive;
 }
-
+#if 0
 Goal::Goal_Status Goal_Hatch::Process(double dTime)
 {
-    return eCompleted;
+    //TODO: Yeet on this
 }
 void Goal_Hatch::Terminate()
 {
+	//TODO: Yeet o this
 }
-
+#endif
+#endif
 #pragma endregion
 #pragma endregion
 
@@ -398,13 +435,47 @@ void Goal_WaitThenDrive::Activate()
 }
 
 /***********************Goal_OneHatch***********************/
-void Goal_OneHatch::Activate()
+void Goal_OneHatchFrontShip::Activate()
 {
-    AddSubgoal(new Goal_DriveStraight(m_activeCollection, 100, 100));
-    AddSubgoal(new Goal_Turn(m_activeCollection, 90));
-    AddSubgoal(new Goal_DriveStraight(m_activeCollection, 100, 100));
-    AddSubgoal(new Goal_Hatch(m_activeCollection, m_timeOut));
     m_Status = eActive;
+    if(m_position == "Level 1 Left")
+    {
+        AddSubgoal(new Goal_DriveStraight(m_activeCollection, new Feet(5.0), .75));
+        AddSubgoal(new Goal_Turn(m_activeCollection, 90));
+        AddSubgoal(new Goal_DriveStraight(m_activeCollection, new Feet(3.0), .75));
+        AddSubgoal(new Goal_Turn(m_activeCollection, -90));
+        AddSubgoal(new Goal_DriveStraight(m_activeCollection, new Feet(2.0), .5));
+        //GOAL DEPLOY HATCH
+    }
+    else if(m_position == "Level 1 Center")
+    {
+        AddSubgoal(new Goal_DriveStraight(m_activeCollection, new Feet(7.0), .75));
+        //deploy hatch
+    }
+    else if(m_position == "Level 1 Right")
+    {
+        AddSubgoal(new Goal_DriveStraight(m_activeCollection, new Feet(5.0), .75));
+        AddSubgoal(new Goal_Turn(m_activeCollection, -90));
+        AddSubgoal(new Goal_DriveStraight(m_activeCollection, new Feet(3.0), .75));
+        AddSubgoal(new Goal_Turn(m_activeCollection, 90));
+        AddSubgoal(new Goal_DriveStraight(m_activeCollection, new Feet(2.0), .5));
+        //GOAL DEPLOY HATCH
+    }
+    else if(m_position == "Level 2 Left")
+    {
+        AddSubgoal(new Goal_DriveStraight(m_activeCollection, new Feet(5.0), .75));
+        AddSubgoal(new Goal_OneHatchFrontShip(m_activeCollection, "Level 1 Left"));
+    }
+    else if(m_position == "Level 2 Right")
+    {
+        AddSubgoal(new Goal_DriveStraight(m_activeCollection, new Feet(5.0), .75));
+        AddSubgoal(new Goal_OneHatchFrontShip(m_activeCollection, "Level 1 Right"));
+    }
+    else
+    {
+        AddSubgoal(new Goal_DriveStraight(m_activeCollection, new Feet(10.0), .75));
+    }
+    
 }
 #pragma endregion
 

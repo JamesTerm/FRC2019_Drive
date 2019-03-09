@@ -17,8 +17,10 @@ Email: chrisrweeks@aol.com
 #include "../Util/VisionTarget.h"
 #include "../Util/Units/Distances.h"
 
-//?HINT ctrl+k then ctrl+0 will collapse all regions
-//?ctrl+k then ctrl+j will uncollapse all regions
+//?HINT: ctrl+k then ctrl+0 will collapse all regions
+//?HINT: ctrl+k then ctrl+[ will collapse all regions within the current scope of the cursor
+//?HINT: ctrl+k then ctrl+] will uncollapse all regions within the current scope of the cursor
+//?HINT: ctrl+k then ctrl+j will uncollapse all regions
 
 //Atomic Goals go in this region
 #pragma region AtomicGoals
@@ -34,10 +36,10 @@ class Goal_Wait_ac : public AtomicGoal
 public:
   Goal_Wait_ac(ActiveCollection *activeCollection, double timeOut)
   {
-
+    m_Status = eInactive;
     m_activeCollection = activeCollection;
     m_currentTime = 0;
-	m_timeOut = timeOut;
+    m_timeOut = timeOut;
   }
   virtual void Activate();
   virtual Goal::Goal_Status Process(double dTime);
@@ -113,6 +115,33 @@ class Goal_ControllerOverride : public AtomicGoal
 	bool m_IsDriveInUse = false;
 };
 #pragma endregion
+class Goal_ElevatorControl : public AtomicGoal
+{
+  public:
+    Goal_ElevatorControl(ActiveCollection* activeCollection, double target)
+    {
+      m_activeCollection = activeCollection;
+      m_target = target;
+      m_Status = eInactive;
+      m_potientiometer = (PotentiometerItem*)activeCollection->Get("elevatorPot"); //TODO this
+    }
+    virtual void Activate();
+    virtual Goal::Goal_Status Process(double dTime);
+    virtual void Terminate();
+  private:
+    double m_target;
+    double m_currentPos;
+    double m_power;
+    ActiveCollection* m_activeCollection;
+    PotentiometerItem* m_potientiometer;
+
+    int kp = 0, ki = 0, kd = 0;
+    int bias = 0; //bias is a constant that is added to the output.
+    double error, integ, deriv;
+    double errorPrior;
+
+};
+    
 
 //Goals that use data to determine completion go here
 #pragma region FeedbackLoopGoals
@@ -123,7 +152,10 @@ class Goal_ControllerOverride : public AtomicGoal
 class Goal_Turn : public Goal_Wait_ac
 {
 public:
-  Goal_Turn(ActiveCollection *activeCollection, double angle, double timeOut = 3.0) : Goal_Wait_ac(activeCollection, timeOut) {}
+  Goal_Turn(ActiveCollection *activeCollection, double angle, double timeOut = 3.0) : Goal_Wait_ac(activeCollection, timeOut) 
+  {
+    m_navx = activeCollection->GetNavX();
+  }
   virtual void Activate();
   virtual Goal::Goal_Status Process(double dTime);
   virtual void Terminate();
@@ -220,6 +252,17 @@ private:
   VisionTarget *m_target;
   VisionTarget *m_currentTarget;
 };
+
+// /* Goal_ElevatorPosition
+//  * Positions: 0, 1, 2, 3
+//  * 0 = all the way down, 3 = all the way up
+//  * Offset: small increase in height for cargo intake on rocket
+//  */
+// class Goal_ElevatorPosition
+// {
+//   public:
+
+// };
 #pragma endregion
 
 #pragma region UtilGoals
@@ -227,14 +270,14 @@ private:
 /* Goal_Hatch
     This goal is meant to manipulate the mechanisms that would result in outtaking the hatch (this will need adjusting)
     */
-class Goal_Hatch : public AtomicGoal
+class Goal_Hatch : public Goal_Wait_ac
 {
 public:
-  Goal_Hatch(ActiveCollection *activeCollection, double timeOut)
+  Goal_Hatch(ActiveCollection *activeCollection, double timeOut) : Goal_Wait_ac(activeCollection, 1)
   {
     m_Status = eActive;
     m_timeOut = timeOut;
-    m_currentTime = 0;
+    m_currentTime = 0; ///////////////////////////////////////////////////////////////////////////////////////////////////
   }
   virtual void Activate();
   virtual Goal::Goal_Status Process(double dTime);
@@ -242,8 +285,6 @@ public:
 
 protected:
   ActiveCollection *m_activeCollection;
-  double m_currentTime;
-  double m_timeOut;
 };
 #pragma endregion
 #pragma endregion
@@ -262,19 +303,21 @@ protected:
 /* Goal_OneHatch
     This goal is meant to score one hatch on the cargo during autonomous
     */
-class Goal_OneHatch : public CompositeGoal
+class Goal_OneHatchFrontShip : public CompositeGoal
 {
 public:
-  Goal_OneHatch(ActiveCollection *activeCollection, double timeOut)
+  Goal_OneHatchFrontShip(ActiveCollection *activeCollection, string position = "none")
   {
-    m_timeOut = timeOut;
+    m_activeCollection = activeCollection;
+    m_position = position;
+    m_Status = eInactive;
   }
 
   virtual void Activate();
 
 private:
-  ActiveCollection *m_activeCollection;
-  double m_timeOut;
+  string m_position;
+  ActiveCollection* m_activeCollection;
 };
 
 /* Goal_WaitThenDrive
@@ -290,6 +333,7 @@ public:
     m_rightSpeed = rightSpeed;
     m_waitTime = waitTime;
     m_driveTime = driveTime;
+    m_Status = eInactive;
   }
   virtual void Activate();
 
