@@ -73,12 +73,98 @@ Goal::Goal_Status Goal_TimeOut::Process(double dTime)
 void Goal_TimeOut::Terminate()
 {
 }
+class VoltageStressTest
+{
+private:
+	size_t counter=0;
+public:
+	void reset()
+	{
+		counter = 0;
+	}
+	void operator()(double &LeftSpeed,double &RightSpeed)
+	{
+		if (counter < 100)
+		{
+			LeftSpeed = RightSpeed = 1.0;
+		}
+		else if (counter < 200)
+		{
+			LeftSpeed = RightSpeed = -1.0;
+		}
+		else if (counter < 300)
+		{
+			LeftSpeed = RightSpeed = 0.0;
+		}
+		else if (counter < 350)
+		{
+			LeftSpeed = RightSpeed = 1.0;
+		}
+		else LeftSpeed = RightSpeed = 0.0;
+		counter++;
+	}
+};
+
+static VoltageStressTest s_tester;
+
+//This behaves similar to a capacitor where it delays a voltage spike, but unlike a capacitor it will immediately fall to zero
+//without discharge in favor of improved latency, and more importantly ability to instantly stop.  We can make variations of this
+//to discharge, but for now this is a one size fits all solution
+class Voltage_Capacitor
+{
+private:
+	double m_LastVoltage=0.0;
+public:
+	double operator()(double voltage_in)
+	{
+		double voltage_to_use = 0.0;
+		const double testsign_crossing = voltage_in * m_LastVoltage;
+		//This is a beefy assertion, if the voltages are the same sign we can interact with the capacitor
+		//if they cross signs we can immediately drop to zero voltage (we'll ramp up in the other direction)
+		//Likewise if voltage in is zero's we immediately set to zero, however if it was zero'd and we have a
+		//new voltage input, that will start ramping
+		if ((testsign_crossing > 0.0)||(testsign_crossing==0.0 && voltage_in!=0.0))
+		{
+			const double farads = 0.2; //simulate farad capacitance the higher the more capacitance (or slower the ramp)
+			//we have the same sign, so we can work with magnitude and positive numbers to reduce branching
+			const double voltin_mag = fabs(voltage_in);
+			const double lastvolt_mag = fabs(m_LastVoltage);
+			//at this point we have 2 positive values of magnitude
+			const double delta = voltin_mag - lastvolt_mag;
+			//only ramp if we are increasing voltage
+			if (delta >= 0)
+			{
+				//set the clamped magnitude of farad threshold
+				voltage_to_use= lastvolt_mag + std::min(delta, farads);
+				//restore the sign
+				if (voltage_in < 0)
+					voltage_to_use *= -1.0;
+			}
+		}
+		//store this result for next time
+		m_LastVoltage = voltage_to_use;
+		return voltage_to_use;
+	}
+};
+
 /***********************Goal_DriveWithTimer***********************/
+
+Goal_DriveWithTimer::Goal_DriveWithTimer(ActiveCollection *activeCollection, double leftSpeed, double rightSpeed, double timeOut) : Goal_Wait_ac(activeCollection, timeOut)
+{
+	m_leftSpeed = leftSpeed;
+	m_rightSpeed = rightSpeed;
+	s_tester.reset();
+}
+
 Goal::Goal_Status Goal_DriveWithTimer::Process(double dTime)
 {
     if (m_Status == eActive)
     {
         m_currentTime += dTime;
+		s_tester;
+		s_tester(m_leftSpeed, m_rightSpeed);
+		static Voltage_Capacitor s_capacitor;
+		m_rightSpeed = s_capacitor(m_rightSpeed);  //apply the capacitor
         SetDrive(m_leftSpeed, m_rightSpeed, m_activeCollection);
         if (m_currentTime >= m_timeOut)
         {
@@ -97,6 +183,7 @@ Goal::Goal_Status Goal_DriveWithTimer::Process(double dTime)
 void Goal_DriveWithTimer::Terminate()
 {
     StopDrive(m_activeCollection);
+	s_tester.reset();
 }
 #pragma endregion
 

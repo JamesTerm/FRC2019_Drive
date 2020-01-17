@@ -65,11 +65,7 @@ public:
 class Goal_DriveWithTimer : public Goal_Wait_ac
 {
 public:
-  Goal_DriveWithTimer(ActiveCollection *activeCollection, double leftSpeed, double rightSpeed, double timeOut) : Goal_Wait_ac(activeCollection, timeOut)
-  {
-    m_leftSpeed = leftSpeed;
-    m_rightSpeed = rightSpeed;
-  }
+  Goal_DriveWithTimer(ActiveCollection *activeCollection, double leftSpeed, double rightSpeed, double timeOut);
   Goal::Goal_Status Process(double dTime);
   void Terminate();
 
